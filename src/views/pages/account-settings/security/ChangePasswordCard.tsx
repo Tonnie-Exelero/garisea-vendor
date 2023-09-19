@@ -1,160 +1,150 @@
 // ** React Imports
-import { useState } from 'react'
+import { useState } from "react";
 
 // ** MUI Imports
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import Button from '@mui/material/Button'
-import InputLabel from '@mui/material/InputLabel'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import FormControl from '@mui/material/FormControl'
-import OutlinedInput from '@mui/material/OutlinedInput'
-import InputAdornment from '@mui/material/InputAdornment'
-import FormHelperText from '@mui/material/FormHelperText'
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import Button from "@mui/material/Button";
+import InputLabel from "@mui/material/InputLabel";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import CardHeader from "@mui/material/CardHeader";
+import CardContent from "@mui/material/CardContent";
+import FormControl from "@mui/material/FormControl";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputAdornment from "@mui/material/InputAdornment";
+import FormHelperText from "@mui/material/FormHelperText";
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from "src/@core/components/icon";
 
 // ** Third Party Imports
-import * as yup from 'yup'
-import toast from 'react-hot-toast'
-import { useForm, Controller } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from "yup";
+import toast from "react-hot-toast";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+// ** Others
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@src/store";
+import { editPassword } from "@src/store/apps/admin/user/single";
 
 interface State {
-  showNewPassword: boolean
-  showCurrentPassword: boolean
-  showConfirmNewPassword: boolean
+  showNewPassword: boolean;
+  showConfirmNewPassword: boolean;
+}
+
+interface PasswordData {
+  newPassword: string;
+  confirmNewPassword: string;
 }
 
 const defaultValues = {
-  newPassword: '',
-  currentPassword: '',
-  confirmNewPassword: ''
-}
+  newPassword: "",
+  confirmNewPassword: "",
+};
 
 const schema = yup.object().shape({
-  currentPassword: yup.string().min(8).required(),
   newPassword: yup
     .string()
-    .min(8)
+    .min(8, "Password must contain at least 8 characters")
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-      'Must contain 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special case character'
+      "Must contain at least 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special case character"
     )
     .required(),
   confirmNewPassword: yup
     .string()
     .required()
-    .oneOf([yup.ref('newPassword')], 'Passwords must match')
-})
+    .oneOf([yup.ref("newPassword")], "Passwords must match"),
+});
 
-const ChangePasswordCard = () => {
+interface ChangePasswordCardProps {
+  user: any;
+}
+
+const ChangePasswordCard: React.FC<ChangePasswordCardProps> = ({ user }) => {
   // ** States
   const [values, setValues] = useState<State>({
     showNewPassword: false,
-    showCurrentPassword: false,
-    showConfirmNewPassword: false
-  })
+    showConfirmNewPassword: false,
+  });
 
   // ** Hooks
+  const dispatch = useDispatch<AppDispatch>();
   const {
     reset,
     control,
     handleSubmit,
-    formState: { errors }
-  } = useForm({ defaultValues, resolver: yupResolver(schema) })
-
-  const handleClickShowCurrentPassword = () => {
-    setValues({ ...values, showCurrentPassword: !values.showCurrentPassword })
-  }
+    formState: { errors },
+  } = useForm({ defaultValues, resolver: yupResolver(schema) });
 
   const handleClickShowNewPassword = () => {
-    setValues({ ...values, showNewPassword: !values.showNewPassword })
-  }
+    setValues({ ...values, showNewPassword: !values.showNewPassword });
+  };
 
   const handleClickShowConfirmNewPassword = () => {
-    setValues({ ...values, showConfirmNewPassword: !values.showConfirmNewPassword })
-  }
+    setValues({
+      ...values,
+      showConfirmNewPassword: !values.showConfirmNewPassword,
+    });
+  };
 
-  const onPasswordFormSubmit = () => {
-    toast.success('Password Changed Successfully')
-    reset(defaultValues)
-  }
+  const onPasswordFormSubmit = async (data: PasswordData) => {
+    const userData = {
+      id: user.id,
+      password: data.newPassword,
+    };
+
+    const resultAction = await dispatch(editPassword({ ...userData }));
+
+    if (editPassword.fulfilled.match(resultAction)) {
+      toast.success(`Password updated successfully!`);
+    } else {
+      toast.error(`Error updating password: ${resultAction.error}`);
+    }
+    reset(defaultValues);
+  };
 
   return (
     <Card>
-      <CardHeader title='Change Password' />
+      <CardHeader title="Change Password" />
       <CardContent>
         <form onSubmit={handleSubmit(onPasswordFormSubmit)}>
-          <Grid container spacing={5}>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel htmlFor='input-current-password' error={Boolean(errors.currentPassword)}>
-                  Current Password
-                </InputLabel>
-                <Controller
-                  name='currentPassword'
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field: { value, onChange } }) => (
-                    <OutlinedInput
-                      value={value}
-                      label='Current Password'
-                      onChange={onChange}
-                      id='input-current-password'
-                      error={Boolean(errors.currentPassword)}
-                      type={values.showCurrentPassword ? 'text' : 'password'}
-                      endAdornment={
-                        <InputAdornment position='end'>
-                          <IconButton
-                            edge='end'
-                            onMouseDown={e => e.preventDefault()}
-                            onClick={handleClickShowCurrentPassword}
-                          >
-                            <Icon icon={values.showCurrentPassword ? 'bx:show' : 'bx:hide'} />
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                    />
-                  )}
-                />
-                {errors.currentPassword && (
-                  <FormHelperText sx={{ color: 'error.main' }}>{errors.currentPassword.message}</FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-          </Grid>
           <Grid container spacing={5} sx={{ mt: 0 }}>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor='input-new-password' error={Boolean(errors.newPassword)}>
+                <InputLabel
+                  htmlFor="input-new-password"
+                  error={Boolean(errors.newPassword)}
+                >
                   New Password
                 </InputLabel>
                 <Controller
-                  name='newPassword'
+                  name="newPassword"
                   control={control}
                   rules={{ required: true }}
                   render={({ field: { value, onChange } }) => (
                     <OutlinedInput
                       value={value}
-                      label='New Password'
+                      label="New Password"
                       onChange={onChange}
-                      id='input-new-password'
+                      id="input-new-password"
                       error={Boolean(errors.newPassword)}
-                      type={values.showNewPassword ? 'text' : 'password'}
+                      type={values.showNewPassword ? "text" : "password"}
                       endAdornment={
-                        <InputAdornment position='end'>
+                        <InputAdornment position="end">
                           <IconButton
-                            edge='end'
+                            edge="end"
                             onClick={handleClickShowNewPassword}
-                            onMouseDown={e => e.preventDefault()}
+                            onMouseDown={(e) => e.preventDefault()}
                           >
-                            <Icon icon={values.showNewPassword ? 'bx:show' : 'bx:hide'} />
+                            <Icon
+                              icon={
+                                values.showNewPassword ? "bx:show" : "bx:hide"
+                              }
+                            />
                           </IconButton>
                         </InputAdornment>
                       }
@@ -162,35 +152,46 @@ const ChangePasswordCard = () => {
                   )}
                 />
                 {errors.newPassword && (
-                  <FormHelperText sx={{ color: 'error.main' }}>{errors.newPassword.message}</FormHelperText>
+                  <FormHelperText sx={{ color: "error.main" }}>
+                    {errors.newPassword.message}
+                  </FormHelperText>
                 )}
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
-                <InputLabel htmlFor='input-confirm-new-password' error={Boolean(errors.confirmNewPassword)}>
+                <InputLabel
+                  htmlFor="input-confirm-new-password"
+                  error={Boolean(errors.confirmNewPassword)}
+                >
                   Confirm New Password
                 </InputLabel>
                 <Controller
-                  name='confirmNewPassword'
+                  name="confirmNewPassword"
                   control={control}
                   rules={{ required: true }}
                   render={({ field: { value, onChange } }) => (
                     <OutlinedInput
                       value={value}
-                      label='Confirm New Password'
+                      label="Confirm New Password"
                       onChange={onChange}
-                      id='input-confirm-new-password'
+                      id="input-confirm-new-password"
                       error={Boolean(errors.confirmNewPassword)}
-                      type={values.showConfirmNewPassword ? 'text' : 'password'}
+                      type={values.showConfirmNewPassword ? "text" : "password"}
                       endAdornment={
-                        <InputAdornment position='end'>
+                        <InputAdornment position="end">
                           <IconButton
-                            edge='end'
-                            onMouseDown={e => e.preventDefault()}
+                            edge="end"
+                            onMouseDown={(e) => e.preventDefault()}
                             onClick={handleClickShowConfirmNewPassword}
                           >
-                            <Icon icon={values.showConfirmNewPassword ? 'bx:show' : 'bx:hide'} />
+                            <Icon
+                              icon={
+                                values.showConfirmNewPassword
+                                  ? "bx:show"
+                                  : "bx:hide"
+                              }
+                            />
                           </IconButton>
                         </InputAdornment>
                       }
@@ -198,23 +199,39 @@ const ChangePasswordCard = () => {
                   )}
                 />
                 {errors.confirmNewPassword && (
-                  <FormHelperText sx={{ color: 'error.main' }}>{errors.confirmNewPassword.message}</FormHelperText>
+                  <FormHelperText sx={{ color: "error.main" }}>
+                    {errors.confirmNewPassword.message}
+                  </FormHelperText>
                 )}
               </FormControl>
             </Grid>
             <Grid item xs={12}>
-              <Typography sx={{ fontWeight: 600, color: 'text.secondary' }}>Password Requirements:</Typography>
-              <Box component='ul' sx={{ pl: 4, mb: 0, '& li': { mb: 1, color: 'text.secondary' } }}>
+              <Typography sx={{ fontWeight: 600, color: "text.secondary" }}>
+                Password Requirements:
+              </Typography>
+              <Box
+                component="ul"
+                sx={{
+                  pl: 4,
+                  mb: 0,
+                  "& li": { mb: 1, color: "text.secondary" },
+                }}
+              >
                 <li>Minimum 8 characters long - the more, the better</li>
                 <li>At least one lowercase & one uppercase character</li>
                 <li>At least one number, symbol, or whitespace character</li>
               </Box>
             </Grid>
             <Grid item xs={12}>
-              <Button variant='contained' type='submit' sx={{ mr: 3 }}>
+              <Button variant="contained" type="submit" sx={{ mr: 3 }}>
                 Save Changes
               </Button>
-              <Button type='reset' variant='outlined' color='secondary' onClick={() => reset()}>
+              <Button
+                type="reset"
+                variant="outlined"
+                color="secondary"
+                onClick={() => reset()}
+              >
                 Reset
               </Button>
             </Grid>
@@ -222,7 +239,7 @@ const ChangePasswordCard = () => {
         </form>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default ChangePasswordCard
+export default ChangePasswordCard;

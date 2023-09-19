@@ -1,0 +1,42 @@
+import { Vendor } from "../vendor/types";
+import { Brand } from "../../admin/brand/types";
+import { Model } from "../../admin/model/types";
+
+export interface Vehicle {
+  id: string;
+  entryNo: string;
+  vendor: Partial<Vendor>;
+  brand: Partial<Brand>;
+  model: Partial<Model>;
+  trim: string;
+  yearOfManufacture: string;
+  yearOfFirstRegistration: string;
+  registered: string;
+  registrationNo: string;
+  condition: string;
+  mileage: number;
+  mileageMetric: string;
+  images: string;
+  transmissionType: string;
+  fuelType: string;
+  engineCapacity: number;
+  engineType: string;
+  driveType: string;
+  vinNo: string;
+  exteriorColor: string;
+  upholstery: string;
+  bodyType: string;
+  interiorColor: string;
+  steering: string;
+  seats: number;
+  doors: number;
+  listingPrice: number;
+  discountedPrice: number;
+  allowedPaymentModes: string;
+  offerType: string;
+  features: string;
+  views: number;
+  extraInfo: string;
+  reserved: string;
+  sold: string;
+}

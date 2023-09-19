@@ -1,13 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "rootDir": "src",
+    "rootDir": ".",
     "target": "es6",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -21,19 +17,39 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "apexcharts": [
-        "./node_modules/apexcharts-clevision"
-      ],
-      "apexcharts/*": [
-        "./node_modules/apexcharts-clevision/*"
-      ],
-    }
+      "apexcharts": ["./node_modules/apexcharts-clevision"],
+      "apexcharts/*": ["./node_modules/apexcharts-clevision/*"],
+      "@app/*": ["app/*"],
+      "@pages/*": ["pages/*"],
+      "@components/*": ["src/@core/components/*"],
+      "@core/*": ["src/@core/*"],
+      "@utils/*": ["src/@core/utils/*"],
+      "@graphql/*": ["src/graphql/*"],
+      "@src/*": ["src/*"],
+      "@lib/*": ["src/lib/*"],
+      "@api/*": ["src/api/*"],
+      "@redux/*": ["src/store/*"]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "src",
-    "declaration.d.ts"
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "next.config.js",
+    ".next/types/**/*.ts",
+    "app",
+    "pages"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  }
 }

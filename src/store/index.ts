@@ -1,28 +1,50 @@
 // ** Toolkit imports
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore } from "@reduxjs/toolkit";
 
 // ** Reducers
-import chat from 'src/store/apps/chat'
-import user from 'src/store/apps/user'
-import email from 'src/store/apps/email'
-import invoice from 'src/store/apps/invoice'
-import calendar from 'src/store/apps/calendar'
-import permissions from 'src/store/apps/permissions'
+import authedUser from "@redux/apps/auth";
+import chat from "@redux/apps/chat";
+import users from "@redux/apps/admin/user";
+import singleUser from "@redux/apps/admin/user/single";
+import vendors from "@redux/apps/vendor/vendor";
+import customers from "@redux/apps/frontend/customer";
+import email from "@redux/apps/email";
+import invoice from "@redux/apps/invoice";
+import calendar from "@redux/apps/calendar";
+import permissions from "@redux/apps/admin/permission";
+import singlePermission from "@redux/apps/admin/permission/single";
+import roles from "@redux/apps/admin/role";
+import singleRole from "@redux/apps/admin/role/single";
+import brands from "@redux/apps/admin/brand";
+import models from "@redux/apps/admin/model";
+import vehicles from "@redux/apps/vendor/vehicle";
+import singleVehicle from "@redux/apps/vendor/vehicle/single";
 
 export const store = configureStore({
   reducer: {
-    user,
+    authedUser,
+    users,
+    singleUser,
+    vendors,
+    customers,
     chat,
     email,
     invoice,
     calendar,
-    permissions
+    permissions,
+    singlePermission,
+    roles,
+    singleRole,
+    brands,
+    models,
+    vehicles,
+    singleVehicle,
   },
-  middleware: getDefaultMiddleware =>
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false
-    })
-})
+      serializableCheck: false,
+    }),
+});
 
-export type AppDispatch = typeof store.dispatch
-export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch;
+export type RootState = ReturnType<typeof store.getState>;

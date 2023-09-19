@@ -1,371 +1,537 @@
 // ** React Imports
-import { useState, ElementType, ChangeEvent } from 'react'
+import { useState, ElementType, ChangeEvent, useEffect } from "react";
 
 // ** MUI Imports
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import Select from '@mui/material/Select'
-import Dialog from '@mui/material/Dialog'
-import Divider from '@mui/material/Divider'
-import { styled } from '@mui/material/styles'
-import Checkbox from '@mui/material/Checkbox'
-import MenuItem from '@mui/material/MenuItem'
-import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-import InputLabel from '@mui/material/InputLabel'
-import CardHeader from '@mui/material/CardHeader'
-import FormControl from '@mui/material/FormControl'
-import CardContent from '@mui/material/CardContent'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import FormHelperText from '@mui/material/FormHelperText'
-import InputAdornment from '@mui/material/InputAdornment'
-import Button, { ButtonProps } from '@mui/material/Button'
-import FormControlLabel from '@mui/material/FormControlLabel'
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import Select from "@mui/material/Select";
+import Dialog from "@mui/material/Dialog";
+import Divider from "@mui/material/Divider";
+import { styled } from "@mui/material/styles";
+import Checkbox from "@mui/material/Checkbox";
+import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import InputLabel from "@mui/material/InputLabel";
+import CardHeader from "@mui/material/CardHeader";
+import FormControl from "@mui/material/FormControl";
+import CardContent from "@mui/material/CardContent";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import FormHelperText from "@mui/material/FormHelperText";
+import InputAdornment from "@mui/material/InputAdornment";
+import Button, { ButtonProps } from "@mui/material/Button";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { CircularProgress } from "@mui/material";
 
 // ** Third Party Imports
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller } from "react-hook-form";
+
+// ** Vercel Imports
+import type { PutBlobResult } from "@vercel/blob";
+
+// ** Context
+import { useAuth } from "src/hooks/useAuth";
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from "src/@core/components/icon";
 
-interface Data {
-  email: string
-  state: string
-  address: string
-  country: string
-  lastName: string
-  currency: string
-  language: string
-  timezone: string
-  firstName: string
-  organization: string
-  number: number | string
-  zipCode: number | string
-}
+// ** Custom Components
+import CustomAvatar from "@components/mui/avatar";
 
-const initialData: Data = {
-  state: '',
-  number: '',
-  address: '',
-  zipCode: '',
-  lastName: 'Doe',
-  currency: 'usd',
-  firstName: 'John',
-  language: 'arabic',
-  timezone: 'gmt-12',
-  country: 'australia',
-  email: 'john.doe@example.com',
-  organization: 'ThemeSelection'
-}
+// ** Others
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@src/store";
+import { removeUser } from "@src/store/apps/admin/user";
+import { editUser, editImage } from "@src/store/apps/admin/user/single";
+import { ThemeColor } from "@core/layouts/types";
+import { getInitials } from "@utils/get-initials";
 
-const ImgStyled = styled('img')(({ theme }) => ({
+const ImgStyled = styled("img")(({ theme }) => ({
   width: 100,
   height: 100,
   marginRight: theme.spacing(6.25),
-  borderRadius: theme.shape.borderRadius
-}))
+  borderRadius: theme.shape.borderRadius,
+}));
 
-const ButtonStyled = styled(Button)<ButtonProps & { component?: ElementType; htmlFor?: string }>(({ theme }) => ({
-  [theme.breakpoints.down('sm')]: {
-    width: '100%',
-    textAlign: 'center'
-  }
-}))
+const ButtonStyled = styled(Button)<
+  ButtonProps & { component?: ElementType; htmlFor?: string }
+>(({ theme }) => ({
+  [theme.breakpoints.down("sm")]: {
+    width: "100%",
+    textAlign: "center",
+  },
+}));
 
 const ResetButtonStyled = styled(Button)<ButtonProps>(({ theme }) => ({
   marginLeft: theme.spacing(3),
-  [theme.breakpoints.down('sm')]: {
-    width: '100%',
+  [theme.breakpoints.down("sm")]: {
+    width: "100%",
     marginLeft: 0,
-    textAlign: 'center',
-    marginTop: theme.spacing(4)
-  }
-}))
+    textAlign: "center",
+    marginTop: theme.spacing(4),
+  },
+}));
 
-const TabAccount = () => {
+interface TabAccountProps {
+  user: any;
+}
+
+const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
   // ** State
-  const [open, setOpen] = useState<boolean>(false)
-  const [inputValue, setInputValue] = useState<string>('')
-  const [userInput, setUserInput] = useState<string>('yes')
-  const [formData, setFormData] = useState<Data>(initialData)
-  const [imgSrc, setImgSrc] = useState<string>('/images/avatars/1.png')
-  const [secondDialogOpen, setSecondDialogOpen] = useState<boolean>(false)
+  const [id, setId] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [image, setImage] = useState<string>("");
+  const [language, setLanguage] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
+  const [address, setAddress] = useState<string>("");
+  const [city, setCity] = useState<string>("");
+  const [country, setCountry] = useState<string>("");
+  const [role, setRole] = useState<any>();
+  const [avatarColor, setAvatarColor] = useState<string | undefined>("");
+  const [open, setOpen] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>("");
+  const [userInput, setUserInput] = useState<string>("yes");
+  const [secondDialogOpen, setSecondDialogOpen] = useState<boolean>(false);
+  const [uploadingImage, setUploadingImage] = useState<boolean>(false);
 
   // ** Hooks
   const {
     control,
     handleSubmit,
-    formState: { errors }
-  } = useForm({ defaultValues: { checkbox: false } })
+    formState: { errors },
+  } = useForm({ defaultValues: { checkbox: false } });
+  const dispatch = useDispatch<AppDispatch>();
+  const { logout } = useAuth();
 
-  const handleClose = () => setOpen(false)
+  const setUpdateUserData = () => {
+    setId(user.id);
+    setFirstName(user.firstName);
+    setLastName(user.lastName);
+    setUsername(user.username);
+    setEmail(user.email);
+    setPhone(user.phone);
+    setImage(user.image);
+    setLanguage(user.language);
+    setStatus(user.status);
+    setAddress(user.address);
+    setCity(user.city);
+    setCountry(user.country);
+    setRole(user.role);
+    setAvatarColor(user.avatarColor);
+  };
 
-  const handleSecondDialogClose = () => setSecondDialogOpen(false)
+  useEffect(() => {
+    setUpdateUserData();
+  }, [user]);
 
-  const onSubmit = () => setOpen(true)
+  const handleClose = () => setOpen(false);
+
+  const handleSecondDialogClose = () => setSecondDialogOpen(false);
+
+  const onSubmit = () => setOpen(true);
 
   const handleConfirmation = (value: string) => {
-    handleClose()
-    setUserInput(value)
-    setSecondDialogOpen(true)
-  }
+    handleClose();
+    setUserInput(value);
+    setSecondDialogOpen(true);
+  };
 
-  const handleInputImageChange = (file: ChangeEvent) => {
-    const reader = new FileReader()
-    const { files } = file.target as HTMLInputElement
+  const handleInputImageChange = async (file: ChangeEvent) => {
+    setUploadingImage(true);
+
+    const { files } = file.target as HTMLInputElement;
     if (files && files.length !== 0) {
-      reader.onload = () => setImgSrc(reader.result as string)
-      reader.readAsDataURL(files[0])
+      const response = await fetch(
+        `/api/images/upload?filename=${files[0].name}`,
+        {
+          method: "POST",
+          body: files[0],
+        }
+      );
 
-      if (reader.result !== null) {
-        setInputValue(reader.result as string)
-      }
+      const newBlob = (await response.json()) as PutBlobResult;
+
+      handleUpdateUserImage(newBlob.url);
+
+      // Then remove the previous image from server.
+      await fetch(`/api/images/remove?url=${image}`, {
+        method: "DELETE",
+      });
     }
-  }
-  const handleInputImageReset = () => {
-    setInputValue('')
-    setImgSrc('/images/avatars/1.png')
-  }
 
-  const handleFormChange = (field: keyof Data, value: Data[keyof Data]) => {
-    setFormData({ ...formData, [field]: value })
-  }
+    setUploadingImage(false);
+  };
+
+  const handleUpdateUserImage = async (imageUrl: string) => {
+    const userData = {
+      id,
+      image: imageUrl,
+    };
+
+    const resultAction: any = await dispatch(editImage({ ...userData }));
+
+    if (editImage.fulfilled.match(resultAction)) {
+      toast.success(`Image updated successfully!`);
+    } else {
+      toast.error(`Error updating image: ${resultAction.error}`);
+    }
+  };
+
+  const handleInputImageReset = () => {
+    setInputValue("");
+    setImage(user.image);
+  };
+
+  const handleUpdateUser = async (e: any) => {
+    e.preventDefault();
+
+    const userData = {
+      id,
+      firstName,
+      lastName,
+      username,
+      email,
+      phone,
+      image,
+      language,
+      status,
+      address,
+      city,
+      country,
+      roleId: role.id,
+    };
+
+    const resultAction = await dispatch(editUser({ ...userData }));
+
+    if (editUser.fulfilled.match(resultAction)) {
+      toast.success(`Profile updated successfully!`);
+    } else {
+      toast.error(`Error updating profile: ${resultAction.error}`);
+    }
+  };
+
+  const handleDeleteAccount = async (e: any) => {
+    e.preventDefault();
+
+    const resultAction = await dispatch(removeUser({ id }));
+
+    if (removeUser.fulfilled.match(resultAction)) {
+      toast.success(`Account deleted successfully!`);
+    } else {
+      toast.error(`Error deleting account: ${resultAction.error}`);
+    }
+  };
 
   return (
     <Grid container spacing={6}>
       {/* Account Details Card */}
       <Grid item xs={12}>
         <Card>
-          <CardHeader title='Account Details' />
-          <form>
-            <CardContent sx={{ pt: 0 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <ImgStyled src={imgSrc} alt='Profile Pic' />
-                <div>
-                  <ButtonStyled component='label' variant='contained' htmlFor='account-settings-upload-image'>
+          <CardHeader title="Account Details" />
+          <CardContent sx={{ pt: 0 }}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              {image ? (
+                <CustomAvatar
+                  src={image}
+                  variant="rounded"
+                  alt={firstName + " " + lastName}
+                  sx={{
+                    width: 100,
+                    height: 100,
+                    marginInlineEnd: (theme) => theme.spacing(6.25),
+                  }}
+                />
+              ) : (
+                <CustomAvatar
+                  skin="light"
+                  variant="rounded"
+                  color={avatarColor as ThemeColor}
+                  sx={{
+                    width: 100,
+                    height: 100,
+                    marginInlineEnd: (theme) => theme.spacing(6.25),
+                    fontWeight: 600,
+                    fontSize: "3rem",
+                  }}
+                >
+                  {getInitials(firstName + " " + lastName)}
+                </CustomAvatar>
+              )}
+              <div>
+                <Box sx={{ display: "flex" }}>
+                  <ButtonStyled
+                    // @ts-ignore
+                    component={"label"}
+                    variant="contained"
+                    htmlFor="account-settings-upload-image"
+                  >
                     Upload New Photo
                     <input
                       hidden
-                      type='file'
+                      type="file"
                       value={inputValue}
-                      accept='image/png, image/jpeg'
+                      accept="image/png, image/jpeg"
                       onChange={handleInputImageChange}
-                      id='account-settings-upload-image'
+                      id="account-settings-upload-image"
                     />
                   </ButtonStyled>
-                  <ResetButtonStyled color='secondary' variant='outlined' onClick={handleInputImageReset}>
+                  <ResetButtonStyled
+                    color="secondary"
+                    variant="outlined"
+                    onClick={handleInputImageReset}
+                  >
                     Reset
                   </ResetButtonStyled>
-                  <Typography sx={{ mt: 6, color: 'text.disabled' }}>Allowed PNG or JPEG. Max size of 800K.</Typography>
-                </div>
-              </Box>
-            </CardContent>
-            <Divider sx={{ my: theme => `${theme.spacing(1)} !important` }} />
-            <CardContent>
-              <Grid container spacing={5}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label='First Name'
-                    placeholder='John'
-                    value={formData.firstName}
-                    onChange={e => handleFormChange('firstName', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label='Last Name'
-                    placeholder='Doe'
-                    value={formData.lastName}
-                    onChange={e => handleFormChange('lastName', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    type='email'
-                    label='Email'
-                    value={formData.email}
-                    placeholder='john.doe@example.com'
-                    onChange={e => handleFormChange('email', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label='Organization'
-                    placeholder='ThemeSelection'
-                    value={formData.organization}
-                    onChange={e => handleFormChange('organization', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    type='number'
-                    label='Phone Number'
-                    value={formData.number}
-                    placeholder='202 555 0111'
-                    onChange={e => handleFormChange('number', e.target.value)}
-                    InputProps={{ startAdornment: <InputAdornment position='start'>US (+1)</InputAdornment> }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label='Address'
-                    placeholder='Address'
-                    value={formData.address}
-                    onChange={e => handleFormChange('address', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label='State'
-                    placeholder='California'
-                    value={formData.state}
-                    onChange={e => handleFormChange('state', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    type='number'
-                    label='Zip Code'
-                    placeholder='231465'
-                    value={formData.zipCode}
-                    onChange={e => handleFormChange('zipCode', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Country</InputLabel>
-                    <Select
-                      label='Country'
-                      value={formData.country}
-                      onChange={e => handleFormChange('country', e.target.value)}
+                  {uploadingImage && (
+                    <Box
+                      sx={{
+                        ml: 4,
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        alignItems: "center",
+                      }}
                     >
-                      <MenuItem value='australia'>Australia</MenuItem>
-                      <MenuItem value='canada'>Canada</MenuItem>
-                      <MenuItem value='france'>France</MenuItem>
-                      <MenuItem value='united-kingdom'>United Kingdom</MenuItem>
-                      <MenuItem value='united-states'>United States</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Language</InputLabel>
-                    <Select
-                      label='Language'
-                      value={formData.language}
-                      onChange={e => handleFormChange('language', e.target.value)}
-                    >
-                      <MenuItem value='arabic'>Arabic</MenuItem>
-                      <MenuItem value='english'>English</MenuItem>
-                      <MenuItem value='french'>French</MenuItem>
-                      <MenuItem value='german'>German</MenuItem>
-                      <MenuItem value='portuguese'>Portuguese</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Timezone</InputLabel>
-                    <Select
-                      label='Timezone'
-                      value={formData.timezone}
-                      onChange={e => handleFormChange('timezone', e.target.value)}
-                    >
-                      <MenuItem value='gmt-12'>(GMT-12:00) International Date Line West</MenuItem>
-                      <MenuItem value='gmt-11'>(GMT-11:00) Midway Island, Samoa</MenuItem>
-                      <MenuItem value='gmt-10'>(GMT-10:00) Hawaii</MenuItem>
-                      <MenuItem value='gmt-09'>(GMT-09:00) Alaska</MenuItem>
-                      <MenuItem value='gmt-08'>(GMT-08:00) Pacific Time (US & Canada)</MenuItem>
-                      <MenuItem value='gmt-08-baja'>(GMT-08:00) Tijuana, Baja California</MenuItem>
-                      <MenuItem value='gmt-07'>(GMT-07:00) Chihuahua, La Paz, Mazatlan</MenuItem>
-                      <MenuItem value='gmt-07-mt'>(GMT-07:00) Mountain Time (US & Canada)</MenuItem>
-                      <MenuItem value='gmt-06'>(GMT-06:00) Central America</MenuItem>
-                      <MenuItem value='gmt-06-ct'>(GMT-06:00) Central Time (US & Canada)</MenuItem>
-                      <MenuItem value='gmt-06-mc'>(GMT-06:00) Guadalajara, Mexico City, Monterrey</MenuItem>
-                      <MenuItem value='gmt-06-sk'>(GMT-06:00) Saskatchewan</MenuItem>
-                      <MenuItem value='gmt-05'>(GMT-05:00) Bogota, Lima, Quito, Rio Branco</MenuItem>
-                      <MenuItem value='gmt-05-et'>(GMT-05:00) Eastern Time (US & Canada)</MenuItem>
-                      <MenuItem value='gmt-05-ind'>(GMT-05:00) Indiana (East)</MenuItem>
-                      <MenuItem value='gmt-04'>(GMT-04:00) Atlantic Time (Canada)</MenuItem>
-                      <MenuItem value='gmt-04-clp'>(GMT-04:00) Caracas, La Paz</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Currency</InputLabel>
-                    <Select
-                      label='Currency'
-                      value={formData.currency}
-                      onChange={e => handleFormChange('currency', e.target.value)}
-                    >
-                      <MenuItem value='usd'>USD</MenuItem>
-                      <MenuItem value='eur'>EUR</MenuItem>
-                      <MenuItem value='pound'>Pound</MenuItem>
-                      <MenuItem value='bitcoin'>Bitcoin</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Button variant='contained' sx={{ mr: 3 }}>
-                    Save Changes
-                  </Button>
-                  <Button type='reset' variant='outlined' color='secondary' onClick={() => setFormData(initialData)}>
-                    Reset
-                  </Button>
-                </Grid>
+                      <CircularProgress size="1.2rem" sx={{ mr: 2 }} />
+                      <Typography variant="h6" sx={{ color: "text.secondary" }}>
+                        Uploading...
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+                <Typography sx={{ mt: 6, color: "text.disabled" }}>
+                  Allowed PNG or JPEG. Max size of 2MB.
+                </Typography>
+              </div>
+            </Box>
+          </CardContent>
+          <Divider sx={{ my: (theme) => `${theme.spacing(1)} !important` }} />
+          <CardContent>
+            <Grid container spacing={5}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  id="firstName"
+                  aria-label="firstName"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  type="text"
+                  label="First Name"
+                  placeholder="e.g. John"
+                />
               </Grid>
-            </CardContent>
-          </form>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  id="lastName"
+                  aria-label="lastName"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  type="text"
+                  label="Last Name"
+                  placeholder="e.g. Doe"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  id="username"
+                  aria-label="username"
+                  value={username}
+                  type="text"
+                  label="Username"
+                  placeholder="johndoe"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">@</InputAdornment>
+                    ),
+                  }}
+                  disabled
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  id="email"
+                  aria-label="email"
+                  value={email}
+                  type="email"
+                  label="Email"
+                  disabled
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  id="phone"
+                  aria-label="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  type="text"
+                  label="Phone"
+                  placeholder="+254 711 222 333"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  id="status"
+                  aria-label="status"
+                  value={status}
+                  type="text"
+                  label="Status"
+                  disabled
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  id="address"
+                  aria-label="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  type="text"
+                  label="Address"
+                  placeholder="e.g. 123 Center Ln., Apartment 34, Plymouth, MN 55441"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  id="city"
+                  aria-label="city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  type="text"
+                  label="City"
+                  placeholder="e.g. Nairobi"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="user-view-country-label">Country</InputLabel>
+                  <Select
+                    label="Country"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    id="country"
+                    labelId="user-view-country-label"
+                  >
+                    <MenuItem value="Kenya">Kenya</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="user-view-language-label">
+                    Language
+                  </InputLabel>
+                  <Select
+                    label="Language"
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    id="language"
+                    labelId="user-view-language-label"
+                  >
+                    <MenuItem value="arabic">Arabic</MenuItem>
+                    <MenuItem value="english">English</MenuItem>
+                    <MenuItem value="french">French</MenuItem>
+                    <MenuItem value="german">German</MenuItem>
+                    <MenuItem value="portuguese">Portuguese</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  id="role"
+                  aria-label="role"
+                  value={role ? role.name : "Editor"}
+                  type="text"
+                  label="Role"
+                  disabled
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  sx={{ mr: 3 }}
+                  onClick={(e) => handleUpdateUser(e)}
+                >
+                  Save Changes
+                </Button>
+
+                <Button
+                  type="reset"
+                  variant="outlined"
+                  color="secondary"
+                  onClick={setUpdateUserData}
+                >
+                  Reset
+                </Button>
+              </Grid>
+            </Grid>
+          </CardContent>
         </Card>
       </Grid>
 
       {/* Delete Account Card */}
       <Grid item xs={12}>
         <Card>
-          <CardHeader title='Delete Account' />
+          <CardHeader title="Delete Account" />
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)}>
               <Box sx={{ mb: 2 }}>
                 <FormControl>
                   <Controller
-                    name='checkbox'
+                    name="checkbox"
                     control={control}
                     rules={{ required: true }}
                     render={({ field }) => (
                       <FormControlLabel
-                        label='I confirm my account deactivation'
-                        sx={{ '& .MuiTypography-root': { color: errors.checkbox ? 'error.main' : 'text.secondary' } }}
+                        label="I confirm my account deactivation"
+                        sx={{
+                          "& .MuiTypography-root": {
+                            color: errors.checkbox
+                              ? "error.main"
+                              : "text.secondary",
+                          },
+                        }}
                         control={
                           <Checkbox
                             {...field}
-                            size='small'
-                            name='validation-basic-checkbox'
-                            sx={errors.checkbox ? { color: 'error.main' } : null}
+                            size="small"
+                            name="validation-basic-checkbox"
+                            sx={
+                              errors.checkbox ? { color: "error.main" } : null
+                            }
                           />
                         }
                       />
                     )}
                   />
                   {errors.checkbox && (
-                    <FormHelperText sx={{ color: 'error.main' }} id='validation-basic-checkbox'>
+                    <FormHelperText
+                      sx={{ color: "error.main" }}
+                      id="validation-basic-checkbox"
+                    >
                       Please confirm you want to delete account
                     </FormHelperText>
                   )}
                 </FormControl>
               </Box>
-              <Button variant='contained' color='error' type='submit' disabled={errors.checkbox !== undefined}>
+              <Button
+                variant="contained"
+                color="error"
+                type="submit"
+                disabled={errors.checkbox !== undefined}
+              >
                 Deactivate Account
               </Button>
             </form>
@@ -374,85 +540,141 @@ const TabAccount = () => {
       </Grid>
 
       {/* Deactivate Account Dialogs */}
-      <Dialog fullWidth maxWidth='xs' open={open} onClose={handleClose}>
+      <Dialog fullWidth maxWidth="xs" open={open} onClose={handleClose}>
         <DialogContent
           sx={{
-            pb: theme => `${theme.spacing(6)} !important`,
-            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-            pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+            pb: (theme) => `${theme.spacing(6)} !important`,
+            px: (theme) => [
+              `${theme.spacing(5)} !important`,
+              `${theme.spacing(15)} !important`,
+            ],
+            pt: (theme) => [
+              `${theme.spacing(8)} !important`,
+              `${theme.spacing(12.5)} !important`,
+            ],
           }}
         >
           <Box
             sx={{
-              display: 'flex',
-              textAlign: 'center',
-              alignItems: 'center',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              '& svg': { mb: 6, color: 'warning.main' }
+              display: "flex",
+              textAlign: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              justifyContent: "center",
+              "& svg": { mb: 6, color: "error.main" },
             }}
           >
-            <Icon icon='bx:error-circle' fontSize='5.5rem' />
-            <Typography>Are you sure you would like to cancel your subscription?</Typography>
+            <Icon icon="bx:error-circle" fontSize="5.5rem" />
+            <Typography>
+              Are you sure you would like to delete your account? This action is
+              irreversible.
+            </Typography>
           </Box>
         </DialogContent>
         <DialogActions
           sx={{
-            justifyContent: 'center',
-            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-            pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+            justifyContent: "center",
+            px: (theme) => [
+              `${theme.spacing(5)} !important`,
+              `${theme.spacing(15)} !important`,
+            ],
+            pb: (theme) => [
+              `${theme.spacing(8)} !important`,
+              `${theme.spacing(12.5)} !important`,
+            ],
           }}
         >
-          <Button variant='contained' sx={{ mr: 2 }} onClick={() => handleConfirmation('yes')}>
+          <Button
+            variant="outlined"
+            sx={{ mr: 2 }}
+            color="error"
+            onClick={(e) => {
+              handleDeleteAccount(e);
+              handleConfirmation("yes");
+            }}
+          >
             Yes
           </Button>
-          <Button variant='outlined' color='secondary' onClick={() => handleConfirmation('cancel')}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => handleConfirmation("cancel")}
+          >
             Cancel
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog fullWidth maxWidth='xs' open={secondDialogOpen} onClose={handleSecondDialogClose}>
+      <Dialog
+        fullWidth
+        maxWidth="xs"
+        open={secondDialogOpen}
+        onClose={handleSecondDialogClose}
+      >
         <DialogContent
           sx={{
-            pb: theme => `${theme.spacing(6)} !important`,
-            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-            pt: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+            pb: (theme) => `${theme.spacing(6)} !important`,
+            px: (theme) => [
+              `${theme.spacing(5)} !important`,
+              `${theme.spacing(15)} !important`,
+            ],
+            pt: (theme) => [
+              `${theme.spacing(8)} !important`,
+              `${theme.spacing(12.5)} !important`,
+            ],
           }}
         >
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              flexDirection: 'column',
-              '& svg': {
+              display: "flex",
+              alignItems: "center",
+              flexDirection: "column",
+              "& svg": {
                 mb: 8,
-                color: userInput === 'yes' ? 'success.main' : 'error.main'
-              }
+                color: userInput === "yes" ? "success.main" : "error.main",
+              },
             }}
           >
-            <Icon fontSize='5.5rem' icon={userInput === 'yes' ? 'bx:check-circle' : 'bx:x-circle'} />
-            <Typography variant='h4' sx={{ mb: 5 }}>
-              {userInput === 'yes' ? 'Deleted!' : 'Cancelled'}
+            <Icon
+              fontSize="5.5rem"
+              icon={userInput === "yes" ? "bx:check-circle" : "bx:x-circle"}
+            />
+            <Typography variant="h4" sx={{ mb: 5 }}>
+              {userInput === "yes" ? "Deleted!" : "Cancelled"}
             </Typography>
             <Typography>
-              {userInput === 'yes' ? 'Your subscription cancelled successfully.' : 'Unsubscription Cancelled!!'}
+              {userInput === "yes"
+                ? "Your account deleted successfully."
+                : "Account delete cancelled!"}
             </Typography>
           </Box>
         </DialogContent>
         <DialogActions
           sx={{
-            justifyContent: 'center',
-            px: theme => [`${theme.spacing(5)} !important`, `${theme.spacing(15)} !important`],
-            pb: theme => [`${theme.spacing(8)} !important`, `${theme.spacing(12.5)} !important`]
+            justifyContent: "center",
+            px: (theme) => [
+              `${theme.spacing(5)} !important`,
+              `${theme.spacing(15)} !important`,
+            ],
+            pb: (theme) => [
+              `${theme.spacing(8)} !important`,
+              `${theme.spacing(12.5)} !important`,
+            ],
           }}
         >
-          <Button variant='contained' color='success' onClick={handleSecondDialogClose}>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => {
+              userInput === "yes" && logout();
+              handleSecondDialogClose();
+            }}
+          >
             OK
           </Button>
         </DialogActions>
       </Dialog>
     </Grid>
-  )
-}
+  );
+};
 
-export default TabAccount
+export default TabAccount;

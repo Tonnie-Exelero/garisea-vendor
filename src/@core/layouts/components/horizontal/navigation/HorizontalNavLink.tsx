@@ -80,70 +80,98 @@ const HorizontalNavLink = (props: Props) => {
 
   return (
     <CanViewNavLink navLink={item}>
-      <Wrapper {...(!hasParent ? { component: 'div', sx: { py: skin === 'bordered' ? 2.375 : 2.5 } } : {})}>
+      <Wrapper
+        {...(!hasParent
+          ? { component: "div", sx: { py: skin === "bordered" ? 2.375 : 2.5 } }
+          : {})}
+      >
         <ListItem
+          // @ts-ignore
           component={Link}
           disabled={item.disabled}
           {...(item.disabled && { tabIndex: -1 })}
           className={clsx({ active: isNavLinkActive() })}
-          target={item.openInNewTab ? '_blank' : undefined}
-          href={item.path === undefined ? '/' : `${item.path}`}
-          onClick={e => {
+          target={item.openInNewTab ? "_blank" : undefined}
+          href={item.path === undefined ? "/login" : `${item.path}`}
+          onClick={(e) => {
             if (item.path === undefined) {
-              e.preventDefault()
-              e.stopPropagation()
+              e.preventDefault();
+              e.stopPropagation();
             }
           }}
           sx={{
-            ...(item.disabled ? { pointerEvents: 'none' } : { cursor: 'pointer' }),
+            ...(item.disabled
+              ? { pointerEvents: "none" }
+              : { cursor: "pointer" }),
             ...(!hasParent
               ? {
                   borderRadius: 1,
-                  '&.active': {
-                    backgroundColor: mode === 'light' ? bgColors.primaryLight.backgroundColor : 'primary.main',
-                    '&:focus-visible': {
-                      backgroundColor: theme =>
-                        mode === 'light' ? hexToRGBA(theme.palette.primary.main, 0.24) : 'primary.dark'
+                  "&.active": {
+                    backgroundColor:
+                      mode === "light"
+                        ? bgColors.primaryLight.backgroundColor
+                        : "primary.main",
+                    "&:focus-visible": {
+                      backgroundColor: (theme) =>
+                        mode === "light"
+                          ? hexToRGBA(theme.palette.primary.main, 0.24)
+                          : "primary.dark",
                     },
-                    '& .MuiTypography-root': {
-                      color: mode === 'light' ? 'primary.main' : 'common.white'
-                    }
-                  }
+                    "& .MuiTypography-root": {
+                      color: mode === "light" ? "primary.main" : "common.white",
+                    },
+                  },
                 }
-              : { py: 2.5 })
+              : { py: 2.5 }),
           }}
         >
-          <Box sx={{ gap: 2, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box
+            sx={{
+              gap: 2,
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                ...(menuTextTruncate && { overflow: 'hidden' }),
-                ...(hasParent && isNavLinkActive() && { pl: 1.5, ml: -1.5 })
+                display: "flex",
+                alignItems: "center",
+                ...(menuTextTruncate && { overflow: "hidden" }),
+                ...(hasParent && isNavLinkActive() && { pl: 1.5, ml: -1.5 }),
               }}
             >
               <ListItemIcon
                 sx={{
                   mr: icon === navSubItemIcon ? 2.5 : 2,
-                  '& svg': { transition: 'transform .25s ease-in-out' },
-                  ...(icon === navSubItemIcon && { color: 'text.disabled' }),
+                  "& svg": { transition: "transform .25s ease-in-out" },
+                  ...(icon === navSubItemIcon && { color: "text.disabled" }),
                   ...(isNavLinkActive() && {
-                    color: 'primary.main',
+                    color: "primary.main",
                     ...(hasParent &&
                       icon === navSubItemIcon && {
-                        '& svg': {
-                          transform: 'scale(1.35)',
-                          filter: theme => `drop-shadow(0 0 2px ${theme.palette.primary.main})`
-                        }
-                      })
-                  })
+                        "& svg": {
+                          transform: "scale(1.35)",
+                          filter: (theme) =>
+                            `drop-shadow(0 0 2px ${theme.palette.primary.main})`,
+                        },
+                      }),
+                  }),
                 }}
               >
-                <UserIcon icon={icon} fontSize={icon === navSubItemIcon ? '0.4375rem' : '1.375rem'} />
+                <UserIcon
+                  icon={icon}
+                  fontSize={icon === navSubItemIcon ? "0.4375rem" : "1.375rem"}
+                />
               </ListItemIcon>
               <Typography
                 {...(menuTextTruncate && { noWrap: true })}
-                sx={{ ...(isNavLinkActive() ? hasParent && { fontWeight: 600 } : { color: 'text.secondary' }) }}
+                sx={{
+                  ...(isNavLinkActive()
+                    ? hasParent && { fontWeight: 600 }
+                    : { color: "text.secondary" }),
+                }}
               >
                 <Translations text={item.title} />
               </Typography>
@@ -151,11 +179,11 @@ const HorizontalNavLink = (props: Props) => {
             {item.badgeContent ? (
               <Chip
                 label={item.badgeContent}
-                color={item.badgeColor || 'primary'}
+                color={item.badgeColor || "primary"}
                 sx={{
                   height: 20,
                   fontWeight: 500,
-                  '& .MuiChip-label': { px: 1.5, textTransform: 'capitalize' }
+                  "& .MuiChip-label": { px: 1.5, textTransform: "capitalize" },
                 }}
               />
             ) : null}
@@ -163,7 +191,7 @@ const HorizontalNavLink = (props: Props) => {
         </ListItem>
       </Wrapper>
     </CanViewNavLink>
-  )
+  );
 }
 
 export default HorizontalNavLink

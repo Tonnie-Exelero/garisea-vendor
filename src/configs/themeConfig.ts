@@ -6,7 +6,7 @@
  */
 
 // ** MUI Imports
-import { Direction } from '@mui/material'
+import { Direction } from "@mui/material";
 
 // ** Types
 import {
@@ -16,8 +16,8 @@ import {
   Footer,
   ContentWidth,
   VerticalNavToggle,
-  HorizontalMenuToggle
-} from 'src/@core/layouts/types'
+  HorizontalMenuToggle,
+} from "src/@core/layouts/types";
 
 type ThemeConfig = {
   skin: Skin;
@@ -27,6 +27,14 @@ type ThemeConfig = {
   navHidden: boolean;
   appBarBlur: boolean;
   direction: Direction;
+  logos: {
+    favicon: string;
+    light: string;
+    dark: string;
+    green: string;
+    greenDark: string;
+    greenLight: string;
+  };
   templateName: string;
   templateDescription: string;
   navCollapsed: boolean;
@@ -56,7 +64,15 @@ type ThemeConfig = {
 
 const themeConfig: ThemeConfig = {
   // ** Layout Configs
-  templateName: "Garisea Vendor" /* App Name */,
+  logos: {
+    favicon: "/images/logos/garisea/favicon.svg",
+    light: "/images/logos/garisea/logo-light.svg",
+    dark: "/images/logos/garisea/logo-dark.svg",
+    green: "/images/logos/garisea/logo-green.svg",
+    greenDark: "/images/logos/garisea/logo-green-dark.svg",
+    greenLight: "/images/logos/garisea/logo-green-light.svg",
+  },
+  templateName: "Garisea" /* App Name */,
   templateDescription: "Sell any vehicle easily" /* App Name */,
   layout: "vertical" /* vertical | horizontal */,
   mode: "light" as Mode /* light | dark | semi-dark /*! Note: semi-dark value will only work for Vertical Layout */,
@@ -92,9 +108,9 @@ const themeConfig: ThemeConfig = {
   // ** Other Configs
   responsiveFontSizes: true /* true | false */,
   disableRipple: true /* true | false */,
-  disableCustomizer: false /* true | false */,
+  disableCustomizer: true /* true | false */,
   toastPosition:
     "top-right" /* top-left | top-center | top-right | bottom-left | bottom-center | bottom-right */,
 };
 
-export default themeConfig
+export default themeConfig;

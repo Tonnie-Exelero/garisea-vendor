@@ -78,7 +78,7 @@ const defaultSuggestionsData: DefaultSuggestionsType[] = [
       {
         icon: 'bx:group',
         suggestion: 'User List',
-        link: '/apps/user/list'
+        link: '/apps/users/list'
       }
     ]
   },

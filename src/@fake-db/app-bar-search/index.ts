@@ -77,42 +77,42 @@ const searchData: AppBarSearchType[] = [
   },
   {
     id: 11,
-    url: '/apps/user/list',
+    url: '/apps/users/list',
     icon: 'bx:group',
     title: 'User List',
     category: 'appsPages'
   },
   {
     id: 12,
-    url: '/apps/user/view/account',
+    url: '/apps/users/view/account',
     icon: 'bx:user',
     title: 'User View - Account',
     category: 'appsPages'
   },
   {
     id: 13,
-    url: '/apps/user/view/security',
+    url: '/apps/users/view/security',
     icon: 'bx:lock-open-alt',
     title: 'User View - Security',
     category: 'appsPages'
   },
   {
     id: 14,
-    url: '/apps/user/view/billing-plan',
+    url: '/apps/users/view/billing-plan',
     icon: 'bx:dollar',
     title: 'User View - Billing & Plans',
     category: 'appsPages'
   },
   {
     id: 15,
-    url: '/apps/user/view/notification',
+    url: '/apps/users/view/notification',
     icon: 'bx:bell',
     title: 'User View - Notification',
     category: 'appsPages'
   },
   {
     id: 16,
-    url: '/apps/user/view/connection',
+    url: '/apps/users/view/connection',
     icon: 'bx:link',
     title: 'User View - Connection',
     category: 'appsPages'

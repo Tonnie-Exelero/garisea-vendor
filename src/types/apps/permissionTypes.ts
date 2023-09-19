@@ -1,6 +1,12 @@
+export type PermissionNode = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  subjects: string;
+};
+
 export type PermissionRowType = {
-  id: number
-  name: string
-  createdDate: string
-  assignedTo: string[]
-}
+  cursor: string;
+  node: PermissionNode;
+};

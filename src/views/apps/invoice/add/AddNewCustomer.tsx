@@ -53,7 +53,8 @@ const schema = yup.object().shape({
   email: yup.string().email().required(),
   company: yup.string().required(),
   contact: yup.string().min(10).max(10).required(),
-  address: yup.string().max(120).required()
+  address: yup.string().max(120).required(),
+  country: yup.string().max(120).required()
 })
 
 const AddNewCustomer = ({ open, toggle, setSelectedClient, clients, setClients }: Props) => {

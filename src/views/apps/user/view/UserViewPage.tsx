@@ -1,29 +1,26 @@
 // ** MUI Imports
-import Grid from '@mui/material/Grid'
-
-// ** Types
-import { InvoiceType } from 'src/types/apps/invoiceTypes'
+import Grid from "@mui/material/Grid";
 
 // ** Demo Components Imports
-import UserViewLeft from 'src/views/apps/user/view/UserViewLeft'
-import UserViewRight from 'src/views/apps/user/view/UserViewRight'
+import UserViewLeft from "src/views/apps/user/view/UserViewLeft";
+import UserViewRight from "src/views/apps/user/view/UserViewRight";
 
 type Props = {
-  tab: string
-  invoiceData: InvoiceType[]
-}
+  tab: string;
+  user: any;
+};
 
-const UserView = ({ tab, invoiceData }: Props) => {
+const UserView = ({ tab, user }: Props) => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12} md={5} lg={4}>
-        <UserViewLeft />
+        <UserViewLeft user={user} />
       </Grid>
       <Grid item xs={12} md={7} lg={8}>
-        <UserViewRight tab={tab} invoiceData={invoiceData} />
+        <UserViewRight tab={tab} user={user} />
       </Grid>
     </Grid>
-  )
-}
+  );
+};
 
-export default UserView
+export default UserView;

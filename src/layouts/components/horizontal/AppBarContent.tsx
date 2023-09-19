@@ -84,7 +84,7 @@ const shortcuts: ShortcutsType[] = [
   {
     title: 'Users',
     icon: 'bx:user',
-    url: '/apps/user/list',
+    url: '/apps/users/list',
     subtitle: 'Manage Users'
   },
   {

@@ -10,7 +10,7 @@ import defaultAuthConfig from 'src/configs/auth'
 // ** Types
 import { UserDataType } from 'src/context/types'
 
-const users: UserDataType[] = [
+const users: any[] = [
   {
     id: 1,
     role: 'admin',

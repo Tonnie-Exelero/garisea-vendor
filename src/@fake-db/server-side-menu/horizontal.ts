@@ -1,662 +1,674 @@
 // ** Mock Adapter
-import mock from 'src/@fake-db/mock'
+import mock from "src/@fake-db/mock";
 
 // ** Type import
-import { HorizontalNavItemsType } from 'src/@core/layouts/types'
+import { HorizontalNavItemsType } from "src/@core/layouts/types";
 
 const navigation: HorizontalNavItemsType = [
   {
-    icon: 'bx:home-circle',
-    title: 'Dashboards',
+    title: "Dashboards",
+    icon: "bx:home-circle",
+    subject: "dashboards",
     children: [
       {
-        icon: 'bx:pie-chart-alt-2',
-        title: 'Analytics',
-        path: '/dashboards/analytics'
+        title: "Analytics",
+        icon: "bx:pie-chart-alt-2",
+        subject: "analytics-dash",
+        path: "/dashboards/analytics",
       },
       {
-        icon: 'bx:shape-circle',
-        title: 'CRM',
-        path: '/dashboards/crm'
+        title: "CRM",
+        icon: "bx:shape-circle",
+        subject: "crm-dash",
+        path: "/dashboards/crm",
       },
       {
-        icon: 'bx:analyse',
-        title: 'eCommerce',
-        path: '/dashboards/ecommerce'
-      }
-    ]
+        title: "eCommerce",
+        icon: "bx:analyse",
+        subject: "ecommerce-dash",
+        path: "/dashboards/ecommerce",
+      },
+    ],
   },
   {
-    icon: 'bx:customize',
-    title: 'Apps',
+    icon: "bx:customize",
+    title: "Apps",
+    subject: "apps-pages",
     children: [
       {
-        title: 'Email',
-        icon: 'bx:envelope',
-        path: '/apps/email'
+        title: "Email",
+        icon: "bx:envelope",
+        subject: "email",
+        path: "/apps/email",
       },
       {
-        title: 'Chat',
-        icon: 'bx:message',
-        path: '/apps/chat'
+        title: "Chat",
+        icon: "bx:message",
+        subject: "chat",
+        path: "/apps/chat",
       },
       {
-        title: 'Calendar',
-        icon: 'bx:calendar',
-        path: '/apps/calendar'
+        title: "Calendar",
+        icon: "bx:calendar",
+        subject: "calendar",
+        path: "/apps/calendar",
       },
       {
-        title: 'Invoice',
-        icon: 'bx:food-menu',
+        title: "Invoice",
+        icon: "bx:food-menu",
+        subject: "invoice",
         children: [
           {
-            title: 'List',
-            path: '/apps/invoice/list'
+            title: "List",
+            path: "/apps/invoice/list",
           },
           {
-            title: 'Preview',
-            path: '/apps/invoice/preview'
+            title: "Preview",
+            path: "/apps/invoice/preview",
           },
           {
-            title: 'Edit',
-            path: '/apps/invoice/edit'
+            title: "Edit",
+            path: "/apps/invoice/edit",
           },
           {
-            title: 'Add',
-            path: '/apps/invoice/add'
-          }
-        ]
+            title: "Add",
+            path: "/apps/invoice/add",
+          },
+        ],
       },
       {
-        title: 'User',
-        icon: 'bx:user',
+        title: "User",
+        icon: "bx:user",
+        subject: "user",
         children: [
           {
-            title: 'List',
-            path: '/apps/user/list'
+            title: "List",
+            path: "/apps/users/list",
           },
           {
-            title: 'View',
+            title: "View",
             children: [
               {
-                title: 'Account',
-                path: '/apps/user/view/account'
+                title: "Account",
+                path: "/apps/users/view/account",
               },
               {
-                title: 'Security',
-                path: '/apps/user/view/security'
+                title: "Security",
+                path: "/apps/users/view/security",
               },
               {
-                title: 'Billing & Plans',
-                path: '/apps/user/view/billing-plan'
+                title: "Billing & Plans",
+                path: "/apps/users/view/billing-plan",
               },
               {
-                title: 'Notifications',
-                path: '/apps/user/view/notification'
+                title: "Notifications",
+                path: "/apps/users/view/notification",
               },
               {
-                title: 'Connection',
-                path: '/apps/user/view/connection'
-              }
-            ]
-          }
-        ]
+                title: "Connection",
+                path: "/apps/users/view/connection",
+              },
+            ],
+          },
+        ],
       },
       {
-        title: 'Roles & Permissions',
-        icon: 'bx:check-shield',
+        title: "Roles & Permissions",
+        icon: "bx:check-shield",
+        subject: "roles-permissions",
         children: [
           {
-            title: 'Roles',
-            path: '/apps/roles'
+            title: "Roles",
+            path: "/apps/roles",
           },
           {
-            title: 'Permissions',
-            path: '/apps/permissions'
-          }
-        ]
-      }
-    ]
+            title: "Permissions",
+            path: "/apps/permissions",
+          },
+        ],
+      },
+    ],
   },
   {
-    icon: 'bx:palette',
-    title: 'UI',
+    icon: "bx:palette",
+    title: "UI",
     children: [
       {
-        title: 'Typography',
-        icon: 'bx:text',
-        path: '/ui/typography'
+        title: "Typography",
+        icon: "bx:text",
+        path: "/ui/typography",
       },
       {
-        title: 'Icons',
-        path: '/ui/icons',
-        icon: 'bx:crown'
+        title: "Icons",
+        path: "/ui/icons",
+        icon: "bx:crown",
       },
       {
-        title: 'Icons Test',
-        path: '/ui/icons-test',
-        icon: 'bx:crown'
+        title: "Icons Test",
+        path: "/ui/icons-test",
+        icon: "bx:crown",
       },
       {
-        title: 'Cards',
-        icon: 'bx:collection',
+        title: "Cards",
+        icon: "bx:collection",
         children: [
           {
-            title: 'Basic',
-            path: '/ui/cards/basic'
+            title: "Basic",
+            path: "/ui/cards/basic",
           },
           {
-            title: 'Advanced',
-            path: '/ui/cards/advanced'
+            title: "Advanced",
+            path: "/ui/cards/advanced",
           },
           {
-            title: 'Statistics',
-            path: '/ui/cards/statistics'
+            title: "Statistics",
+            path: "/ui/cards/statistics",
           },
           {
-            title: 'Widgets',
-            path: '/ui/cards/widgets'
+            title: "Widgets",
+            path: "/ui/cards/widgets",
           },
           {
-            title: 'Gamification',
-            path: '/ui/cards/gamification'
+            title: "Gamification",
+            path: "/ui/cards/gamification",
           },
           {
-            title: 'Actions',
-            path: '/ui/cards/actions'
-          }
-        ]
+            title: "Actions",
+            path: "/ui/cards/actions",
+          },
+        ],
       },
       {
-        title: 'Components',
-        icon: 'bx:box',
+        title: "Components",
+        icon: "bx:box",
         children: [
           {
-            title: 'Accordion',
-            path: '/components/accordion'
+            title: "Accordion",
+            path: "/components/accordion",
           },
           {
-            title: 'Alerts',
-            path: '/components/alerts'
+            title: "Alerts",
+            path: "/components/alerts",
           },
           {
-            title: 'Avatars',
-            path: '/components/avatars'
+            title: "Avatars",
+            path: "/components/avatars",
           },
           {
-            title: 'Badges',
-            path: '/components/badges'
+            title: "Badges",
+            path: "/components/badges",
           },
           {
-            title: 'Buttons',
-            path: '/components/buttons'
+            title: "Buttons",
+            path: "/components/buttons",
           },
           {
-            title: 'Button Group',
-            path: '/components/button-group'
+            title: "Button Group",
+            path: "/components/button-group",
           },
           {
-            title: 'Chips',
-            path: '/components/chips'
+            title: "Chips",
+            path: "/components/chips",
           },
           {
-            title: 'Dialogs',
-            path: '/components/dialogs'
+            title: "Dialogs",
+            path: "/components/dialogs",
           },
           {
-            title: 'List',
-            path: '/components/list'
+            title: "List",
+            path: "/components/list",
           },
           {
-            title: 'Menu',
-            path: '/components/menu'
+            title: "Menu",
+            path: "/components/menu",
           },
           {
-            title: 'Pagination',
-            path: '/components/pagination'
+            title: "Pagination",
+            path: "/components/pagination",
           },
           {
-            title: 'Progress',
-            path: '/components/progress'
+            title: "Progress",
+            path: "/components/progress",
           },
           {
-            title: 'Ratings',
-            path: '/components/ratings'
+            title: "Ratings",
+            path: "/components/ratings",
           },
           {
-            title: 'Snackbar',
-            path: '/components/snackbar'
+            title: "Snackbar",
+            path: "/components/snackbar",
           },
           {
-            title: 'Swiper',
-            path: '/components/swiper'
+            title: "Swiper",
+            path: "/components/swiper",
           },
           {
-            title: 'Tabs',
-            path: '/components/tabs'
+            title: "Tabs",
+            path: "/components/tabs",
           },
           {
-            title: 'Timeline',
-            path: '/components/timeline'
+            title: "Timeline",
+            path: "/components/timeline",
           },
           {
-            title: 'Toasts',
-            path: '/components/toast'
+            title: "Toasts",
+            path: "/components/toast",
           },
           {
-            title: 'Tree View',
-            path: '/components/tree-view'
+            title: "Tree View",
+            path: "/components/tree-view",
           },
           {
-            title: 'More',
-            path: '/components/more'
+            title: "More",
+            path: "/components/more",
           },
           {
-            title: 'Test',
-            path: '/components/test'
-          }
-        ]
-      }
-    ]
+            title: "Test",
+            path: "/components/test",
+          },
+        ],
+      },
+    ],
   },
   {
-    icon: 'bx:collection',
-    title: 'Pages',
+    icon: "bx:collection",
+    title: "Pages",
+    subject: "pages",
     children: [
       {
-        title: 'User Profile',
-        icon: 'bx:user-circle',
+        title: "User Profile",
+        icon: "bx:user-circle",
         children: [
           {
-            title: 'Profile',
-            path: '/pages/user-profile/profile'
+            title: "Profile",
+            path: "/pages/user-profile/profile",
           },
           {
-            title: 'Teams',
-            path: '/pages/user-profile/teams'
+            title: "Teams",
+            path: "/pages/user-profile/teams",
           },
           {
-            title: 'Projects',
-            path: '/pages/user-profile/projects'
+            title: "Projects",
+            path: "/pages/user-profile/projects",
           },
           {
-            title: 'Connections',
-            path: '/pages/user-profile/connections'
-          }
-        ]
+            title: "Connections",
+            path: "/pages/user-profile/connections",
+          },
+        ],
       },
       {
-        icon: 'bx:cog',
-        title: 'Account Settings',
+        icon: "bx:cog",
+        title: "Account Settings",
         children: [
           {
-            title: 'Account',
-            path: '/pages/account-settings/account'
+            title: "Account",
+            path: "/pages/account-settings/account",
           },
           {
-            title: 'Security',
-            path: '/pages/account-settings/security'
+            title: "Security",
+            path: "/pages/account-settings/security",
           },
           {
-            title: 'Billing & Plans',
-            path: '/pages/account-settings/billing-plan'
+            title: "Billing & Plans",
+            path: "/pages/account-settings/billing-plan",
           },
           {
-            title: 'Notifications',
-            path: '/pages/account-settings/notifications'
+            title: "Notifications",
+            path: "/pages/account-settings/notifications",
           },
 
           {
-            title: 'Connections',
-            path: '/pages/account-settings/connections'
-          }
-        ]
+            title: "Connections",
+            path: "/pages/account-settings/connections",
+          },
+        ],
       },
       {
-        title: 'FAQ',
-        path: '/pages/faq',
-        icon: 'bx:help-circle'
+        title: "FAQ",
+        path: "/pages/faq",
+        icon: "bx:help-circle",
       },
       {
-        title: 'Help Center',
-        icon: 'bx:buoy',
-        path: '/pages/help-center'
+        title: "Help Center",
+        icon: "bx:buoy",
+        path: "/pages/help-center",
       },
       {
-        title: 'Pricing',
-        icon: 'bx:diamond',
-        path: '/pages/pricing'
+        title: "Pricing",
+        icon: "bx:diamond",
+        path: "/pages/pricing",
       },
       {
-        title: 'Miscellaneous',
-        icon: 'bx:shape-circle',
+        title: "Miscellaneous",
+        icon: "bx:shape-circle",
         children: [
           {
             openInNewTab: true,
-            title: 'Coming Soon',
-            path: '/pages/misc/coming-soon'
+            title: "Coming Soon",
+            path: "/pages/misc/coming-soon",
           },
           {
             openInNewTab: true,
-            title: 'Under Maintenance',
-            path: '/pages/misc/under-maintenance'
+            title: "Under Maintenance",
+            path: "/pages/misc/under-maintenance",
           },
           {
             openInNewTab: true,
-            title: 'Page Not Found - 404',
-            path: '/pages/misc/404-not-found'
+            title: "Page Not Found - 404",
+            path: "/pages/misc/404-not-found",
           },
           {
             openInNewTab: true,
-            title: 'Not Authorized - 401',
-            path: '/pages/misc/401-not-authorized'
+            title: "Not Authorized - 401",
+            path: "/pages/misc/401-not-authorized",
           },
           {
             openInNewTab: true,
-            title: 'Server Error - 500',
-            path: '/pages/misc/500-server-error'
-          }
-        ]
+            title: "Server Error - 500",
+            path: "/pages/misc/500-server-error",
+          },
+        ],
       },
       {
-        title: 'Auth Pages',
-        icon: 'bx:lock-open-alt',
+        title: "Auth Pages",
+        icon: "bx:lock-open-alt",
         children: [
           {
-            title: 'Login',
+            title: "Login",
             children: [
               {
                 openInNewTab: true,
-                title: 'Login v1',
-                path: '/pages/auth/login-v1'
+                title: "Login v1",
+                path: "/pages/auth/login-v1",
               },
               {
                 openInNewTab: true,
-                title: 'Login v2',
-                path: '/pages/auth/login-v2'
+                title: "Login v2",
+                path: "/pages/auth/login-v2",
               },
               {
                 openInNewTab: true,
-                title: 'Login With AppBar',
-                path: '/pages/auth/login-with-appbar'
-              }
-            ]
+                title: "Login With AppBar",
+                path: "/pages/auth/login-with-appbar",
+              },
+            ],
           },
           {
-            title: 'Register',
+            title: "Register",
             children: [
               {
                 openInNewTab: true,
-                title: 'Register v1',
-                path: '/pages/auth/register-v1'
+                title: "Register v1",
+                path: "/pages/auth/register-v1",
               },
               {
                 openInNewTab: true,
-                title: 'Register v2',
-                path: '/pages/auth/register-v2'
+                title: "Register v2",
+                path: "/pages/auth/register-v2",
               },
               {
                 openInNewTab: true,
-                title: 'Register Multi-Steps',
-                path: '/pages/auth/register-multi-steps'
-              }
-            ]
+                title: "Register Multi-Steps",
+                path: "/pages/auth/register-multi-steps",
+              },
+            ],
           },
           {
-            title: 'Verify Email',
+            title: "Verify Email",
             children: [
               {
                 openInNewTab: true,
-                title: 'Verify Email v1',
-                path: '/pages/auth/verify-email-v1'
+                title: "Verify Email v1",
+                path: "/pages/auth/verify-email-v1",
               },
               {
                 openInNewTab: true,
-                title: 'Verify Email v2',
-                path: '/pages/auth/verify-email-v2'
-              }
-            ]
+                title: "Verify Email v2",
+                path: "/pages/auth/verify-email-v2",
+              },
+            ],
           },
           {
-            title: 'Forgot Password',
+            title: "Forgot Password",
             children: [
               {
                 openInNewTab: true,
-                title: 'Forgot Password v1',
-                path: '/pages/auth/forgot-password-v1'
+                title: "Forgot Password v1",
+                path: "/pages/auth/forgot-password-v1",
               },
               {
                 openInNewTab: true,
-                title: 'Forgot Password v2',
-                path: '/pages/auth/forgot-password-v2'
-              }
-            ]
+                title: "Forgot Password v2",
+                path: "/pages/auth/forgot-password-v2",
+              },
+            ],
           },
           {
-            title: 'Reset Password',
+            title: "Reset Password",
             children: [
               {
                 openInNewTab: true,
-                title: 'Reset Password v1',
-                path: '/pages/auth/reset-password-v1'
+                title: "Reset Password v1",
+                path: "/pages/auth/reset-password-v1",
               },
               {
                 openInNewTab: true,
-                title: 'Reset Password v2',
-                path: '/pages/auth/reset-password-v2'
-              }
-            ]
+                title: "Reset Password v2",
+                path: "/pages/auth/reset-password-v2",
+              },
+            ],
           },
           {
-            title: 'Two Steps',
+            title: "Two Steps",
             children: [
               {
                 openInNewTab: true,
-                title: 'Two Steps v1',
-                path: '/pages/auth/two-steps-v1'
+                title: "Two Steps v1",
+                path: "/pages/auth/two-steps-v1",
               },
               {
                 openInNewTab: true,
-                title: 'Two Steps v2',
-                path: '/pages/auth/two-steps-v2'
-              }
-            ]
-          }
-        ]
+                title: "Two Steps v2",
+                path: "/pages/auth/two-steps-v2",
+              },
+            ],
+          },
+        ],
       },
       {
-        title: 'Wizard Examples',
-        icon: 'bx:spreadsheet',
+        title: "Wizard Examples",
+        icon: "bx:spreadsheet",
         children: [
           {
-            title: 'Checkout',
-            path: '/pages/wizard-examples/checkout'
+            title: "Checkout",
+            path: "/pages/wizard-examples/checkout",
           },
           {
-            title: 'Property Listing',
-            path: '/pages/wizard-examples/property-listing'
+            title: "Property Listing",
+            path: "/pages/wizard-examples/property-listing",
           },
           {
-            title: 'Create Deal',
-            path: '/pages/wizard-examples/create-deal'
-          }
-        ]
+            title: "Create Deal",
+            path: "/pages/wizard-examples/create-deal",
+          },
+        ],
       },
       {
-        icon: 'bx:window-open',
-        title: 'Dialog Examples',
-        path: '/pages/dialog-examples'
-      }
-    ]
+        icon: "bx:window-open",
+        title: "Dialog Examples",
+        path: "/pages/dialog-examples",
+      },
+    ],
   },
   {
-    icon: 'bx:grid-alt',
-    title: 'Forms & Tables',
+    icon: "bx:grid-alt",
+    title: "Forms & Tables",
     children: [
       {
-        title: 'Form Elements',
-        icon: 'bx:detail',
+        title: "Form Elements",
+        icon: "bx:detail",
         children: [
           {
-            title: 'Text Field',
-            path: '/forms/form-elements/text-field'
+            title: "Text Field",
+            path: "/forms/form-elements/text-field",
           },
           {
-            title: 'Select',
-            path: '/forms/form-elements/select'
+            title: "Select",
+            path: "/forms/form-elements/select",
           },
           {
-            title: 'Checkbox',
-            path: '/forms/form-elements/checkbox'
+            title: "Checkbox",
+            path: "/forms/form-elements/checkbox",
           },
           {
-            title: 'Radio',
-            path: '/forms/form-elements/radio'
+            title: "Radio",
+            path: "/forms/form-elements/radio",
           },
           {
-            title: 'Custom Inputs',
-            path: '/forms/form-elements/custom-inputs'
+            title: "Custom Inputs",
+            path: "/forms/form-elements/custom-inputs",
           },
           {
-            title: 'Textarea',
-            path: '/forms/form-elements/textarea'
+            title: "Textarea",
+            path: "/forms/form-elements/textarea",
           },
           {
-            title: 'Autocomplete',
-            path: '/forms/form-elements/autocomplete'
+            title: "Autocomplete",
+            path: "/forms/form-elements/autocomplete",
           },
           {
-            title: 'Date Pickers',
-            path: '/forms/form-elements/pickers'
+            title: "Date Pickers",
+            path: "/forms/form-elements/pickers",
           },
           {
-            title: 'Switch',
-            path: '/forms/form-elements/switch'
+            title: "Switch",
+            path: "/forms/form-elements/switch",
           },
           {
-            title: 'File Uploader',
-            path: '/forms/form-elements/file-uploader'
+            title: "File Uploader",
+            path: "/forms/form-elements/file-uploader",
           },
           {
-            title: 'Editor',
-            path: '/forms/form-elements/editor'
+            title: "Editor",
+            path: "/forms/form-elements/editor",
           },
           {
-            title: 'Slider',
-            path: '/forms/form-elements/slider'
+            title: "Slider",
+            path: "/forms/form-elements/slider",
           },
           {
-            title: 'Input Mask',
-            path: '/forms/form-elements/input-mask'
+            title: "Input Mask",
+            path: "/forms/form-elements/input-mask",
           },
           {
-            title: 'Test',
-            path: '/forms/form-elements/test'
-          }
-        ]
+            title: "Test",
+            path: "/forms/form-elements/test",
+          },
+        ],
       },
       {
-        icon: 'bx:detail',
-        title: 'Form Layouts',
-        path: '/forms/form-layouts'
+        icon: "bx:detail",
+        title: "Form Layouts",
+        path: "/forms/form-layouts",
       },
       {
-        title: 'Form Validation',
-        path: '/forms/form-validation',
-        icon: 'bx:list-check'
+        title: "Form Validation",
+        path: "/forms/form-validation",
+        icon: "bx:list-check",
       },
       {
-        title: 'Form Wizard',
-        path: '/forms/form-wizard',
-        icon: 'bx:carousel'
+        title: "Form Wizard",
+        path: "/forms/form-wizard",
+        icon: "bx:carousel",
       },
       {
-        title: 'Table',
-        icon: 'bx:table',
-        path: '/tables/mui'
+        title: "Table",
+        icon: "bx:table",
+        path: "/tables/mui",
       },
       {
-        title: 'Mui DataGrid',
-        icon: 'bx:grid',
-        path: '/tables/data-grid'
-      }
-    ]
+        title: "Mui DataGrid",
+        icon: "bx:grid",
+        path: "/tables/data-grid",
+      },
+    ],
   },
   {
-    title: 'Charts',
-    icon: 'bx:bar-chart-square',
+    title: "Charts",
+    icon: "bx:bar-chart-square",
     children: [
       {
-        title: 'Apex',
-        icon: 'bx:line-chart',
-        path: '/charts/apex-charts'
+        title: "Apex",
+        icon: "bx:line-chart",
+        path: "/charts/apex-charts",
       },
       {
-        title: 'Recharts',
-        icon: 'bx:bar-chart',
-        path: '/charts/recharts'
+        title: "Recharts",
+        icon: "bx:bar-chart",
+        path: "/charts/recharts",
       },
       {
-        title: 'ChartJS',
-        path: '/charts/chartjs',
-        icon: 'bx:pie-chart-alt'
-      }
-    ]
+        title: "ChartJS",
+        path: "/charts/chartjs",
+        icon: "bx:pie-chart-alt",
+      },
+    ],
   },
   {
-    title: 'Others',
-    icon: 'bx:dots-horizontal-rounded',
+    title: "Others",
+    icon: "bx:dots-horizontal-rounded",
     children: [
       {
-        path: '/acl',
-        action: 'read',
-        subject: 'acl-page',
-        icon: 'bx:shield',
-        title: 'Access Control'
+        path: "/acl",
+        action: "read",
+        subject: "acl-page",
+        icon: "bx:shield",
+        title: "Access Control",
       },
       {
-        title: 'Menu Levels',
-        icon: 'bx:menu',
+        title: "Menu Levels",
+        icon: "bx:menu",
         children: [
           {
-            title: 'Menu Level 2.1'
+            title: "Menu Level 2.1",
           },
           {
-            title: 'Menu Level 2.2',
+            title: "Menu Level 2.2",
             children: [
               {
-                title: 'Menu Level 3.1'
+                title: "Menu Level 3.1",
               },
               {
-                title: 'Menu Level 3.2'
-              }
-            ]
-          }
-        ]
+                title: "Menu Level 3.2",
+              },
+            ],
+          },
+        ],
       },
       {
-        title: 'Disabled Menu',
-        icon: 'bx:block',
-        disabled: true
+        title: "Disabled Menu",
+        icon: "bx:block",
+        disabled: true,
       },
       {
-        title: 'Raise Support',
-        icon: 'bx:support',
+        title: "Raise Support",
+        icon: "bx:support",
         externalLink: true,
         openInNewTab: true,
-        path: 'https://themeselection.com/support'
+        path: "https://themeselection.com/support",
       },
       {
-        title: 'Documentation',
-        icon: 'bx:file',
+        title: "Documentation",
+        icon: "bx:file",
         externalLink: true,
         openInNewTab: true,
-        path: 'https://demos.themeselection.com/sneat-mui-react-nextjs-admin-template/documentation/'
-      }
-    ]
-  }
-]
+        path: "https://demos.themeselection.com/sneat-mui-react-nextjs-admin-template/documentation/",
+      },
+    ],
+  },
+];
 
-mock.onGet('/api/horizontal-nav/data').reply(() => {
-  return [200, navigation]
-})
+mock.onGet("/api/horizontal-nav/data").reply(() => {
+  return [200, navigation];
+});
