@@ -19,7 +19,7 @@ builder.queryFields((t) => ({
       return prisma.model.findMany({
         ...query,
         orderBy: {
-          createdAt: 'desc',
+          name: "asc",
         },
       });
     },
@@ -45,7 +45,7 @@ builder.queryFields((t) => ({
         ...query,
         where,
         orderBy: {
-          createdAt: 'desc',
+          name: "asc",
         },
       });
     },
@@ -80,31 +80,15 @@ builder.queryFields((t) => ({
     cursor: "id",
     args: {
       brandId: t.arg.string({ required: true }),
-      first: t.arg.int(),
-      last: t.arg.int(),
-      after: t.arg.string(),
-      before: t.arg.string(),
     },
     resolve: (query, _parent, args, _ctx, _info) => {
-      const { first, last, after, before } = args;
-
       return prisma.model.findMany({
         ...query,
         where: {
           brandId: args.brandId,
         },
-        // Limit the number of events returned by this query.
-        take: first && !last ? first : last && !first ? -last : undefined,
-        // Conditionally use a cursor if it exists.
-        ...((after || before) && {
-          skip: 1, // Do not include the cursor itself in the query result.
-          cursor: {
-            id:
-              after && !before ? after : before && !after ? before : undefined,
-          },
-        }),
         orderBy: {
-          createdAt: "desc",
+          name: "asc",
         },
       });
     },

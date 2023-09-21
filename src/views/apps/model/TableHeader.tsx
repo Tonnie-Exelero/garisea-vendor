@@ -152,7 +152,7 @@ const TableHeader = (props: TableHeaderProps) => {
               variant="contained"
               onClick={handleDialogToggle}
             >
-              Add Model
+              Add
             </Button>
           )}
         </Box>
@@ -197,7 +197,7 @@ const TableHeader = (props: TableHeaderProps) => {
               fullWidth
               id="name"
               aria-label="name"
-              value={name}
+              value={name.trimStart()}
               onChange={(e) => {
                 setName(e.target.value);
                 setSlug(e.target.value.replace(/\s+/g, "-").toLowerCase());
@@ -240,15 +240,23 @@ const TableHeader = (props: TableHeaderProps) => {
                 onChange={(e) => setBrandId(e.target.value)}
                 inputProps={{ placeholder: "Select Brand" }}
               >
-                {brands.edges.map((brand, index) => {
-                  const { id, name } = brand.node;
-
-                  return (
-                    <MenuItem key={index} value={id}>
-                      {name}
+                {brands.edges.length > 0 ? (
+                  brands.edges.map((brand, index) => (
+                    <MenuItem key={index} value={brand.node.id}>
+                      {brand.node.name}
                     </MenuItem>
-                  );
-                })}
+                  ))
+                ) : (
+                  <Typography
+                    sx={{
+                      padding: 3,
+                      color: "text.secondary",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    No brands available
+                  </Typography>
+                )}
               </Select>
             </FormControl>
             <Box

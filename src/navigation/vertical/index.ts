@@ -96,6 +96,13 @@ const navigation = (): VerticalNavItemsType => {
       subject: "customers",
     },
     {
+      title: "Organizations",
+      icon: "bx:building",
+      path: "/apps/organizations/list",
+      action: "read",
+      subject: "organizations",
+    },
+    {
       title: "Roles & Permissions",
       icon: "bx:check-shield",
       children: [

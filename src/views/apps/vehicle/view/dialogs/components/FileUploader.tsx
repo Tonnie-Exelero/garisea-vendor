@@ -10,9 +10,6 @@ import IconButton from "@mui/material/IconButton";
 import { styled, useTheme } from "@mui/material/styles";
 import Typography, { TypographyProps } from "@mui/material/Typography";
 
-// ** Vercel Imports
-import type { PutBlobResult } from "@vercel/blob";
-
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
 
@@ -28,6 +25,7 @@ import { editVehicleImages } from "@src/store/apps/vendor/vehicle/single";
 
 // ** Types
 import { VehicleNode } from "src/types/apps/vehicleTypes";
+import { uploadFileOfFiles } from "@core/utils/file-manager";
 
 interface FileProp {
   name: string;
@@ -118,12 +116,7 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
     setUploading("ongoing");
 
     for (const file of files) {
-      const response = await fetch(`/api/images/upload?filename=${file.name}`, {
-        method: "POST",
-        body: file,
-      });
-
-      const newBlob = (await response.json()) as PutBlobResult;
+      const newBlob = await uploadFileOfFiles(file);
 
       imagesArray.push(newBlob);
     }

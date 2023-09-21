@@ -28,9 +28,6 @@ import { CircularProgress } from "@mui/material";
 // ** Third Party Imports
 import { useForm, Controller } from "react-hook-form";
 
-// ** Vercel Imports
-import type { PutBlobResult } from "@vercel/blob";
-
 // ** Context
 import { useAuth } from "src/hooks/useAuth";
 
@@ -48,13 +45,7 @@ import { removeUser } from "@src/store/apps/admin/user";
 import { editUser, editImage } from "@src/store/apps/admin/user/single";
 import { ThemeColor } from "@core/layouts/types";
 import { getInitials } from "@utils/get-initials";
-
-const ImgStyled = styled("img")(({ theme }) => ({
-  width: 100,
-  height: 100,
-  marginRight: theme.spacing(6.25),
-  borderRadius: theme.shape.borderRadius,
-}));
+import { uploadFile, removeFile } from "@core/utils/file-manager";
 
 const ButtonStyled = styled(Button)<
   ButtonProps & { component?: ElementType; htmlFor?: string }
@@ -146,25 +137,12 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
   const handleInputImageChange = async (file: ChangeEvent) => {
     setUploadingImage(true);
 
-    const { files } = file.target as HTMLInputElement;
-    if (files && files.length !== 0) {
-      const response = await fetch(
-        `/api/images/upload?filename=${files[0].name}`,
-        {
-          method: "POST",
-          body: files[0],
-        }
-      );
+    const newFile = await uploadFile(file);
 
-      const newBlob = (await response.json()) as PutBlobResult;
+    newFile && handleUpdateUserImage(newFile.url);
 
-      handleUpdateUserImage(newBlob.url);
-
-      // Then remove the previous image from server.
-      await fetch(`/api/images/remove?url=${image}`, {
-        method: "DELETE",
-      });
-    }
+    // Then remove the previous image from server.
+    image && removeFile(image);
 
     setUploadingImage(false);
   };
@@ -272,12 +250,12 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
                     variant="contained"
                     htmlFor="account-settings-upload-image"
                   >
-                    Upload New Photo
+                    Upload
                     <input
                       hidden
                       type="file"
                       value={inputValue}
-                      accept="image/png, image/jpeg"
+                      accept="image/png, image/jpeg, image/svg"
                       onChange={handleInputImageChange}
                       id="account-settings-upload-image"
                     />
@@ -306,7 +284,7 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
                   )}
                 </Box>
                 <Typography sx={{ mt: 6, color: "text.disabled" }}>
-                  Allowed PNG or JPEG. Max size of 2MB.
+                  Allowed PNG/JPEG/SVG. Max size of 2MB.
                 </Typography>
               </div>
             </Box>

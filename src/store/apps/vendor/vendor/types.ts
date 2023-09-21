@@ -1,3 +1,5 @@
+import { Organization } from "../organization/types";
+
 export interface Vendor {
   id: string;
   firstName: string;
@@ -13,4 +15,6 @@ export interface Vendor {
   city: string;
   country: string;
   emailVerified: string;
+  addedOrganization: string;
+  organization: Partial<Organization>;
 }

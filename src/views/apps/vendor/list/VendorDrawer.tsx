@@ -7,7 +7,11 @@ import {
   BoxProps,
   Button,
   Drawer,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -25,14 +29,13 @@ import {
   editVendor,
   fetchVendors,
 } from "@src/store/apps/vendor/vendor";
+import { fetchOrganizations } from "@src/store/apps/vendor/organization";
 
 // ** Types Imports
 import { RootState, AppDispatch } from "src/store";
-import { VendorRowType } from "src/types/apps/vendorTypes";
 
 // ** Others
 import toast from "react-hot-toast";
-import { AnyAction } from "@reduxjs/toolkit";
 
 interface SidebarVendorType {
   open: boolean;
@@ -66,10 +69,15 @@ const SidebarVendor = (props: SidebarVendorType) => {
   const [address, setAddress] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [country, setCountry] = useState<string>("");
+  const [organization, setOrganization] = useState<any>();
+  const [organizationId, setOrganizationId] = useState<string>("");
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const { vendors } = useSelector((state: RootState) => state.vendors);
+  const { organizations } = useSelector(
+    (state: RootState) => state.organizations
+  );
 
   const resetData = () => {
     setFirstName("");
@@ -83,6 +91,8 @@ const SidebarVendor = (props: SidebarVendorType) => {
     setAddress("");
     setCity("");
     setCountry("");
+    setOrganization("");
+    setOrganizationId("");
   };
 
   const setUpdateVendorData = () => {
@@ -98,11 +108,13 @@ const SidebarVendor = (props: SidebarVendorType) => {
     setAddress(data.address);
     setCity(data.city);
     setCountry(data.country);
+    setOrganization(data.organization);
   };
 
   useEffect(() => {
     resetData();
 
+    dispatch(fetchOrganizations({ first: 100 }));
     dispatch(fetchVendors({ first: 20 }));
 
     type === "Update" && setUpdateVendorData();
@@ -141,6 +153,8 @@ const SidebarVendor = (props: SidebarVendorType) => {
         city,
         country,
         emailVerified: "No",
+        addedOrganization: "No",
+        organizationId,
       };
 
       const resultAction = await dispatch(addVendor({ ...vendorData }));
@@ -177,6 +191,7 @@ const SidebarVendor = (props: SidebarVendorType) => {
       address,
       city,
       country,
+      organizationId,
     };
 
     const resultAction = await dispatch(editVendor({ ...vendorData }));
@@ -298,18 +313,59 @@ const SidebarVendor = (props: SidebarVendorType) => {
           label="City"
           placeholder="e.g. Nairobi"
         />
-        <TextField
-          fullWidth
-          id="country"
-          aria-label="country"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          type="text"
-          sx={{ mb: 4 }}
-          label="Country"
-          placeholder="e.g. Kenya"
-        />
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <FormControl fullWidth sx={{ mb: 4 }}>
+          <InputLabel id="vendor-view-country-label">Country</InputLabel>
+          <Select
+            label="Country"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            id="country"
+            labelId="vendor-view-country-label"
+          >
+            <MenuItem value="Kenya">Kenya</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl fullWidth sx={{ mb: 4 }}>
+          <InputLabel id="vendor-view-organization-label">
+            Organization
+          </InputLabel>
+          <Select
+            label="Organization"
+            value={organization}
+            onChange={(e) => setOrganizationId(e.target.value)}
+            id="organization"
+            labelId="vendor-view-organization-label"
+          >
+            {organizations.edges.length > 0 ? (
+              organizations.edges.map((org, index) => {
+                const { id, name } = org.node;
+
+                return (
+                  <MenuItem key={index} value={id}>
+                    {name}
+                  </MenuItem>
+                );
+              })
+            ) : (
+              <Typography
+                sx={{
+                  padding: 3,
+                  color: "text.secondary",
+                  fontStyle: "italic",
+                }}
+              >
+                No organizations available
+              </Typography>
+            )}
+          </Select>
+        </FormControl>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Button
             size="large"
             onClick={(e) => {
@@ -318,7 +374,7 @@ const SidebarVendor = (props: SidebarVendorType) => {
             variant="contained"
             sx={{ mr: 3 }}
           >
-            {type === "Add" ? "Add" : "Update"} Vendor
+            {type === "Add" ? "Create" : "Update"}
           </Button>
           <Button
             size="large"

@@ -8,11 +8,14 @@ import {
   Box,
   Button,
   Card,
+  CardContent,
+  CardHeader,
   Checkbox,
   CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
+  Divider,
   FormControl,
   FormControlLabel,
   FormGroup,
@@ -22,6 +25,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  SelectChangeEvent,
   TextField,
   Typography,
 } from "@mui/material";
@@ -45,13 +49,16 @@ import { ModelRowType } from "src/types/apps/modelTypes";
 // ** Actions Imports
 import {
   editModel,
-  fetchModels,
   fetchFilteredModels,
   removeModel,
+  fetchModelsByBrand,
 } from "@src/store/apps/admin/model";
 import { fetchBrands } from "@src/store/apps/admin/brand";
 import apolloClient from "@lib/apollo";
-import { GET_FILTERED_MODELS, GET_MODELS } from "@src/api/admin/model";
+import {
+  GET_FILTERED_MODELS,
+  GET_MODELS_BY_BRAND_ID,
+} from "@src/api/admin/model";
 
 // ** Others
 import toast from "react-hot-toast";
@@ -107,18 +114,13 @@ const defaultColumns: GridColDef[] = [
   },
 ];
 
-interface Props {
-  models: any;
-}
-
-const Models = (props: Partial<Props>) => {
+const Models = () => {
   // ** Watch for idle time or reload
   idleTimer();
 
-  const { models } = props;
-
   // ** State
-  const [vModels, setVModels] = useState<any>(models);
+  const [vModels, setVModels] = useState<any>();
+  const [vBrandId, setVBrandId] = useState<string>("");
   const [value, setValue] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
@@ -144,12 +146,38 @@ const Models = (props: Partial<Props>) => {
     dispatch(fetchBrands({ first: 100 }));
   }, [dispatch, vModels]);
 
+  const handleBrandSelect = useCallback(
+    async (event: SelectChangeEvent) => {
+      setIsLoading(true);
+      const {
+        target: { value },
+      } = event;
+
+      setVBrandId(value);
+
+      const brandModels = await dispatch(
+        fetchModelsByBrand({ brandId: value })
+      );
+
+      setPaginationModel({
+        page: 0,
+        pageSize: PAGE_SIZE,
+      });
+
+      const { modelsByBrandId }: any = brandModels.payload;
+
+      setVModels(modelsByBrandId);
+      setIsLoading(false);
+    },
+    [dispatch, vBrandId]
+  );
+
   const handleRefresh = useCallback(async () => {
     setIsLoading(true);
     const { data } = await apolloClient.query({
-      query: value === "" ? GET_MODELS : GET_FILTERED_MODELS,
+      query: value === "" ? GET_MODELS_BY_BRAND_ID : GET_FILTERED_MODELS,
       variables: {
-        ...(value !== "" && { filter: value }),
+        ...(value === "" ? { brandId: vBrandId } : { filter: value }),
         first: PAGE_SIZE,
       },
       fetchPolicy: "no-cache",
@@ -163,9 +191,9 @@ const Models = (props: Partial<Props>) => {
     setVModels(
       value === ""
         ? () => {
-            const { models }: any = data;
+            const { modelsByBrandId }: any = data;
 
-            return models;
+            return modelsByBrandId;
           }
         : () => {
             const { modelsFiltered }: any = data;
@@ -186,7 +214,8 @@ const Models = (props: Partial<Props>) => {
         setPaginationModel(newPaginationModel);
         const newModels = await dispatch(
           value === ""
-            ? fetchModels({
+            ? fetchModelsByBrand({
+                brandId: vBrandId,
                 first: paginationModel.pageSize,
                 after: vModels.pageInfo.endCursor,
               })
@@ -200,9 +229,9 @@ const Models = (props: Partial<Props>) => {
         setVModels(
           value === ""
             ? () => {
-                const { models }: any = newModels.payload;
+                const { modelsByBrandId }: any = newModels.payload;
 
-                return models;
+                return modelsByBrandId;
               }
             : () => {
                 const { modelsFiltered }: any = newModels.payload;
@@ -217,7 +246,8 @@ const Models = (props: Partial<Props>) => {
 
         const newModels = await dispatch(
           value === ""
-            ? fetchModels({
+            ? fetchModelsByBrand({
+                brandId: vBrandId,
                 last: paginationModel.pageSize,
                 before: vModels.pageInfo.startCursor,
               })
@@ -231,9 +261,9 @@ const Models = (props: Partial<Props>) => {
         setVModels(
           value === ""
             ? () => {
-                const { models }: any = newModels.payload;
+                const { modelsByBrandId }: any = newModels.payload;
 
-                return models;
+                return modelsByBrandId;
               }
             : () => {
                 const { modelsFiltered }: any = newModels.payload;
@@ -249,12 +279,16 @@ const Models = (props: Partial<Props>) => {
   );
 
   // Following lines are here to prevent `rowCountState` from being undefined during the loading
-  const [rowCountState, setRowCountState] = useState(vModels.totalCount || 0);
+  const [rowCountState, setRowCountState] = useState(
+    (vModels && vModels.totalCount) || 0
+  );
   useEffect(() => {
     setRowCountState((prevRowCountState: any) =>
-      vModels.totalCount !== undefined ? vModels.totalCount : prevRowCountState
+      vModels && vModels.totalCount !== undefined
+        ? vModels && vModels.totalCount
+        : prevRowCountState
     );
-  }, [vModels.totalCount, setRowCountState]);
+  }, [vBrandId, vModels, vModels && vModels.totalCount, setRowCountState]);
 
   const handleFilter = useCallback(
     async (val: string) => {
@@ -266,6 +300,11 @@ const Models = (props: Partial<Props>) => {
           filter: val,
         })
       );
+
+      setPaginationModel({
+        page: 0,
+        pageSize: PAGE_SIZE,
+      });
 
       const { modelsFiltered }: any = filteredModels.payload;
 
@@ -317,17 +356,14 @@ const Models = (props: Partial<Props>) => {
   };
 
   const handleSubmitDeleteModel = async (e: any) => {
-    setDeleteDialogOpen(false);
     e.preventDefault();
 
     const resultAction = await dispatch(removeModel({ id }));
 
     if (removeModel.fulfilled.match(resultAction)) {
-      // model will have a type signature of Model as we passed that as the Returned parameter in createAsyncThunk
-      const model = resultAction.payload;
-      const { deleteModel }: any = model;
+      setDeleteDialogOpen(false);
 
-      toast.success(`Model ${deleteModel.name} deleted successfully!`);
+      toast.success(`Model  deleted successfully!`);
     } else {
       toast.error(`Error deleting model: ${resultAction.error}`);
     }
@@ -379,6 +415,44 @@ const Models = (props: Partial<Props>) => {
         </Grid>
         <Grid item xs={12}>
           <Card>
+            <CardHeader title="Filter By Brand" />
+            <CardContent>
+              <Grid container spacing={5}>
+                <Grid item sm={4} xs={12}>
+                  <FormControl fullWidth>
+                    <InputLabel id="role-select">Select Brand</InputLabel>
+                    <Select
+                      fullWidth
+                      id="brand"
+                      labelId="brand-select"
+                      label="Brand"
+                      value={vBrandId}
+                      onChange={handleBrandSelect}
+                      inputProps={{ placeholder: "Select Brand" }}
+                    >
+                      {brands.edges.length > 0 ? (
+                        brands.edges.map((brand, index) => (
+                          <MenuItem key={index} value={brand.node.id}>
+                            {brand.node.name}
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <Typography
+                          sx={{
+                            padding: 3,
+                            color: "text.secondary",
+                            fontStyle: "italic",
+                          }}
+                        >
+                          No brands available
+                        </Typography>
+                      )}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </CardContent>
+            <Divider sx={{ m: "0 !important" }} />
             <TableHeader
               value={value}
               handleFilter={handleFilter}
@@ -409,15 +483,21 @@ const Models = (props: Partial<Props>) => {
                   />
                 ) : (
                   <Box sx={{ margin: "2rem" }}>
-                    <Typography
-                      sx={{
-                        color: "text.secondary",
-                        fontStyle: "italic",
-                        textAlign: "center",
-                      }}
-                    >
-                      There are no models created yet.
-                    </Typography>
+                    {isLoading ? (
+                      <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        <CircularProgress />
+                      </Box>
+                    ) : (
+                      <Typography
+                        sx={{
+                          color: "text.secondary",
+                          fontStyle: "italic",
+                          textAlign: "center",
+                        }}
+                      >
+                        There are no models created yet.
+                      </Typography>
+                    )}
                   </Box>
                 )}
               </>
@@ -515,15 +595,23 @@ const Models = (props: Partial<Props>) => {
                   onChange={(e) => setBrandId(e.target.value)}
                   inputProps={{ placeholder: "Select Brand" }}
                 >
-                  {brands.edges.map((brand, index) => {
-                    const { id, name } = brand.node;
-
-                    return (
-                      <MenuItem key={index} value={id}>
-                        {name}
+                  {brands.edges.length > 0 ? (
+                    brands.edges.map((brand, index) => (
+                      <MenuItem key={index} value={brand.node.id}>
+                        {brand.node.name}
                       </MenuItem>
-                    );
-                  })}
+                    ))
+                  ) : (
+                    <Typography
+                      sx={{
+                        padding: 3,
+                        color: "text.secondary",
+                        fontStyle: "italic",
+                      }}
+                    >
+                      No brands available
+                    </Typography>
+                  )}
                 </Select>
               </FormControl>
 
@@ -621,33 +709,6 @@ const Models = (props: Partial<Props>) => {
       </Dialog>
     </>
   );
-};
-
-export const getServerSideProps: any = async () => {
-  const { data, loading, error } = await apolloClient.query({
-    query: GET_MODELS,
-    variables: {
-      first: PAGE_SIZE,
-    },
-  });
-
-  if (loading) {
-    toast.loading("Fetching models...");
-  }
-
-  if (error) {
-    console.error(error);
-    toast.error(`An error occurred while fetching models: ${error}`);
-    return undefined;
-  }
-
-  const { models }: any = data;
-
-  return {
-    props: {
-      models: { ...models },
-    },
-  };
 };
 
 Models.acl = {

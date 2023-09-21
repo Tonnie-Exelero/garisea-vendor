@@ -11,7 +11,7 @@ generator pothos {
 
 datasource db {
   provider          = "postgresql"
-  //   url      = env("LOCAL_DATABASE_URL")
+  // url      = env("LOCAL_DATABASE_URL")
   url               = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl         = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
   shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
@@ -42,24 +42,27 @@ model User {
 }
 
 model Vendor {
-  id            String    @id @default(cuid())
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
-  firstName     String?
-  lastName      String?
-  username      String    @unique
-  email         String    @unique
-  password      String
-  phone         String?
-  token         String?
-  status        String?
-  image         String?
-  language      String?
-  address       String?
-  city          String?
-  country       String?
-  emailVerified String?
-  Vehicle       Vehicle[]
+  id                String        @id @default(cuid())
+  createdAt         DateTime      @default(now()) @map(name: "created_at")
+  updatedAt         DateTime      @updatedAt @map(name: "updated_at")
+  firstName         String?
+  lastName          String?
+  username          String        @unique
+  email             String        @unique
+  password          String
+  phone             String?
+  token             String?
+  status            String?
+  image             String?
+  language          String?
+  address           String?
+  city              String?
+  country           String?
+  emailVerified     String?
+  addedOrganization String?
+  organization      Organization? @relation(fields: [organizationId], references: [id])
+  organizationId    String?
+  Vehicle           Vehicle[]
 }
 
 model Customer {
@@ -80,6 +83,22 @@ model Customer {
   city          String?
   country       String?
   emailVerified String?
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now()) @map(name: "created_at")
+  updatedAt   DateTime @updatedAt @map(name: "updated_at")
+  name        String   @unique
+  email       String?
+  phone       String?
+  address     String?
+  address2    String?
+  city        String?
+  country     String?
+  logo        String?
+  certificate String?
+  Vendor      Vendor[]
 }
 
 model Permission {

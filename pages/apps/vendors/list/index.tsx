@@ -75,6 +75,7 @@ import VendorDrawer from "@src/views/apps/vendor/list/VendorDrawer";
 import toast from "react-hot-toast";
 import { idleTimer } from "@src/configs/idleOrReload";
 import { AbilityContext } from "src/layouts/components/acl/Can";
+import { removeFile } from "@core/utils/file-manager";
 
 const PAGE_SIZE = 20;
 
@@ -234,6 +235,7 @@ const VendorList = (props: Partial<Props>) => {
   const [id, setId] = useState<string>("");
   const [value, setValue] = useState<string>("");
   const [status, setStatus] = useState<string>("");
+  const [image, setImage] = useState<string>("");
   const [vendorData, setVendorData] = useState<any>();
   const [drawerType, setDrawerType] = useState<string>("Add");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
@@ -416,6 +418,11 @@ const VendorList = (props: Partial<Props>) => {
         })
       );
 
+      setPaginationModel({
+        page: 0,
+        pageSize: PAGE_SIZE,
+      });
+
       const { vendorsFiltered }: any = filteredVendors.payload;
 
       setVVendors(vendorsFiltered);
@@ -437,6 +444,11 @@ const VendorList = (props: Partial<Props>) => {
         fetchVendorsByStatus({ first: PAGE_SIZE, status: value })
       );
 
+      setPaginationModel({
+        page: 0,
+        pageSize: PAGE_SIZE,
+      });
+
       const { vendorsByStatus }: any = statusVendors.payload;
 
       setVVendors(vendorsByStatus);
@@ -452,23 +464,24 @@ const VendorList = (props: Partial<Props>) => {
 
   const handleDeleteVendor = (row: any) => {
     setId(row.node.id);
+    setImage(row.node.image);
     setDeleteDialogOpen(true);
   };
 
   const handleSubmitDeleteVendor = async (e: any) => {
-    setDeleteDialogOpen(false);
     e.preventDefault();
+
+    // Remove image from server
+    image && (await removeFile(image));
 
     const resultAction = await dispatch(removeVendor({ id }));
 
     if (removeVendor.fulfilled.match(resultAction)) {
-      // user will have a type signature of User as we passed that as the Returned parameter in createAsyncThunk
-      const vendor = resultAction.payload;
-      const { deleteVendor }: any = vendor;
+      setDeleteDialogOpen(false);
 
-      toast.success(`User ${deleteVendor.firstName} removed successfully!`);
+      toast.success(`Vendor removed successfully!`);
     } else {
-      toast.error(`Error removing user: ${resultAction.error}`);
+      toast.error(`Error removing vendor: ${resultAction.error}`);
     }
   };
 

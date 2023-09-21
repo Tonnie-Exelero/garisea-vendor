@@ -88,7 +88,7 @@ const TableHeader = (props: TableHeaderProps) => {
         </Box>
         {ability?.can("create", "vendors") && (
           <Button onClick={() => toggle("Add")} variant="contained">
-            Add Vendor
+            Add
           </Button>
         )}
       </Box>

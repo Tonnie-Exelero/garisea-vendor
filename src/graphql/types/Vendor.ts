@@ -21,6 +21,8 @@ export const Vendor = builder.prismaObject("Vendor", {
     city: t.exposeString("city", { nullable: true }),
     country: t.exposeString("country", { nullable: true }),
     emailVerified: t.exposeString("emailVerified", { nullable: true }),
+    addedOrganization: t.exposeString("addedOrganization", { nullable: true }),
+    organization: t.relation("organization", { nullable: true }),
   }),
 });
 
@@ -32,7 +34,7 @@ builder.queryFields((t) => ({
       return prisma.vendor.findMany({
         ...query,
         orderBy: {
-          createdAt: 'desc',
+          firstName: "asc",
         },
       });
     },
@@ -54,7 +56,7 @@ builder.queryFields((t) => ({
           status,
         },
         orderBy: {
-          createdAt: 'desc',
+          firstName: "asc",
         },
       });
     },
@@ -90,7 +92,7 @@ builder.queryFields((t) => ({
         ...query,
         where,
         orderBy: {
-          createdAt: 'desc',
+          firstName: "asc",
         },
       });
     },
@@ -191,6 +193,8 @@ builder.mutationFields((t) => ({
       city: t.arg.string(),
       country: t.arg.string(),
       emailVerified: t.arg.string(),
+      addedOrganization: t.arg.string(),
+      organizationId: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx) => {
       const {
@@ -207,6 +211,8 @@ builder.mutationFields((t) => ({
         city,
         country,
         emailVerified,
+        addedOrganization,
+        organizationId,
       } = args;
 
       const hashedPassword = password && (await bcrypt.hash(password, 10));
@@ -227,6 +233,10 @@ builder.mutationFields((t) => ({
           city,
           country,
           emailVerified,
+          addedOrganization,
+          organization: {
+            connect: { id: String(organizationId) || undefined },
+          },
         },
       });
     },
@@ -245,6 +255,7 @@ builder.mutationFields((t) => ({
       address: t.arg.string(),
       city: t.arg.string(),
       country: t.arg.string(),
+      organizationId: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx) => {
       const {
@@ -258,6 +269,7 @@ builder.mutationFields((t) => ({
         address,
         city,
         country,
+        organizationId,
       } = args;
 
       return await prisma.vendor.update({
@@ -276,6 +288,9 @@ builder.mutationFields((t) => ({
           address: address ? address : undefined,
           city: city ? city : undefined,
           country: country ? country : undefined,
+          organization: organizationId
+            ? { connect: { id: String(organizationId) || undefined } }
+            : undefined,
         },
       });
     },
@@ -302,6 +317,26 @@ builder.mutationFields((t) => ({
       });
     },
   }),
+  updateVendorStatus: t.prismaField({
+    type: "Vendor",
+    args: {
+      id: t.arg.string({ required: true }),
+      status: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { status } = args;
+
+      return await prisma.vendor.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          status: status ? status : undefined,
+        },
+      });
+    },
+  }),
   updateVendorEmailVerified: t.prismaField({
     type: "Vendor",
     args: {
@@ -318,6 +353,26 @@ builder.mutationFields((t) => ({
         },
         data: {
           emailVerified: emailVerified ? emailVerified : undefined,
+        },
+      });
+    },
+  }),
+  updateVendorAddedOrganization: t.prismaField({
+    type: "Vendor",
+    args: {
+      id: t.arg.string({ required: true }),
+      addedOrganization: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { addedOrganization } = args;
+
+      return await prisma.vendor.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          addedOrganization: addedOrganization ? addedOrganization : undefined,
         },
       });
     },

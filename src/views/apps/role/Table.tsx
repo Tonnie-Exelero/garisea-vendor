@@ -324,6 +324,11 @@ const RoleList: React.FC<Partial<RoleListProps>> = (props) => {
         })
       );
 
+      setPaginationModel({
+        page: 0,
+        pageSize: PAGE_SIZE,
+      });
+
       const { rolesFiltered }: any = filteredRoles.payload;
 
       setVRoles(rolesFiltered);
@@ -339,17 +344,14 @@ const RoleList: React.FC<Partial<RoleListProps>> = (props) => {
   const handleDeleteDialogToggle = () => setDeleteDialogOpen(!deleteDialogOpen);
 
   const handleSubmitDeleteRole = async (e: any) => {
-    setDeleteDialogOpen(false);
     e.preventDefault();
 
     const resultAction = await dispatch(removeRole({ id }));
 
     if (removeRole.fulfilled.match(resultAction)) {
-      // permission will have a type signature of Role as we passed that as the Returned parameter in createAsyncThunk
-      const role = resultAction.payload;
-      const { deleteRole }: any = role;
+      setDeleteDialogOpen(false);
 
-      toast.success(`Role ${deleteRole.name} deleted successfully!`);
+      toast.success(`Role  deleted successfully!`);
     } else {
       toast.error(`Error deleting role: ${resultAction.error}`);
     }

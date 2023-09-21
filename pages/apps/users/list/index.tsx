@@ -75,6 +75,7 @@ import {
 } from "@src/api/admin/user";
 import { idleTimer } from "@src/configs/idleOrReload";
 import { AbilityContext } from "src/layouts/components/acl/Can";
+import { removeFile } from "@core/utils/file-manager";
 
 const PAGE_SIZE = 20;
 
@@ -246,6 +247,7 @@ const UserList = () => {
   const [roleId, setRoleId] = useState<string>("");
   const [value, setValue] = useState<string>("");
   const [status, setStatus] = useState<string>("");
+  const [image, setImage] = useState<string>("");
   const [userData, setUserData] = useState<any>();
   const [drawerType, setDrawerType] = useState<string>("Add");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
@@ -436,6 +438,11 @@ const UserList = () => {
         })
       );
 
+      setPaginationModel({
+        page: 0,
+        pageSize: PAGE_SIZE,
+      });
+
       const { usersFiltered }: any = filteredUsers.payload;
 
       setVUsers(usersFiltered);
@@ -456,6 +463,11 @@ const UserList = () => {
       const usersByRole = await dispatch(
         fetchUsersByRole({ first: PAGE_SIZE, roleId: value })
       );
+
+      setPaginationModel({
+        page: 0,
+        pageSize: PAGE_SIZE,
+      });
 
       const { usersByRoleId }: any = usersByRole.payload;
 
@@ -478,6 +490,11 @@ const UserList = () => {
         fetchUsersByStatus({ first: PAGE_SIZE, status: value })
       );
 
+      setPaginationModel({
+        page: 0,
+        pageSize: PAGE_SIZE,
+      });
+
       const { usersByStatus }: any = statusUsers.payload;
 
       setVUsers(usersByStatus);
@@ -493,21 +510,22 @@ const UserList = () => {
 
   const handleDeleteUser = (row: any) => {
     setId(row.node.id);
+    setImage(row.node.image);
     setDeleteDialogOpen(true);
   };
 
   const handleSubmitDeleteUser = async (e: any) => {
-    setDeleteDialogOpen(false);
     e.preventDefault();
+
+    // Remove image from server
+    image && (await removeFile(image));
 
     const resultAction = await dispatch(removeUser({ id }));
 
     if (removeUser.fulfilled.match(resultAction)) {
-      // user will have a type signature of User as we passed that as the Returned parameter in createAsyncThunk
-      const user = resultAction.payload;
-      const { deleteUser }: any = user;
+      setDeleteDialogOpen(false);
 
-      toast.success(`User ${deleteUser.firstName} removed successfully!`);
+      toast.success(`User  removed successfully!`);
     } else {
       toast.error(`Error removing user: ${resultAction.error}`);
     }

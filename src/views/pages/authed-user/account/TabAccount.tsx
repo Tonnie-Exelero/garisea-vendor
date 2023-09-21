@@ -28,9 +28,6 @@ import { CircularProgress } from "@mui/material";
 // ** Third Party Imports
 import { useForm, Controller } from "react-hook-form";
 
-// ** Vercel Imports
-import type { PutBlobResult } from "@vercel/blob";
-
 // ** Context
 import { useAuth } from "src/hooks/useAuth";
 
@@ -47,6 +44,7 @@ import { AppDispatch } from "@src/store";
 import { editUser, editImage, removeUser } from "@src/store/apps/auth";
 import { ThemeColor } from "@core/layouts/types";
 import { getInitials } from "@utils/get-initials";
+import { removeFile, uploadFile } from "@core/utils/file-manager";
 
 const ButtonStyled = styled(Button)<
   ButtonProps & { component?: ElementType; htmlFor?: string }
@@ -138,25 +136,12 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
   const handleInputImageChange = async (file: ChangeEvent) => {
     setUploadingImage(true);
 
-    const { files } = file.target as HTMLInputElement;
-    if (files && files.length !== 0) {
-      const response = await fetch(
-        `/api/images/upload?filename=${files[0].name}`,
-        {
-          method: "POST",
-          body: files[0],
-        }
-      );
+    const newFile = await uploadFile(file);
 
-      const newBlob = (await response.json()) as PutBlobResult;
+    newFile && handleUpdateUserImage(newFile.url);
 
-      handleUpdateUserImage(newBlob.url);
-
-      // Then remove the previous image from server.
-      await fetch(`/api/images/remove?url=${image}`, {
-        method: "DELETE",
-      });
-    }
+    // Then remove the previous image from server.
+    image && removeFile(image);
 
     setUploadingImage(false);
   };

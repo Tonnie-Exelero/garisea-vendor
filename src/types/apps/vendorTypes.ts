@@ -1,5 +1,6 @@
 // ** Types
 import { ThemeColor } from "src/@core/layouts/types";
+import { OrganizationNode } from "./organizationTypes";
 
 export type VendorNode = {
   id: string;
@@ -15,6 +16,8 @@ export type VendorNode = {
   city: string;
   country: string;
   emailVerified: string;
+  addedOrganization: string;
+  organization: Partial<OrganizationNode>;
   avatarColor?: ThemeColor;
 };
 

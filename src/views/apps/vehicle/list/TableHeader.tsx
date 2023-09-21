@@ -47,7 +47,7 @@ const TableHeader = (props: TableHeaderProps) => {
             variant="contained"
             href={`/apps/vehicles/add`}
           >
-            Add Vehicle
+            Add
           </Button>
         )}
       </Box>

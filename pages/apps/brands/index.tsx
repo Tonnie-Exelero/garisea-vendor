@@ -244,6 +244,11 @@ const Brands = (props: Partial<Props>) => {
         })
       );
 
+      setPaginationModel({
+        page: 0,
+        pageSize: PAGE_SIZE,
+      });
+
       const { brandsFiltered }: any = filteredBrands.payload;
 
       setVBrands(brandsFiltered);
@@ -292,17 +297,14 @@ const Brands = (props: Partial<Props>) => {
   };
 
   const handleSubmitDeleteBrand = async (e: any) => {
-    setDeleteDialogOpen(false);
     e.preventDefault();
 
     const resultAction = await dispatch(removeBrand({ id }));
 
     if (removeBrand.fulfilled.match(resultAction)) {
-      // brand will have a type signature of Brand as we passed that as the Returned parameter in createAsyncThunk
-      const brand = resultAction.payload;
-      const { deleteBrand }: any = brand;
+      setDeleteDialogOpen(false);
 
-      toast.success(`Brand ${deleteBrand.name} deleted successfully!`);
+      toast.success(`Brand deleted successfully!`);
     } else {
       toast.error(`Error deleting brand: ${resultAction.error}`);
     }

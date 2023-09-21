@@ -101,27 +101,26 @@ export const fetchFilteredModels = createAsyncThunk<Model, any, {}>(
 );
 
 // ** Fetch Models By Brand
-export const fetchModelsByBrand = createAsyncThunk<
-  Model,
-  { brandId: string },
-  {}
->("appModels/fetchModelsByBrand", async (brandId, { rejectWithValue }) => {
-  try {
-    const { data } = await apolloClient.query({
-      query: GET_MODELS_BY_BRAND_ID,
-      variables: { ...brandId, first: 20 },
-    });
+export const fetchModelsByBrand = createAsyncThunk<Model, any, {}>(
+  "appModels/fetchModelsByBrand",
+  async (modelData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_MODELS_BY_BRAND_ID,
+        variables: modelData,
+      });
 
-    return data;
-  } catch (err) {
-    let error: any = err; // cast the error for access
-    if (!error.response) {
-      throw err;
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
     }
-    // We got validation errors, let's return those so we can reference in our component and set form errors
-    return rejectWithValue(error.response.data);
   }
-});
+);
 
 // ** Create Model
 export const addModel = createAsyncThunk<Model, Partial<Model>, {}>(

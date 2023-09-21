@@ -7,7 +7,11 @@ import {
   BoxProps,
   Button,
   Drawer,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -301,18 +305,25 @@ const SidebarCustomer = (props: SidebarCustomerType) => {
           label="City"
           placeholder="e.g. Nairobi"
         />
-        <TextField
-          fullWidth
-          id="country"
-          aria-label="country"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          type="text"
-          sx={{ mb: 4 }}
-          label="Country"
-          placeholder="e.g. Kenya"
-        />
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <FormControl fullWidth sx={{ mb: 4 }}>
+          <InputLabel id="customer-view-country-label">Country</InputLabel>
+          <Select
+            label="Country"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            id="country"
+            labelId="customer-view-country-label"
+          >
+            <MenuItem value="Kenya">Kenya</MenuItem>
+          </Select>
+        </FormControl>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Button
             size="large"
             onClick={(e) => {
@@ -323,7 +334,7 @@ const SidebarCustomer = (props: SidebarCustomerType) => {
             variant="contained"
             sx={{ mr: 3 }}
           >
-            {type === "Add" ? "Add" : "Update"} Customer
+            {type === "Add" ? "Create" : "Update"}
           </Button>
           <Button
             size="large"

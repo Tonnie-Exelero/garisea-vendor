@@ -176,7 +176,7 @@ const Login = () => {
               Welcome to {themeConfig.templateName} <strong>Vendor</strong>! 👋🏻
             </Typography>
             <Typography sx={{ mb: 6, color: "text.secondary" }}>
-              Please sign-in to your account and experience adventure.
+              Please sign-in to your account and adventure.
             </Typography>
             {loginErrorMessage && (
               <Typography sx={{ mb: 3 }} variant="body2" color="error">

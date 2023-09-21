@@ -32,7 +32,7 @@ builder.queryFields((t) => ({
       return prisma.customer.findMany({
         ...query,
         orderBy: {
-          createdAt: "desc",
+          firstName: "asc",
         },
       });
     },
@@ -54,7 +54,7 @@ builder.queryFields((t) => ({
           status,
         },
         orderBy: {
-          createdAt: "desc",
+          firstName: "asc",
         },
       });
     },
@@ -90,7 +90,7 @@ builder.queryFields((t) => ({
         ...query,
         where,
         orderBy: {
-          createdAt: "desc",
+          firstName: "asc",
         },
       });
     },

@@ -409,15 +409,17 @@ const UserViewLeft: React.FC<UserViewLeftProps> = ({ user }) => {
                         ? "Activate"
                         : status === "active" && "Suspend"}
                     </Button>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      size="small"
-                      sx={{ mr: 2 }}
-                      onClick={() => handleStatusDialogToggle("inactive")}
-                    >
-                      Deactivate
-                    </Button>
+                    {status !== "inactive" && (
+                      <Button
+                        variant="contained"
+                        color="error"
+                        size="small"
+                        sx={{ mr: 2 }}
+                        onClick={() => handleStatusDialogToggle("inactive")}
+                      >
+                        Deactivate
+                      </Button>
+                    )}
                   </Box>
                   <Button
                     variant="contained"
@@ -655,15 +657,27 @@ const UserViewLeft: React.FC<UserViewLeftProps> = ({ user }) => {
                             }}
                             inputProps={{ placeholder: "Select Role" }}
                           >
-                            {roles.edges.map((role, index) => {
-                              const { id, name } = role.node;
+                            {roles.edges.length > 0 ? (
+                              roles.edges.map((role, index) => {
+                                const { id, name } = role.node;
 
-                              return (
-                                <MenuItem key={index} value={id}>
-                                  {name}
-                                </MenuItem>
-                              );
-                            })}
+                                return (
+                                  <MenuItem key={index} value={id}>
+                                    {name}
+                                  </MenuItem>
+                                );
+                              })
+                            ) : (
+                              <Typography
+                                sx={{
+                                  padding: 3,
+                                  color: "text.secondary",
+                                  fontStyle: "italic",
+                                }}
+                              >
+                                No roles available
+                              </Typography>
+                            )}
                           </Select>
                         </FormControl>
                       </Grid>

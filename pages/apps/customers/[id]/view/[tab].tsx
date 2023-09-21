@@ -1,5 +1,9 @@
 // ** Next Import
 import { InferGetServerSidePropsType } from "next/types";
+import Link from "next/link";
+
+// ** MUI Imports
+import { Button } from "@mui/material";
 
 // ** Third Party Imports
 import axios from "axios";
@@ -15,6 +19,7 @@ import apolloClient from "@lib/apollo";
 import { GET_CUSTOMER_BY_ID } from "@api/frontend/customer";
 
 // ** Others
+import Icon from "@components/icon";
 import toast from "react-hot-toast";
 import { idleTimer } from "@src/configs/idleOrReload";
 
@@ -27,7 +32,22 @@ const CustomerView = ({
   idleTimer();
 
   return (
-    <CustomerViewPage tab={tab} invoiceData={invoiceData} customer={customer} />
+    <>
+      <Button
+        component={Link}
+        variant="contained"
+        href={`/apps/customers/list`}
+        startIcon={<Icon icon="bx:arrow-back" />}
+        sx={{ mb: 4 }}
+      >
+        Customers List
+      </Button>
+      <CustomerViewPage
+        tab={tab}
+        invoiceData={invoiceData}
+        customer={customer}
+      />
+    </>
   );
 };
 

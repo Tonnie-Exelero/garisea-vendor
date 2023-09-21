@@ -296,6 +296,11 @@ const Permissions = (props: Partial<Props>) => {
         })
       );
 
+      setPaginationModel({
+        page: 0,
+        pageSize: PAGE_SIZE,
+      });
+
       const { permissionsFiltered }: any = filteredPermissions.payload;
 
       setVPermissions(permissionsFiltered);
@@ -360,19 +365,14 @@ const Permissions = (props: Partial<Props>) => {
   };
 
   const handleSubmitDeletePermission = async (e: any) => {
-    setDeleteDialogOpen(false);
     e.preventDefault();
 
     const resultAction = await dispatch(removePermission({ id }));
 
     if (removePermission.fulfilled.match(resultAction)) {
-      // permission will have a type signature of Permission as we passed that as the Returned parameter in createAsyncThunk
-      const permission = resultAction.payload;
-      const { deletePermission }: any = permission;
+      setDeleteDialogOpen(false);
 
-      toast.success(
-        `Permission ${deletePermission.name} deleted successfully!`
-      );
+      toast.success(`Permission  deleted successfully!`);
     } else {
       toast.error(`Error deleting permission: ${resultAction.error}`);
     }

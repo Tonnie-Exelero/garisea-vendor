@@ -35,6 +35,7 @@ import { VehicleNode } from "src/types/apps/vehicleTypes";
 // ** Others
 import toast from "react-hot-toast";
 import FileUploader from "./FileUploader";
+import { removeFile } from "@core/utils/file-manager";
 
 const SwiperControls: React.FC<any> = ({
   direction,
@@ -100,11 +101,8 @@ const SwiperControls: React.FC<any> = ({
 
   const handleDeleteImage = async (url: string) => {
     setDeleting("ongoing");
-    const response = await fetch(`/api/images/remove?url=${url}`, {
-      method: "DELETE",
-    });
 
-    const newResp = await response.json();
+    const newResp = await removeFile(url);
 
     if (vImages.some((image) => image === newResp.url)) {
       const updatedList = vImages.filter((image) => image !== newResp.url);

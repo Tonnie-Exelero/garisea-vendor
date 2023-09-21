@@ -369,7 +369,7 @@ const RolesCards: React.FC<Partial<RolesCardsProps>> = (props) => {
               fullWidth
               id="name"
               aria-label="name"
-              value={name}
+              value={name.trimStart()}
               onChange={(e) => {
                 setName(e.target.value);
                 setSlug(e.target.value.replace(/\s+/g, "-").toLowerCase());

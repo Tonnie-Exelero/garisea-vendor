@@ -1,5 +1,9 @@
 // ** Next Import
 import { InferGetServerSidePropsType } from "next/types";
+import Link from "next/link";
+
+// ** MUI Imports
+import { Button } from "@mui/material";
 
 // ** Third Party Imports
 import axios from "axios";
@@ -15,6 +19,7 @@ import apolloClient from "@lib/apollo";
 import { GET_VENDOR_BY_ID } from "@api/vendor/vendor";
 
 // ** Others
+import Icon from "@components/icon";
 import toast from "react-hot-toast";
 import { idleTimer } from "@src/configs/idleOrReload";
 
@@ -26,7 +31,20 @@ const VendorView = ({
   // ** Watch for idle time or reload
   idleTimer();
 
-  return <VendorViewPage tab={tab} invoiceData={invoiceData} vendor={vendor} />;
+  return (
+    <>
+      <Button
+        component={Link}
+        variant="contained"
+        href={`/apps/vendors/list`}
+        startIcon={<Icon icon="bx:arrow-back" />}
+        sx={{ mb: 4 }}
+      >
+        Vendors List
+      </Button>
+      <VendorViewPage tab={tab} invoiceData={invoiceData} vendor={vendor} />
+    </>
+  );
 };
 
 export const getServerSideProps: any = async ({ params }: any) => {

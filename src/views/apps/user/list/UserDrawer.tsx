@@ -340,17 +340,18 @@ const SidebarUser = (props: SidebarUserType) => {
           label="City"
           placeholder="e.g. Nairobi"
         />
-        <TextField
-          fullWidth
-          id="country"
-          aria-label="country"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          type="text"
-          sx={{ mb: 4 }}
-          label="Country"
-          placeholder="e.g. Kenya"
-        />
+        <FormControl fullWidth sx={{ mb: 4 }}>
+          <InputLabel id="user-view-country-label">Country</InputLabel>
+          <Select
+            label="Country"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            id="country"
+            labelId="user-view-country-label"
+          >
+            <MenuItem value="Kenya">Kenya</MenuItem>
+          </Select>
+        </FormControl>
         <FormControl fullWidth sx={{ mb: 6 }}>
           <InputLabel id="role-select">Select Role</InputLabel>
           <Select
@@ -362,18 +363,36 @@ const SidebarUser = (props: SidebarUserType) => {
             onChange={(e) => setRoleId(e.target.value)}
             inputProps={{ placeholder: "Select Role" }}
           >
-            {roles.edges.map((role, index) => {
-              const { id, name } = role.node;
+            {roles.edges.length > 0 ? (
+              roles.edges.map((role, index) => {
+                const { id, name } = role.node;
 
-              return (
-                <MenuItem key={index} value={id}>
-                  {name}
-                </MenuItem>
-              );
-            })}
+                return (
+                  <MenuItem key={index} value={id}>
+                    {name}
+                  </MenuItem>
+                );
+              })
+            ) : (
+              <Typography
+                sx={{
+                  padding: 3,
+                  color: "text.secondary",
+                  fontStyle: "italic",
+                }}
+              >
+                No roles available
+              </Typography>
+            )}
           </Select>
         </FormControl>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Button
             size="large"
             onClick={(e) => {
@@ -382,7 +401,7 @@ const SidebarUser = (props: SidebarUserType) => {
             variant="contained"
             sx={{ mr: 3 }}
           >
-            {type === "Add" ? "Add" : "Update"} User
+            {type === "Add" ? "Create" : "Update"}
           </Button>
           <Button
             size="large"

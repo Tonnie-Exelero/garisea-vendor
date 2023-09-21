@@ -21,7 +21,7 @@ builder.queryFields((t) => ({
       return prisma.role.findMany({
         ...query,
         orderBy: {
-          createdAt: 'desc',
+          name: "asc",
         },
       });
     },
@@ -47,7 +47,7 @@ builder.queryFields((t) => ({
         ...query,
         where,
         orderBy: {
-          createdAt: 'desc',
+          name: "asc",
         },
       });
     },

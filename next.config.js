@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const path = require('path')
+const path = require("path");
 
 /** @type {import('next').NextConfig} */
 
@@ -21,6 +21,11 @@ module.exports = {
         "./node_modules/apexcharts-clevision"
       ),
     };
+
+    config.module.rules.push({
+      test: /\.node/,
+      use: "raw-loader",
+    });
 
     return config;
   },

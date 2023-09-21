@@ -164,7 +164,7 @@ const TableHeader = (props: TableHeaderProps) => {
               variant="contained"
               onClick={handleDialogToggle}
             >
-              Add Permission
+              Add
             </Button>
           )}
         </Box>
@@ -209,7 +209,7 @@ const TableHeader = (props: TableHeaderProps) => {
               fullWidth
               id="name"
               aria-label="name"
-              value={name}
+              value={name.trimStart()}
               onChange={(e) => {
                 setName(e.target.value);
                 setSlug(e.target.value.replace(/\s+/g, "-").toLowerCase());

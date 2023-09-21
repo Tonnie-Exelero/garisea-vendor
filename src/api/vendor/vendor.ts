@@ -19,6 +19,19 @@ export const GET_VENDORS = gql`
           city
           country
           emailVerified
+          addedOrganization
+          organization {
+            id
+            name
+            email
+            phone
+            address
+            address2
+            city
+            country
+            logo
+            certificate
+          }
         }
       }
       pageInfo {
@@ -63,6 +76,19 @@ export const GET_VENDORS_BY_STATUS = gql`
           city
           country
           emailVerified
+          addedOrganization
+          organization {
+            id
+            name
+            email
+            phone
+            address
+            address2
+            city
+            country
+            logo
+            certificate
+          }
         }
       }
       pageInfo {
@@ -95,6 +121,19 @@ export const GET_FILTERED_VENDORS = gql`
           city
           country
           emailVerified
+          addedOrganization
+          organization {
+            id
+            name
+            email
+            phone
+            address
+            address2
+            city
+            country
+            logo
+            certificate
+          }
         }
       }
       pageInfo {
@@ -124,6 +163,19 @@ export const GET_VENDOR_BY_ID = gql`
       city
       country
       emailVerified
+      addedOrganization
+      organization {
+        id
+        name
+        email
+        phone
+        address
+        address2
+        city
+        country
+        logo
+        certificate
+      }
     }
   }
 `;
@@ -143,6 +195,8 @@ export const CREATE_VENDOR = gql`
     $city: String
     $country: String
     $emailVerified: String
+    $addedOrganization: String
+    $organizationId: String
   ) {
     createVendor(
       firstName: $firstName
@@ -158,6 +212,8 @@ export const CREATE_VENDOR = gql`
       city: $city
       country: $country
       emailVerified: $emailVerified
+      addedOrganization: $addedOrganization
+      organizationId: $organizationId
     ) {
       id
       firstName
@@ -172,6 +228,19 @@ export const CREATE_VENDOR = gql`
       city
       country
       emailVerified
+      addedOrganization
+      organization {
+        id
+        name
+        email
+        phone
+        address
+        address2
+        city
+        country
+        logo
+        certificate
+      }
     }
   }
 `;
@@ -189,6 +258,7 @@ export const UPDATE_VENDOR = gql`
     $address: String
     $city: String
     $country: String
+    $organizationId: String
   ) {
     updateVendor(
       id: $id
@@ -202,6 +272,7 @@ export const UPDATE_VENDOR = gql`
       address: $address
       city: $city
       country: $country
+      organizationId: $organizationId
     ) {
       id
       firstName
@@ -216,6 +287,19 @@ export const UPDATE_VENDOR = gql`
       city
       country
       emailVerified
+      addedOrganization
+      organization {
+        id
+        name
+        email
+        phone
+        address
+        address2
+        city
+        country
+        logo
+        certificate
+      }
     }
   }
 `;
@@ -229,6 +313,16 @@ export const UPDATE_PASSWORD = gql`
     }
   }
 `;
+export const UPDATE_VENDOR_STATUS = gql`
+  mutation UpdateVendorStatus($id: String!, $status: String!) {
+    updateVendorStatus(id: $id, status: $status) {
+      id
+      firstName
+      lastName
+      status
+    }
+  }
+`;
 
 export const UPDATE_EMAIL_VERIFIED = gql`
   mutation UpdateVendorEmailVerified($id: String!, $emailVerified: String!) {
@@ -237,6 +331,22 @@ export const UPDATE_EMAIL_VERIFIED = gql`
       firstName
       lastName
       email
+    }
+  }
+`;
+export const UPDATE_ADDED_ORGANIZATION = gql`
+  mutation UpdateVendorAddedOrganization(
+    $id: String!
+    $addedOrganization: String!
+  ) {
+    updateVendorAddedOrganization(
+      id: $id
+      addedOrganization: $addedOrganization
+    ) {
+      id
+      firstName
+      lastName
+      addedOrganization
     }
   }
 `;

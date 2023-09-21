@@ -19,11 +19,11 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Icon from "src/@core/components/icon";
 
 // ** Demo Components Imports
-import VendorViewBilling from "src/views/apps/vendor/view/VendorViewBilling";
-import VendorViewAccount from "src/views/apps/vendor/view/VendorViewAccount";
-import VendorViewSecurity from "src/views/apps/vendor/view/VendorViewSecurity";
-import VendorViewConnection from "src/views/apps/vendor/view/VendorViewConnection";
-import VendorViewNotification from "src/views/apps/vendor/view/VendorViewNotification";
+import VendorViewBilling from "./VendorViewBilling";
+import VendorViewAccount from "./VendorViewAccount";
+import VendorViewSecurity from "./VendorViewSecurity";
+import VendorViewConnection from "./VendorViewConnection";
+import VendorViewNotification from "./VendorViewNotification";
 
 // ** Types
 import { InvoiceType } from "src/types/apps/invoiceTypes";
@@ -107,8 +107,8 @@ const VendorViewRight = ({ tab, invoiceData, vendor }: Props) => {
                 ...(!hideText && { "& svg": { mr: 2 } }),
               }}
             >
-              <Icon icon="bx:user" />
-              {!hideText && "Account"}
+              <Icon icon="bx:building" />
+              {!hideText && "Organization"}
             </Box>
           }
         />
@@ -180,7 +180,7 @@ const VendorViewRight = ({ tab, invoiceData, vendor }: Props) => {
         ) : (
           <>
             <TabPanel value="account">
-              <VendorViewAccount invoiceData={invoiceData} />
+              <VendorViewAccount vendor={vendor} />
             </TabPanel>
             <TabPanel value="security">
               <VendorViewSecurity />

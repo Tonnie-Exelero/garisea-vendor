@@ -12,6 +12,7 @@ import {
   UPDATE_PASSWORD,
   UPDATE_EMAIL_VERIFIED,
   DELETE_VENDOR,
+  UPDATE_ADDED_ORGANIZATION,
 } from "@api/vendor/vendor";
 
 // ** Others
@@ -37,6 +38,19 @@ const vendorsInitialState = {
         city: "",
         country: "",
         emailVerified: "",
+        addedOrganization: "",
+        organization: {
+          id: "",
+          name: "",
+          email: "",
+          phone: "",
+          address: "",
+          address2: "",
+          city: "",
+          country: "",
+          logo: "",
+          certificate: "",
+        },
       },
     },
   ],
@@ -217,6 +231,28 @@ export const editEmailVerified = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
   }
 );
 
+// ** Update Added Organization
+export const editAddedOrganization = createAsyncThunk<Vendor, any, {}>(
+  "appVendors/editAddedOrganization",
+  async (vendorData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_ADDED_ORGANIZATION,
+        variables: { ...vendorData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // ** Delete Vendor
 export const removeVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
   "appVendors/removeVendor",
@@ -338,6 +374,13 @@ export const appVendorsSlice = createSlice({
       })
       .addCase(editEmailVerified.fulfilled, (state, { payload }) => {
         const { updateVendorEmailVerified }: any = payload;
+
+        state.vendors = { ...state.vendors, ...updateVendorEmailVerified };
+      })
+      .addCase(editAddedOrganization.fulfilled, (state, { payload }) => {
+        const { updateVendorAddedOrganization }: any = payload;
+
+        state.vendors = { ...state.vendors, ...updateVendorAddedOrganization };
       })
       .addCase(removeVendor.fulfilled, (state, { payload }) => {
         const { deleteVendor }: any = payload;

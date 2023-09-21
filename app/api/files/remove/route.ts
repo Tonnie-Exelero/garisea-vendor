@@ -3,12 +3,12 @@ import { NextResponse } from "next/server";
 
 export async function DELETE(request: Request | any): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
-  const imageUrl = searchParams.get("url");
+  const fileUrl = searchParams.get("url");
 
-  imageUrl && (await del(imageUrl));
+  fileUrl && (await del(fileUrl));
 
   const res = {
-    url: imageUrl,
+    url: fileUrl,
     removed: true,
   };
 

@@ -51,7 +51,6 @@ import { getInitials } from "src/@core/utils/get-initials";
 import apolloClient from "@lib/apollo";
 import { fetchVendors } from "@src/store/apps/vendor/vendor";
 import {
-  fetchVehiclesByVendor,
   fetchFilteredVehicles,
   removeVehicle,
 } from "@src/store/apps/vendor/vehicle";
@@ -74,6 +73,7 @@ import VehicleSearch from "@src/views/apps/vehicle/view/search";
 import toast from "react-hot-toast";
 import { idleTimer } from "@src/configs/idleOrReload";
 import { AbilityContext } from "src/layouts/components/acl/Can";
+import { removeFile } from "@core/utils/file-manager";
 
 const PAGE_SIZE = 20;
 
@@ -289,8 +289,7 @@ const VehiclesList = () => {
   // ** State
   const [vVehicles, setVVehicles] = useState<any>();
   const [id, setId] = useState<string>("");
-  const [value, setValue] = useState<string>("");
-  const [vendorId, setVendorId] = useState<string>("");
+  const [images, setImages] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -342,7 +341,10 @@ const VehiclesList = () => {
       })
     );
 
-    console.log(filteredVehicles);
+    setPaginationModel({
+      page: 0,
+      pageSize: PAGE_SIZE,
+    });
 
     const { vehiclesFiltered }: any = filteredVehicles.payload;
 
@@ -418,16 +420,21 @@ const VehiclesList = () => {
 
   const handleDeleteVehicle = (row: any) => {
     setId(row.node.id);
+    setImages(row.node.images);
     setDeleteDialogOpen(true);
   };
 
   const handleSubmitDeleteVehicle = async (e: any) => {
-    setDeleteDialogOpen(false);
     e.preventDefault();
+
+    // Remove images from server
+    images.split(",").forEach(async (image) => await removeFile(image));
 
     const resultAction = await dispatch(removeVehicle({ id }));
 
     if (removeVehicle.fulfilled.match(resultAction)) {
+      setDeleteDialogOpen(false);
+
       toast.success(`Vehicle listing removed successfully!`);
     } else {
       toast.error(`Error removing vehicle: ${resultAction.error}`);
@@ -528,7 +535,7 @@ const VehiclesList = () => {
                             textAlign: "center",
                           }}
                         >
-                          There are no vehicles added yet.
+                          There are no vehicles matching criteria.
                         </Typography>
                       </Box>
                     )}
@@ -544,7 +551,7 @@ const VehiclesList = () => {
                     textAlign: "center",
                   }}
                 >
-                  Please select a vendor to show their vehicle listing.
+                  Please select some parameters to show vehicle listings.
                 </Typography>
               </Box>
             )}

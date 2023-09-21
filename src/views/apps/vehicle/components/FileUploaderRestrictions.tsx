@@ -10,9 +10,6 @@ import IconButton from "@mui/material/IconButton";
 import { styled, useTheme } from "@mui/material/styles";
 import Typography, { TypographyProps } from "@mui/material/Typography";
 
-// ** Vercel Imports
-import type { PutBlobResult } from "@vercel/blob";
-
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
 
@@ -20,6 +17,7 @@ import Icon from "src/@core/components/icon";
 import toast from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
 import { CircularProgress } from "@mui/material";
+import { uploadFileOfFiles } from "@core/utils/file-manager";
 
 interface FileProp {
   name: string;
@@ -102,12 +100,7 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
   const handleUploadFiles = async () => {
     setUploading("ongoing");
     for (const file of files) {
-      const response = await fetch(`/api/images/upload?filename=${file.name}`, {
-        method: "POST",
-        body: file,
-      });
-
-      const newBlob = (await response.json()) as PutBlobResult;
+      const newBlob = await uploadFileOfFiles(file);
 
       imagesArray.push(newBlob);
     }

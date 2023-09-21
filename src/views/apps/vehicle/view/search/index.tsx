@@ -146,15 +146,27 @@ const VehicleSearch = (props: Props) => {
             onChange={(e) => setVendorId(e.target.value)}
             inputProps={{ placeholder: "Select Vendor" }}
           >
-            {vendors.edges.map((vendor, index) => {
-              const { id, firstName, lastName } = vendor.node;
+            {vendors.edges.length > 0 ? (
+              vendors.edges.map((vendor, index) => {
+                const { id, firstName, lastName } = vendor.node;
 
-              return (
-                <MenuItem key={index} value={id}>
-                  {firstName + " " + lastName}
-                </MenuItem>
-              );
-            })}
+                return (
+                  <MenuItem key={index} value={id}>
+                    {firstName + " " + lastName}
+                  </MenuItem>
+                );
+              })
+            ) : (
+              <Typography
+                sx={{
+                  padding: 3,
+                  color: "text.secondary",
+                  fontStyle: "italic",
+                }}
+              >
+                No vendors available
+              </Typography>
+            )}
           </Select>
         </FormControl>
       </Grid>
@@ -170,11 +182,23 @@ const VehicleSearch = (props: Props) => {
             onChange={handleBrandSelect}
             inputProps={{ placeholder: "Select Brand" }}
           >
-            {brands.edges.map((brand, index) => (
-              <MenuItem key={index} value={brand.node.id}>
-                {brand.node.name}
-              </MenuItem>
-            ))}
+            {brands.edges.length > 0 ? (
+              brands.edges.map((brand, index) => (
+                <MenuItem key={index} value={brand.node.id}>
+                  {brand.node.name}
+                </MenuItem>
+              ))
+            ) : (
+              <Typography
+                sx={{
+                  padding: 3,
+                  color: "text.secondary",
+                  fontStyle: "italic",
+                }}
+              >
+                No brands available
+              </Typography>
+            )}
           </Select>
         </FormControl>
       </Grid>
