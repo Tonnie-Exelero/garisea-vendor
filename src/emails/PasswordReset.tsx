@@ -15,7 +15,7 @@ import {
 import * as React from "react";
 
 const logoUrl =
-  "https://admin.garisea.com/images/logos/garisea/logo-green-dark.png";
+  "https://vendor.garisea.com/images/logos/garisea/logo-green-dark.png";
 
 export const PasswordReset = (url: string, name: string) => (
   <Html>
