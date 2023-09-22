@@ -50,6 +50,7 @@ const UserDropdown = (props: Props) => {
 
   // ** States
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
+  const [showBackDrop, setShowBackDrop] = useState<boolean>(false);
 
   // ** Hooks
   const { authedVendor } = useSelector(
@@ -63,13 +64,16 @@ const UserDropdown = (props: Props) => {
 
   const handleDropdownOpen = (event: SyntheticEvent) => {
     setAnchorEl(event.currentTarget);
+    setShowBackDrop(true);
   };
 
   const handleDropdownClose = (url?: string) => {
+    setAnchorEl(null);
+    setShowBackDrop(false);
+
     if (url) {
       router.push(url);
     }
-    setAnchorEl(null);
   };
 
   const styles = {
@@ -132,7 +136,10 @@ const UserDropdown = (props: Props) => {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={() => handleDropdownClose()}
-        sx={{ "& .MuiMenu-paper": { width: 230, mt: 4 } }}
+        sx={{
+          visibility: showBackDrop ? "visible" : "hidden",
+          "& .MuiMenu-paper": { width: 230, mt: 4 },
+        }}
         anchorOrigin={{
           vertical: "bottom",
           horizontal: direction === "ltr" ? "right" : "left",
