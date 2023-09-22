@@ -33,7 +33,7 @@ export const idleTimer = () => {
   const goBackToLogin = () => {
     window.localStorage.setItem(
       "iT",
-      "You have been logged out because you refreshed the page or inactivity."
+      "You have been logged out because you refreshed the page or have been inactive."
     );
     logout();
   };
@@ -70,15 +70,23 @@ export const idleTimer = () => {
     events.forEach((event) => window.addEventListener(event, onEventStart));
 
     // If page is reloaded, logout user and redirect to login
-    window.addEventListener("beforeunload", (event) => {
-      goBackToLogin();
-    });
+    window.addEventListener(
+      "beforeunload",
+      (event) => {
+        goBackToLogin();
+      },
+      { capture: true }
+    );
 
     // Cleanup
     return () => {
-      window.removeEventListener("beforeunload", (event) => {
-        goBackToLogin();
-      });
+      window.removeEventListener(
+        "beforeunload",
+        (event) => {
+          goBackToLogin();
+        },
+        { capture: true }
+      );
 
       if (timeout) {
         clearTimeout(timeout);

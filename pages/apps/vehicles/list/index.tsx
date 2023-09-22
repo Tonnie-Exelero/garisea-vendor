@@ -451,11 +451,6 @@ const VehiclesList = () => {
       headerName: "Actions",
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {ability?.can("update", "vehicles") && (
-            <IconButton onClick={() => handleEditVehicle(row)}>
-              <Icon fontSize={20} icon="bx:edit" />
-            </IconButton>
-          )}
           {ability?.can("delete", "vehicles") && (
             <IconButton onClick={() => handleDeleteVehicle(row)}>
               <Icon fontSize={20} icon="bx:trash" />

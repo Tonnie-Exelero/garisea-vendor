@@ -6,10 +6,15 @@ import { useTheme } from "@mui/material/styles";
 import {
   Box,
   Button,
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   FormControl,
   FormControlLabel,
   FormLabel,
   Grid,
+  IconButton,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -18,6 +23,7 @@ import {
   Select,
   SelectChangeEvent,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 
@@ -31,15 +37,21 @@ import {
 import CustomRadioIcons from "@components/custom-radio/icons";
 import CustomChip from "@components/mui/chip";
 
+// ** Icon Imports
+import Icon from "src/@core/components/icon";
+
 // ** API
-import { fetchVendors } from "@src/store/apps/vendor/vendor";
-import { fetchBrands } from "@src/store/apps/admin/brand";
-import { fetchModelsByBrand } from "@src/store/apps/admin/model";
+import apolloClient from "@src/lib/apollo";
+import { GET_BRANDS } from "@src/api/admin/brand";
+import { GET_MODELS_BY_BRAND_ID } from "@src/api/admin/model";
+import { addBrand, fetchBrands } from "@src/store/apps/admin/brand";
+import { addModel, fetchModelsByBrand } from "@src/store/apps/admin/model";
 
 // ** Others
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@src/store";
 import { country, metrics } from "../../config";
+import toast from "react-hot-toast";
 
 interface IconType {
   icon: CustomRadioIconsProps["icon"];
@@ -101,6 +113,13 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
   const [registrationNo, setRegistrationNo] = useState<string>("");
   const [mileage, setMileage] = useState<number>();
   const [mileageMetric, setMileageMetric] = useState<string>("");
+  const [newItem, setNewItem] = useState<string>("");
+  const [itemType, setItemType] = useState<string>("");
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [vBrands, setVBrands] = useState<any>();
+  const [vModels, setVModels] = useState<any>();
+  const [isLoadingBrands, setIsLoadingBrands] = useState<boolean>(false);
+  const [isLoadingModels, setIsLoadingModels] = useState<boolean>(false);
 
   // ** Hook
   const theme = useTheme();
@@ -109,12 +128,14 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
     (state: RootState) => state.authedVendor
   );
   const { brands } = useSelector((state: RootState) => state.brands);
-  const { models } = useSelector((state: RootState) => state.models);
+
+  const handleDialogToggle = () => setOpenDialog(!openDialog);
 
   useEffect(() => {
-    dispatch(fetchVendors({ first: 100 }));
     dispatch(fetchBrands({ first: 100 }));
-  }, [dispatch]);
+
+    setVBrands(brands);
+  }, [dispatch, brands]);
 
   const icons: IconType[] = [
     {
@@ -157,6 +178,34 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
     mileageMetric,
   };
 
+  const handleRefreshBrands = useCallback(async () => {
+    setIsLoadingBrands(true);
+    const { data } = await apolloClient.query({
+      query: GET_BRANDS,
+      variables: { first: 100 },
+      fetchPolicy: "no-cache",
+    });
+
+    const { brands }: any = data;
+
+    setVBrands(brands);
+    setIsLoadingBrands(false);
+  }, [vBrands, isLoadingBrands]);
+
+  const handleRefreshModels = useCallback(async () => {
+    setIsLoadingModels(true);
+    const { data } = await apolloClient.query({
+      query: GET_MODELS_BY_BRAND_ID,
+      variables: { brandId, first: 100 },
+      fetchPolicy: "no-cache",
+    });
+
+    const { modelsByBrandId }: any = data;
+
+    setVModels(modelsByBrandId);
+    setIsLoadingModels(false);
+  }, [vModels, isLoadingModels]);
+
   const handleRadioChange = (prop: string | ChangeEvent<HTMLInputElement>) => {
     if (typeof prop === "string") {
       setCondition(prop);
@@ -176,13 +225,21 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
   };
 
   const handleBrandSelect = useCallback(
-    (event: SelectChangeEvent) => {
+    async (event: SelectChangeEvent) => {
       const {
         target: { value },
       } = event;
-
       setBrandId(value);
-      dispatch(fetchModelsByBrand({ brandId: value }));
+
+      const { data } = await apolloClient.query({
+        query: GET_MODELS_BY_BRAND_ID,
+        variables: { brandId: value, first: 100 },
+        fetchPolicy: "no-cache",
+      });
+
+      const { modelsByBrandId }: any = data;
+
+      setVModels(modelsByBrandId);
     },
     [dispatch, brandId]
   );
@@ -194,6 +251,63 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
   const confirmData = () => {
     handleBasicData(basicData);
     nextStep(true);
+  };
+
+  const addNewBrand = async () => {
+    const brandData = {
+      name: newItem,
+      slug: newItem.replace(/\s+/g, "-").toLowerCase(),
+      description: "",
+    };
+
+    const resultAction = await dispatch(addBrand({ ...brandData }));
+
+    if (addBrand.fulfilled.match(resultAction)) {
+      // brand will have a type signature of Brand as we passed that as the Returned parameter in createAsyncThunk
+      const brand = resultAction.payload;
+      const { createBrand }: any = brand;
+
+      toast.success(`Brand ${createBrand.name} created successfully!`);
+
+      setNewItem("");
+      handleDialogToggle();
+    } else {
+      toast.error(`Error creating brand: ${resultAction.error}`);
+    }
+  };
+
+  const addNewModel = async () => {
+    const modelData = {
+      name: newItem,
+      slug: newItem.replace(/\s+/g, "-").toLowerCase(),
+      description: "",
+      brandId,
+    };
+
+    const resultAction = await dispatch(addModel({ ...modelData }));
+
+    if (addModel.fulfilled.match(resultAction)) {
+      // model will have a type signature of Model as we passed that as the Returned parameter in createAsyncThunk
+      const model = resultAction.payload;
+      const { createModel }: any = model;
+
+      toast.success(`Model ${createModel.name} created successfully!`);
+
+      setNewItem("");
+      handleDialogToggle();
+    } else {
+      toast.error(`Error creating model: ${resultAction.error}`);
+    }
+  };
+
+  const toggleNewBrand = () => {
+    setItemType("Brand");
+    setOpenDialog(true);
+  };
+
+  const toggleNewModel = () => {
+    setItemType("Model");
+    setOpenDialog(true);
   };
 
   return (
@@ -212,7 +326,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
           />
         ))}
         <Grid item xs={12} md={6}>
-          <FormControl fullWidth sx={{ mb: 4 }}>
+          <FormControl fullWidth sx={{ mb: 0 }}>
             <InputLabel htmlFor="brand-select">Brand</InputLabel>
             <Select
               fullWidth
@@ -223,8 +337,8 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
               onChange={handleBrandSelect}
               inputProps={{ placeholder: "Select Brand" }}
             >
-              {brands.edges.length > 0 ? (
-                brands.edges.map((brand, index) => (
+              {vBrands && vBrands.edges.length > 0 ? (
+                vBrands.edges.map((brand: any, index: any) => (
                   <MenuItem key={index} value={brand.node.id}>
                     {brand.node.name}
                   </MenuItem>
@@ -241,6 +355,36 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
                 </Typography>
               )}
             </Select>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mt: 2,
+              }}
+            >
+              <Tooltip title="Add Brand" placement="top">
+                <IconButton
+                  onClick={toggleNewBrand}
+                  sx={{
+                    paddingInline: 4,
+                    "&:hover": { background: "transparent" },
+                  }}
+                >
+                  <Icon icon="bx:plus" fontSize={20} />
+                  <Typography sx={{ ml: 2 }}>Add Brand</Typography>
+                </IconButton>
+              </Tooltip>
+              {isLoadingBrands ? (
+                <CircularProgress />
+              ) : (
+                <Tooltip title="Refresh" placement="top">
+                  <IconButton onClick={handleRefreshBrands}>
+                    <Icon fontSize={30} icon="bx:refresh" />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </Box>
           </FormControl>
         </Grid>
         <Grid item xs={12} md={6}>
@@ -256,8 +400,8 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
               inputProps={{ placeholder: "Select Model" }}
               disabled={brandId !== "" ? false : true}
             >
-              {models.edges.length > 0 ? (
-                models.edges.map((model: any, index: any) => (
+              {vModels && vModels.edges.length > 0 ? (
+                vModels.edges.map((model: any, index: any) => (
                   <MenuItem key={index} value={model.node.id}>
                     {model.node.name}
                   </MenuItem>
@@ -274,6 +418,36 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
                 </Typography>
               )}
             </Select>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mt: 2,
+              }}
+            >
+              <Tooltip title="Add Model" placement="top">
+                <IconButton
+                  onClick={toggleNewModel}
+                  sx={{
+                    paddingInline: 4,
+                    "&:hover": { background: "transparent" },
+                  }}
+                >
+                  <Icon icon="bx:plus" fontSize={20} />
+                  <Typography sx={{ ml: 2 }}>Add Model</Typography>
+                </IconButton>
+              </Tooltip>
+              {isLoadingModels ? (
+                <CircularProgress />
+              ) : (
+                <Tooltip title="Refresh" placement="top">
+                  <IconButton onClick={handleRefreshModels}>
+                    <Icon fontSize={30} icon="bx:refresh" />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </Box>
           </FormControl>
         </Grid>
         <Grid item xs={12} md={6}>
@@ -411,6 +585,56 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
           </Box>
         </Box>
       </Box>
+
+      <Dialog
+        maxWidth="sm"
+        fullWidth
+        onClose={handleDialogToggle}
+        open={openDialog}
+        sx={{
+          "& .MuiDialogTitle-root + .MuiDialogContent-root": {
+            pt: (theme) => `${theme.spacing(1.5)} !important`,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            pt: 16,
+            mx: "auto",
+            textAlign: "center",
+            fontSize: "1.625rem !important",
+          }}
+        >
+          Add {itemType}
+        </DialogTitle>
+        <DialogContent sx={{ pb: 16, px: 18 }}>
+          <TextField
+            autoFocus
+            fullWidth
+            id={`new-${itemType === "Brand" ? "brand" : "model"}`}
+            aria-label={`new-${itemType === "Brand" ? "brand" : "model"}`}
+            type="text"
+            variant="standard"
+            placeholder={`e.g. ${itemType === "Brand" ? "Tesla" : "Model X"}`}
+            label={`Add ${itemType}`}
+            value={newItem}
+            onChange={(e) => setNewItem(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() =>
+                      itemType === "Brand" ? addNewBrand() : addNewModel()
+                    }
+                  >
+                    <Icon icon="bx:bxs-right-arrow-circle" fontSize={20} />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

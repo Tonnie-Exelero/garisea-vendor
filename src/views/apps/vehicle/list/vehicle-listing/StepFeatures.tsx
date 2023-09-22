@@ -2,13 +2,22 @@
 import { useState } from "react";
 
 // ** MUI Imports
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  TextField,
+  Typography,
+  IconButton,
+  InputAdornment,
+  Tooltip,
+} from "@mui/material";
 
 // ** Custom Components Imports
 import CustomChip from "@components/mui/chip";
 
-// ** Others
-import { featuresArray } from "../../config";
+// ** Icon Imports
+import Icon from "src/@core/components/icon";
 
 interface StepFeaturesProps {
   handleFeaturesData: (data: any) => void;
@@ -21,6 +30,8 @@ const StepFeatures: React.FC<StepFeaturesProps> = (props) => {
   // ** State
   const [features, setFeatures] = useState<string[]>([]);
   const [extraInfo, setExtraInfo] = useState<string>("");
+  const [newFeature, setNewFeature] = useState<string>("");
+  const [showTextField, setShowTextField] = useState<boolean>(false);
 
   const featuresData = {
     features: [...new Set(features)].toString(),
@@ -28,11 +39,18 @@ const StepFeatures: React.FC<StepFeaturesProps> = (props) => {
   };
 
   const handleFeatureSelect = (value: string) => {
-    if (features.some((subject) => subject === value)) {
-      const updatedList = features.filter((subject) => subject !== value);
+    if (features.some((feat) => feat === value)) {
+      const updatedList = features.filter((feat) => feat !== value);
       return setFeatures(updatedList);
     }
     return setFeatures((prev) => [...prev, value]);
+  };
+
+  const addNewFeature = (value: string) => {
+    setShowTextField(false);
+    setNewFeature("");
+
+    return setFeatures((prev) => (prev ? [...prev, value] : [value]));
   };
 
   const confirmData = () => {
@@ -45,20 +63,57 @@ const StepFeatures: React.FC<StepFeaturesProps> = (props) => {
       <Grid container spacing={5}>
         <Grid item xs={12} sx={{ mb: 4 }}>
           <Typography variant="body2" sx={{ mb: 4 }}>
-            Select Vehicle Features
+            Add Vehicle Features
           </Typography>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-            {featuresArray.map((feature, index) => (
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            {features.map((feature, index) => (
               <CustomChip
                 rounded
                 key={index}
                 label={feature}
                 skin="light"
-                color={features.includes(feature) ? "info" : "secondary"}
+                color={"info"}
                 onClick={() => handleFeatureSelect(feature)}
                 sx={{ cursor: "pointer", "&:hover": { color: "#FFF" } }}
               />
             ))}
+            {showTextField && (
+              <TextField
+                autoFocus
+                fullWidth
+                id="new-feature"
+                aria-label="new-feature"
+                type="text"
+                size="small"
+                variant="standard"
+                placeholder="e.g. Stereo"
+                label="Feature"
+                value={newFeature}
+                onChange={(e) => setNewFeature(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => addNewFeature(newFeature)}>
+                        <Icon icon="bx:bxs-right-arrow-circle" fontSize={20} />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{ width: 200 }}
+              />
+            )}
+            <Tooltip title="Add feature" placement="top">
+              <IconButton onClick={() => setShowTextField(!showTextField)}>
+                <Icon icon="bx:plus" fontSize={20} />
+              </IconButton>
+            </Tooltip>
           </Box>
         </Grid>
         <Grid item xs={12}>

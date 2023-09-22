@@ -1,11 +1,14 @@
 // ** React Imports
 import { ReactNode, useState } from "react";
 
+// ** Next Import
+import Link from "next/link";
+
 // ** MUI Components
 import Box, { BoxProps } from "@mui/material/Box";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { styled, useTheme } from "@mui/material/styles";
-import { Typography } from "@mui/material";
+import { CircularProgress, Typography } from "@mui/material";
 
 // ** Layout Import
 import BlankLayout from "src/@core/layouts/BlankLayout";
@@ -13,8 +16,12 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 // ** Hooks
 import { useSettings } from "src/@core/hooks/useSettings";
 
-// ** Demo Components Imports
+// ** Components Imports
 import RegisterMultiStepsWizard from "src/views/pages/auth/register-multi-steps";
+import CustomAvatar from "@components/mui/avatar";
+
+// ** Configs
+import themeConfig from "src/configs/themeConfig";
 
 // ** API
 import { useDispatch } from "react-redux";
@@ -76,10 +83,17 @@ const WizardWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   },
 }));
 
+const LinkStyled = styled(Link)(({ theme }) => ({
+  fontSize: "0.875rem",
+  textDecoration: "none",
+  color: theme.palette.primary.main,
+}));
+
 const Register = () => {
   // ** States
   const [personal, setPersonal] = useState<any>();
   const [accountCreated, setAccountCreated] = useState<boolean>(false);
+  const [creating, setCreating] = useState<string>("");
 
   // ** Hooks
   const theme = useTheme();
@@ -90,11 +104,16 @@ const Register = () => {
   // ** Var
   const { skin } = settings;
 
+  // ** Local Storage
+  const fromLocalStore = window.localStorage.getItem("settings");
+  const appSettings = fromLocalStore && JSON.parse(fromLocalStore);
+
   const handleAddPersonalInfo = (personalInfo: any) => {
     setPersonal(personalInfo);
   };
 
   const handleCreateVendor = async (organizationInfo: any) => {
+    setCreating("ongoing");
     setAccountCreated(false);
 
     const resultAction = await dispatch(
@@ -121,6 +140,7 @@ const Register = () => {
 
       if (addVendor.fulfilled.match(vendorResult)) {
         setAccountCreated(true);
+        setCreating("complete");
 
         // vendor will have a type signature of Vendor as we passed that as the Returned parameter in createAsyncThunk
         const vendor = vendorResult.payload;
@@ -166,7 +186,58 @@ const Register = () => {
   return (
     <Box className="content-right">
       {!hidden ? (
-        <LeftWrapper>
+        <LeftWrapper
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-start",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-end",
+              }}
+            >
+              <CustomAvatar
+                src={
+                  appSettings?.mode === "dark"
+                    ? themeConfig.logos.greenLight
+                    : themeConfig.logos.greenDark
+                }
+                variant="rounded"
+                alt={"Garisea"}
+                sx={{
+                  width: 200,
+                  height: "auto",
+                }}
+              />
+              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    lineHeight: 1,
+                    fontWeight: 400,
+                    letterSpacing: "-0.45px",
+                    textTransform: "lowercase",
+                    fontSize: ".85rem !important",
+                    transition:
+                      "opacity .35s ease-in-out, margin .35s ease-in-out",
+                  }}
+                >
+                  Vendor
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+
           <RegisterMultiStepsIllustration
             alt="register-multi-steps-illustration"
             src={`/images/pages/create-account-${theme.palette.mode}.png`}
@@ -179,6 +250,9 @@ const Register = () => {
             ? { borderLeft: `1px solid ${theme.palette.divider}` }
             : {}
         }
+        display={"flex"}
+        flexDirection={"column"}
+        gap={8}
       >
         {!accountCreated ? (
           <WizardWrapper>
@@ -186,6 +260,36 @@ const Register = () => {
               handleAddPersonalInfo={handleAddPersonalInfo}
               handleCreateVendor={handleCreateVendor}
             />
+            {creating === "ongoing" && (
+              <Box
+                sx={{
+                  mt: 4,
+                  mb: 4,
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                }}
+              >
+                <CircularProgress size="1.5rem" sx={{ mr: 2 }} />
+                <Typography variant="h6" sx={{ color: "text.secondary" }}>
+                  Creating Account...
+                </Typography>
+              </Box>
+            )}
+            {creating === "complete" && (
+              <Box
+                sx={{
+                  mb: 4,
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                }}
+              >
+                <Typography variant="h6" sx={{ color: "green" }}>
+                  Account Created Successfully!
+                </Typography>
+              </Box>
+            )}
           </WizardWrapper>
         ) : (
           <Box
@@ -206,6 +310,23 @@ const Register = () => {
             >
               Account created successfully. Please go to your email address (
               {personal.email}) to verify your account.
+            </Typography>
+          </Box>
+        )}
+        {creating === "" && (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              justifyContent: "center",
+            }}
+          >
+            <Typography variant="body2" sx={{ mr: 2 }}>
+              Already have an account?
+            </Typography>
+            <Typography variant="body2">
+              <LinkStyled href="/login">Sign in instead</LinkStyled>
             </Typography>
           </Box>
         )}

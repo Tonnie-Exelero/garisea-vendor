@@ -231,6 +231,16 @@ const StepAccountDetails = (props: Props) => {
                 handleNext();
               }}
               endIcon={<Icon icon="bx:chevron-right" fontSize={20} />}
+              disabled={
+                firstName === "" ||
+                lastName === "" ||
+                username === "" ||
+                email === "" ||
+                phone === "" ||
+                storeLink === "" ||
+                address === "" ||
+                city === ""
+              }
             >
               Next
             </Button>

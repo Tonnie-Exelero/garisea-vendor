@@ -222,7 +222,7 @@ export const CREATE_VENDOR = gql`
   mutation CreateVendor(
     $firstName: String
     $lastName: String
-    $username: String!
+    $username: String
     $email: String!
     $password: String
     $phone: String
