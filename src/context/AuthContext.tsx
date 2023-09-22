@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import authConfig from "src/configs/auth";
 
 // ** Types
-import { AuthValuesType, LoginParams, UserDataType } from "./types";
+import { AuthValuesType, LoginParams, VendorDataType } from "./types";
 import { signIn } from "@redux/apps/auth";
 
 // ** Others
@@ -19,9 +19,9 @@ import { encryptData, decryptData } from "@utils/encryption";
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
-  user: null,
+  vendor: null,
   loading: true,
-  setUser: () => null,
+  setVendor: () => null,
   setLoading: () => Boolean,
   login: () => Promise.resolve(),
   logout: () => Promise.resolve(),
@@ -35,7 +35,7 @@ type Props = {
 
 const AuthProvider = ({ children }: Props) => {
   // ** States
-  const [user, setUser] = useState<UserDataType | null>(defaultProvider.user);
+  const [vendor, setVendor] = useState<VendorDataType | null>(defaultProvider.vendor);
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading);
 
   // ** Hooks
@@ -49,7 +49,7 @@ const AuthProvider = ({ children }: Props) => {
       window.localStorage.removeItem("uD");
       window.localStorage.removeItem("rT");
       window.localStorage.removeItem("aT");
-      setUser(null);
+      setVendor(null);
 
       setLoading(false);
       if (
@@ -71,20 +71,20 @@ const AuthProvider = ({ children }: Props) => {
       const resultAction = await dispatch(signIn({ ...params }));
 
       if (signIn.fulfilled.match(resultAction)) {
-        // user will have a type signature of User as we passed that as the Returned parameter in createAsyncThunk
-        const user = resultAction.payload;
-        const { loginUser }: any = user;
+        // vendor will have a type signature of Vendor as we passed that as the Returned parameter in createAsyncThunk
+        const vendor = resultAction.payload;
+        const { loginVendor }: any = vendor;
 
-        if (loginUser) {
+        if (loginVendor) {
           window.localStorage.setItem(
             authConfig.storageTokenKeyName,
-            loginUser.token
+            loginVendor.token
           );
 
           const returnUrl = router.query.returnUrl;
 
-          setUser({ ...loginUser });
-          window.localStorage.setItem("uD", encryptData(loginUser));
+          setVendor({ ...loginVendor, role: "superadmin" });
+          window.localStorage.setItem("uD", encryptData(loginVendor));
 
           const redirectURL = returnUrl && returnUrl !== "/" ? returnUrl : "/";
 
@@ -119,16 +119,16 @@ const AuthProvider = ({ children }: Props) => {
   };
 
   const handleLogout = () => {
-    setUser(null);
+    setVendor(null);
     window.localStorage.removeItem("uD");
     window.localStorage.removeItem(authConfig.storageTokenKeyName);
     router.push("/login");
   };
 
   const values = {
-    user,
+    vendor,
     loading,
-    setUser,
+    setVendor,
     setLoading,
     login: handleLogin,
     logout: handleLogout,

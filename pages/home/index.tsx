@@ -17,34 +17,22 @@ const HomePage = () => {
   // ** Watch for idle time or reload
   idleTimer();
 
-  let userSubjects: any[] = [];
-
   // ** Hooks
-  const { authedUser } = useSelector((state: RootState) => state.authedUser);
-
-  const createSubjectsArray = (permissions: any[] | undefined) => {
-    const subjectsArr = permissions?.map((i) => i.subjects);
-
-    return [...new Set(subjectsArr?.toString().split(","))];
-  };
-
-  const mySubjects = createSubjectsArray(authedUser.role.permissions);
-
-  subjects.map((item, i) => {
-    if (mySubjects.includes(item.name)) userSubjects.push(item);
-  });
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
 
   return (
     <>
       <Typography variant="h4" sx={{ marginBlock: 4 }}>
-        Welcome back {authedUser.firstName}!
+        Welcome back {authedVendor.firstName}!
       </Typography>
       <Typography variant="h6" sx={{ marginBlock: 3 }}>
         You can go to any of the links in the cards below to explore your
         dashboard.
       </Typography>
       <Grid container spacing={6} className="match-height">
-        {userSubjects.map((subject, index) => (
+        {subjects.map((subject, index) => (
           <>
             {subject.name !== "home" && (
               <Grid item md={4} sm={6} xs={12} key={index}>

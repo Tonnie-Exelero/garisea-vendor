@@ -30,7 +30,7 @@ const GuestGuard = (props: GuestGuardProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.route]);
 
-  if (auth.loading || (!auth.loading && auth.user !== null)) {
+  if (auth.loading || (!auth.loading && auth.vendor !== null)) {
     return fallback;
   }
 

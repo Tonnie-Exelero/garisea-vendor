@@ -23,7 +23,7 @@ const AuthGuard = (props: AuthGuardProps) => {
         return;
       }
 
-      if (auth.user === null && !window.localStorage.getItem("uD")) {
+      if (auth.vendor === null && !window.localStorage.getItem("uD")) {
         if (router.asPath !== "/login") {
           router.replace({
             pathname: "/login",
@@ -38,7 +38,7 @@ const AuthGuard = (props: AuthGuardProps) => {
     [router.route]
   );
 
-  if (auth.loading || auth.user === null) {
+  if (auth.loading || auth.vendor === null) {
     return fallback;
   }
 

@@ -21,7 +21,6 @@ export const VENDOR_LOGIN = gql`
       lastName
       username
       email
-      password
       phone
       image
       language
@@ -29,7 +28,20 @@ export const VENDOR_LOGIN = gql`
       address
       city
       country
-      token
+      emailVerified
+      addedOrganization
+      organization {
+        id
+        name
+        email
+        phone
+        address
+        address2
+        city
+        country
+        logo
+        certificate
+      }
     }
   }
 `;

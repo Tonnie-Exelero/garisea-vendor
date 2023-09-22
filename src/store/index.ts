@@ -2,7 +2,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 
 // ** Reducers
-import authedUser from "@redux/apps/auth";
+import authedVendor from "@redux/apps/auth";
 import chat from "@redux/apps/chat";
 import users from "@redux/apps/admin/user";
 import singleUser from "@redux/apps/admin/user/single";
@@ -25,7 +25,7 @@ import singleOrganization from "@redux/apps/vendor/organization/single";
 
 export const store = configureStore({
   reducer: {
-    authedUser,
+    authedVendor,
     users,
     singleUser,
     vendors,

@@ -28,13 +28,13 @@ const AccountSettingsTab = ({
   idleTimer();
 
   // ** Hooks
-  const { authedUser } = useSelector((state: RootState) => state.authedUser);
+  const { authedVendor } = useSelector((state: RootState) => state.authedVendor);
 
   return (
     <AccountSettings
       tab={tab}
       apiPricingPlanData={apiPricingPlanData}
-      user={authedUser}
+      user={authedVendor}
     />
   );
 };

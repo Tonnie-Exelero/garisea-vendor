@@ -28,9 +28,9 @@ const UserProfileTab = ({
   idleTimer();
 
   // ** Hooks
-  const { authedUser } = useSelector((state: RootState) => state.authedUser);
+  const { authedVendor } = useSelector((state: RootState) => state.authedVendor);
 
-  return <UserProfile tab={tab} data={data} user={authedUser} />;
+  return <UserProfile tab={tab} data={data} user={authedVendor} />;
 };
 
 export const getStaticPaths: GetStaticPaths = () => {

@@ -127,6 +127,20 @@ builder.queryFields((t) => ({
         },
       }),
   }),
+  vendorByEmail: t.prismaField({
+    type: Vendor,
+    nullable: true,
+    args: {
+      email: t.arg.string({ required: true }),
+    },
+    resolve: (query, _parent, args, _info) =>
+      prisma.vendor.findUniqueOrThrow({
+        ...query,
+        where: {
+          email: args.email,
+        },
+      }),
+  }),
 }));
 
 builder.mutationFields((t) => ({
@@ -313,6 +327,26 @@ builder.mutationFields((t) => ({
         },
         data: {
           password: hashedPassword ? hashedPassword : undefined,
+        },
+      });
+    },
+  }),
+  updateVendorImage: t.prismaField({
+    type: "Vendor",
+    args: {
+      id: t.arg.string({ required: true }),
+      image: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { image } = args;
+
+      return await prisma.vendor.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          image: image ? image : undefined,
         },
       });
     },

@@ -40,14 +40,6 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 import AuthIllustrationWrapper from "src/views/pages/auth/AuthIllustrationWrapper";
 import CustomAvatar from "@components/mui/avatar";
 
-// ** API
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@src/store";
-import { fetchRoles } from "@src/store/apps/admin/role";
-
-// ** Others
-import toast from "react-hot-toast";
-
 // ** Styled Components
 const LinkStyled = styled(Link)(({ theme }) => ({
   fontSize: "0.875rem",
@@ -72,10 +64,6 @@ const Login = () => {
   // ** Hooks
   const auth = useAuth();
   const theme = useTheme();
-  const dispatch = useDispatch<AppDispatch>();
-  const { roles, loading, error } = useSelector(
-    (state: RootState) => state.roles
-  );
 
   // ** Local Storage
   const fromLocalStore = window.localStorage.getItem("settings");
@@ -85,17 +73,7 @@ const Login = () => {
     // Clear local storage to allow direct return login
     window.localStorage.removeItem("aT");
     window.localStorage.removeItem("uD");
-
-    dispatch(fetchRoles({ first: 10 }));
-
-    if (loading === "pending")
-      toast.loading("Fetching roles...", { duration: 1000 });
-
-    if (error !== null)
-      toast.error(`An error occurred while fetching roles: ${error}`, {
-        duration: 3000,
-      });
-  }, [dispatch]);
+  }, []);
 
   // ** Var
   const loginErrorMessage = localStorage.getItem("lE");
@@ -286,23 +264,21 @@ const Login = () => {
               >
                 Sign in
               </Button>
-              {roles.edges.length === 0 && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Typography variant="body2" sx={{ mr: 2 }}>
-                    New on our platform?
-                  </Typography>
-                  <Typography>
-                    <LinkStyled href="/register">Create an account</LinkStyled>
-                  </Typography>
-                </Box>
-              )}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  justifyContent: "center",
+                }}
+              >
+                <Typography variant="body2" sx={{ mr: 2 }}>
+                  New to {themeConfig.templateName}?
+                </Typography>
+                <Typography>
+                  <LinkStyled href="/register">Create an account</LinkStyled>
+                </Typography>
+              </Box>
             </form>
           </CardContent>
         </Card>

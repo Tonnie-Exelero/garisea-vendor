@@ -1,3 +1,6 @@
+import { ThemeColor } from "src/@core/layouts/types";
+import { OrganizationNode } from "../types/apps/organizationTypes";
+
 export type ErrCallbackType = (err: { [key: string]: string }) => void;
 
 export type LoginParams = {
@@ -6,7 +9,7 @@ export type LoginParams = {
   rememberMe?: boolean;
 };
 
-export type UserDataType = {
+export type VendorDataType = {
   id: string;
   firstName: string;
   lastName: string;
@@ -19,28 +22,18 @@ export type UserDataType = {
   address: string;
   city: string;
   country: string;
-  token: string;
-  role: {
-    id: string;
-    name: string;
-    slug: string;
-    ability: string;
-    permissions: [
-      {
-        id: string;
-        name: string;
-        slug: string;
-        subjects: string;
-      },
-    ];
-  };
+  emailVerified: string;
+  addedOrganization: string;
+  organization: Partial<OrganizationNode>;
+  role: any;
+  avatarColor?: ThemeColor;
 };
 
 export type AuthValuesType = {
   loading: boolean;
   logout: () => void;
-  user: UserDataType | null;
+  vendor: VendorDataType | null;
   setLoading: (value: boolean) => void;
-  setUser: (value: UserDataType | null) => void;
+  setVendor: (value: VendorDataType | null) => void;
   login: (params: LoginParams, errorCallback?: ErrCallbackType) => void;
 };

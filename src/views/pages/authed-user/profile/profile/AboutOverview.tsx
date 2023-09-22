@@ -75,21 +75,6 @@ const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
                 <Typography
                   sx={{ mr: 2, fontWeight: 700, color: "text.secondary" }}
                 >
-                  Role:
-                </Typography>
-                <Typography
-                  sx={{
-                    color: "text.secondary",
-                    textTransform: "capitalize",
-                  }}
-                >
-                  {role ? role.name : "King"}
-                </Typography>
-              </Box>
-              <Box sx={{ display: "flex", mb: 4 }}>
-                <Typography
-                  sx={{ mr: 2, fontWeight: 700, color: "text.secondary" }}
-                >
                   Contact:
                 </Typography>
                 <Typography sx={{ color: "text.secondary" }}>

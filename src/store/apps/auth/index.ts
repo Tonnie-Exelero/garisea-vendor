@@ -4,18 +4,18 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 // ** API
 import apolloClient from "@lib/apollo";
 import {
-  UPDATE_USER,
+  UPDATE_VENDOR,
   UPDATE_PASSWORD,
   UPDATE_IMAGE,
-  DELETE_USER,
-} from "@api/admin/user";
-import { LOGIN } from "@api/admin/auth";
+  DELETE_VENDOR,
+} from "@api/vendor/vendor";
+import { VENDOR_LOGIN } from "@src/api/vendor/auth";
 
 // ** Others
-import { User } from "../admin/user/types";
+import { Vendor } from "../vendor/vendor/types";
 
-// ** User initial state
-const userInitialState = {
+// ** Vendor initial state
+const vendorInitialState = {
   id: "",
   firstName: "",
   lastName: "",
@@ -29,32 +29,30 @@ const userInitialState = {
   address: "",
   city: "",
   country: "",
-  token: "",
   emailVerified: "",
-  role: {
+  addedOrganization: "",
+  organization: {
     id: "",
     name: "",
-    slug: "",
-    ability: "",
-    permissions: [
-      {
-        id: "",
-        name: "",
-        slug: "",
-        subjects: "",
-      },
-    ],
+    email: "",
+    phone: "",
+    address: "",
+    address2: "",
+    city: "",
+    country: "",
+    logo: "",
+    certificate: "",
   },
 };
 
-// ** Login User
-export const signIn = createAsyncThunk<User, Partial<User>, {}>(
+// ** Login Vendor
+export const signIn = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
   "appAuth/signIn",
-  async (userData, { rejectWithValue }) => {
+  async (vendorData, { rejectWithValue }) => {
     try {
       const { data } = await apolloClient.mutate({
-        mutation: LOGIN,
-        variables: { ...userData },
+        mutation: VENDOR_LOGIN,
+        variables: { ...vendorData },
       });
 
       return data;
@@ -69,14 +67,14 @@ export const signIn = createAsyncThunk<User, Partial<User>, {}>(
   }
 );
 
-// ** Update User
-export const editUser = createAsyncThunk<User, Partial<User>, {}>(
-  "authedUser/editUser",
-  async (userData, { rejectWithValue }) => {
+// ** Update Vendor
+export const editVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
+  "authedVendor/editVendor",
+  async (vendorData, { rejectWithValue }) => {
     try {
       const { data } = await apolloClient.mutate({
-        mutation: UPDATE_USER,
-        variables: { ...userData },
+        mutation: UPDATE_VENDOR,
+        variables: { ...vendorData },
       });
 
       return data;
@@ -92,13 +90,13 @@ export const editUser = createAsyncThunk<User, Partial<User>, {}>(
 );
 
 // ** Update Password
-export const editPassword = createAsyncThunk<User, Partial<User>, {}>(
-  "authedUser/editPassword",
-  async (userData, { rejectWithValue }) => {
+export const editPassword = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
+  "authedVendor/editPassword",
+  async (vendorData, { rejectWithValue }) => {
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_PASSWORD,
-        variables: { ...userData },
+        variables: { ...vendorData },
       });
 
       return data;
@@ -114,13 +112,13 @@ export const editPassword = createAsyncThunk<User, Partial<User>, {}>(
 );
 
 // ** Update Image
-export const editImage = createAsyncThunk<User, Partial<User>, {}>(
-  "authedUser/editImage",
-  async (userData, { rejectWithValue }) => {
+export const editImage = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
+  "authedVendor/editImage",
+  async (vendorData, { rejectWithValue }) => {
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_IMAGE,
-        variables: { ...userData },
+        variables: { ...vendorData },
       });
 
       return data;
@@ -135,14 +133,14 @@ export const editImage = createAsyncThunk<User, Partial<User>, {}>(
   }
 );
 
-// ** Delete User
-export const removeUser = createAsyncThunk<User, Partial<User>, {}>(
-  "appUsers/removeUser",
-  async (userData, { rejectWithValue }) => {
+// ** Delete Vendor
+export const removeVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
+  "appVendors/removeVendor",
+  async (vendorData, { rejectWithValue }) => {
     try {
       const { data } = await apolloClient.mutate({
-        mutation: DELETE_USER,
-        variables: { id: userData.id },
+        mutation: DELETE_VENDOR,
+        variables: { id: vendorData.id },
       });
 
       return data;
@@ -157,11 +155,11 @@ export const removeUser = createAsyncThunk<User, Partial<User>, {}>(
   }
 );
 
-export const authedUserSlice = createSlice({
-  name: "authedUser",
+export const authedVendorSlice = createSlice({
+  name: "authedVendor",
   initialState: {
-    authedUser: <User>{
-      ...userInitialState,
+    authedVendor: <Vendor>{
+      ...vendorInitialState,
     },
     loading: "",
     error: null,
@@ -175,11 +173,11 @@ export const authedUserSlice = createSlice({
         }
       })
       .addCase(signIn.fulfilled, (state, { payload }) => {
-        const { loginUser }: any = payload;
+        const { loginVendor }: any = payload;
 
         if (state.loading === "pending") {
           state.loading = "";
-          state.authedUser = loginUser;
+          state.authedVendor = loginVendor;
         }
       })
       .addCase(signIn.rejected, (state, action) => {
@@ -188,34 +186,34 @@ export const authedUserSlice = createSlice({
           state.error = <any>action.error.message;
         }
       })
-      .addCase(editUser.fulfilled, (state, { payload }) => {
-        // Reset user state.
-        state.authedUser = { ...userInitialState };
+      .addCase(editVendor.fulfilled, (state, { payload }) => {
+        // Reset vendor state.
+        state.authedVendor = { ...vendorInitialState };
 
-        const { updateUser }: any = payload;
+        const { updateVendor }: any = payload;
 
-        state.authedUser = { ...updateUser };
+        state.authedVendor = { ...updateVendor };
       })
       .addCase(editPassword.fulfilled, (state, { payload }) => {
-        // Reset user state.
-        state.authedUser = { ...userInitialState };
+        // Reset vendor state.
+        state.authedVendor = { ...vendorInitialState };
 
         const { updatePassword }: any = payload;
 
-        state.authedUser = { ...updatePassword };
+        state.authedVendor = { ...updatePassword };
       })
       .addCase(editImage.fulfilled, (state, { payload }) => {
-        // Reset user state.
-        state.authedUser = { ...userInitialState };
+        // Reset vendor state.
+        state.authedVendor = { ...vendorInitialState };
 
-        const { updateUserImage }: any = payload;
+        const { updateVendorImage }: any = payload;
 
-        state.authedUser = { ...updateUserImage };
+        state.authedVendor = { ...updateVendorImage };
       })
-      .addCase(removeUser.fulfilled, (state, { payload }) => {
-        const { deleteUser }: any = payload;
+      .addCase(removeVendor.fulfilled, (state, { payload }) => {
+        const { deleteVendor }: any = payload;
       });
   },
 });
 
-export default authedUserSlice.reducer;
+export default authedVendorSlice.reducer;

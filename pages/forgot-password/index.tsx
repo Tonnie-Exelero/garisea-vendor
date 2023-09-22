@@ -3,7 +3,6 @@ import { ReactNode, useState } from "react";
 
 // ** Next Import
 import Link from "next/link";
-import Router from "next/router";
 
 // ** MUI Components
 import Box from "@mui/material/Box";
@@ -34,7 +33,7 @@ import PasswordReset from "@src/emails/PasswordReset";
 // ** API
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@src/store";
-import { fetchUserByEmail } from "@src/store/apps/admin/user/single";
+import { fetchVendorByEmail } from "@src/store/apps/vendor/vendor/single";
 
 // ** Others
 import toast from "react-hot-toast";
@@ -54,7 +53,7 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 
 const ForgotPassword = () => {
   // ** States
-  const [uEmail, setUEmail] = useState<string>("");
+  const [vEmail, setVEmail] = useState<string>("");
   const [isSending, setIsSending] = useState<string>("");
 
   // ** Hooks
@@ -68,12 +67,12 @@ const ForgotPassword = () => {
   const handleResetLink = async () => {
     setIsSending("sending");
 
-    const resultAction = await dispatch(fetchUserByEmail({ email: uEmail }));
+    const resultAction = await dispatch(fetchVendorByEmail({ email: vEmail }));
 
-    if (fetchUserByEmail.fulfilled.match(resultAction)) {
+    if (fetchVendorByEmail.fulfilled.match(resultAction)) {
       const user = resultAction.payload;
       const {
-        userByEmail: { id, email, firstName },
+        vendorByEmail: { id, email, firstName },
       }: any = user;
 
       // Organize and send email
@@ -167,8 +166,8 @@ const ForgotPassword = () => {
                 fullWidth
                 id="email"
                 aria-label="email"
-                value={uEmail}
-                onChange={(e) => setUEmail(e.target.value)}
+                value={vEmail}
+                onChange={(e) => setVEmail(e.target.value)}
                 type="email"
                 sx={{ mb: 4 }}
                 label="Email"

@@ -52,7 +52,9 @@ const UserDropdown = (props: Props) => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   // ** Hooks
-  const { authedUser } = useSelector((state: RootState) => state.authedUser);
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
   const router = useRouter();
   const { logout } = useAuth();
 
@@ -102,10 +104,10 @@ const UserDropdown = (props: Props) => {
           horizontal: "right",
         }}
       >
-        {authedUser.image ? (
+        {authedVendor.image ? (
           <Avatar
-            alt={authedUser.firstName}
-            src={authedUser.image}
+            alt={authedVendor.firstName}
+            src={authedVendor.image}
             onClick={handleDropdownOpen}
             sx={{ width: 40, height: 40 }}
           />
@@ -122,7 +124,7 @@ const UserDropdown = (props: Props) => {
               fontSize: "1rem",
             }}
           >
-            {getInitials(authedUser.firstName + " " + authedUser.lastName)}
+            {getInitials(authedVendor.firstName + " " + authedVendor.lastName)}
           </CustomAvatar>
         )}
       </Badge>
@@ -150,10 +152,10 @@ const UserDropdown = (props: Props) => {
                 horizontal: "right",
               }}
             >
-              {authedUser.image ? (
+              {authedVendor.image ? (
                 <Avatar
-                  alt={authedUser.firstName}
-                  src={authedUser.image}
+                  alt={authedVendor.firstName}
+                  src={authedVendor.image}
                   onClick={handleDropdownOpen}
                   sx={{ width: 40, height: 40 }}
                 />
@@ -171,7 +173,7 @@ const UserDropdown = (props: Props) => {
                   }}
                 >
                   {getInitials(
-                    authedUser.firstName + " " + authedUser.lastName
+                    authedVendor.firstName + " " + authedVendor.lastName
                   )}
                 </CustomAvatar>
               )}
@@ -185,10 +187,7 @@ const UserDropdown = (props: Props) => {
               }}
             >
               <Typography sx={{ fontWeight: 500 }}>
-                {authedUser.firstName + " " + authedUser.lastName}
-              </Typography>
-              <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                {authedUser.role ? authedUser.role.name : "User"}
+                {authedVendor.firstName + " " + authedVendor.lastName}
               </Typography>
             </Box>
           </Box>

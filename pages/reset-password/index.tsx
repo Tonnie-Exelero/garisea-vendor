@@ -42,7 +42,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 // ** Others
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@src/store";
-import { editPassword } from "@src/store/apps/admin/user/single";
+import { editPassword } from "@src/store/apps/vendor/vendor/single";
 import { decodeToken } from "@src/configs/jwt";
 
 interface State {
