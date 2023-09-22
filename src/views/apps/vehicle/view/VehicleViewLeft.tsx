@@ -63,7 +63,6 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
   const {
     id,
     entryNo,
-    vendor,
     brand,
     model,
     trim,
@@ -248,16 +247,6 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                     </Typography>
                     <Typography sx={{ color: "text.secondary" }}>
                       {entryNo}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: "flex", mb: 4 }}>
-                    <Typography
-                      sx={{ mr: 2, fontWeight: 700, color: "text.secondary" }}
-                    >
-                      Vendor Name:
-                    </Typography>
-                    <Typography sx={{ color: "text.secondary" }}>
-                      {vendor.firstName + " " + vendor.lastName}
                     </Typography>
                   </Box>
                   {registered && (

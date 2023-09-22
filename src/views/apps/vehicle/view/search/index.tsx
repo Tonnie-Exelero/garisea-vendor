@@ -1,6 +1,9 @@
 // ** React Imports
 import { useCallback, useEffect, useState } from "react";
 
+// ** Next Import
+import Link from "next/link";
+
 // ** MUI Imports
 import {
   Box,
@@ -16,6 +19,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 // ** API
 import { useDispatch, useSelector } from "react-redux";
@@ -25,6 +29,12 @@ import { fetchModelsByBrand } from "@src/store/apps/admin/model";
 
 // ** Others
 import { currency, vehicleBodyTypes } from "../../config";
+
+const LinkStyled = styled(Link)(({ theme }) => ({
+  textDecoration: "none",
+  marginLeft: theme.spacing(1),
+  color: theme.palette.primary.main,
+}));
 
 interface Props {
   handleVehiclesFilter: (params: any) => void;
@@ -61,6 +71,28 @@ const VehicleSearch = (props: Props) => {
   );
   const { brands } = useSelector((state: RootState) => state.brands);
   const { models } = useSelector((state: RootState) => state.models);
+
+  const resetData = () => {
+    setBrandId("");
+    setModelId("");
+    setCondition("");
+    setRegistered("");
+    setYearRange([2010, 2024]);
+    setMileage([1000, 150000]);
+    setEngineType("");
+    setEngineCapacity([1000, 6000]);
+    setFuelType("");
+    setTransmissionType("");
+    setDriveType("");
+    setExteriorColor("");
+    setInteriorColor("");
+    setBodyType("");
+    setUpholstery("");
+    setSeats(0);
+    setDoors(0);
+    setSteering("");
+    setPrice([200000, 20000000]);
+  };
 
   useEffect(() => {
     dispatch(fetchBrands({ first: 100 }));
@@ -491,10 +523,27 @@ const VehicleSearch = (props: Props) => {
         </FormControl>
       </Grid>
       <Grid item md={2} sm={3} xs={12}>
-        <Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-end",
+            gap: 6,
+          }}
+        >
           <Button onClick={handleSearch} variant="contained" color="primary">
             Search
           </Button>
+          <LinkStyled
+            href="#"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+            }}
+            onClick={resetData}
+          >
+            Clear
+          </LinkStyled>
         </Box>
       </Grid>
     </Grid>

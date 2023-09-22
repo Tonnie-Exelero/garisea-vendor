@@ -24,22 +24,22 @@ const navigation = (): HorizontalNavItemsType => {
       subject: "profile",
       path: "/account/settings/account",
     },
-    {
-      title: "Pages",
-      icon: "bx:dock-top",
-      action: "read",
-      subject: "pages",
-      children: [
-        {
-          title: "FAQ",
-          path: "/pages/faq",
-        },
-        {
-          title: "Help Center",
-          path: "/pages/help-center",
-        },
-      ],
-    },
+    // {
+    //   title: "Pages",
+    //   icon: "bx:dock-top",
+    //   action: "read",
+    //   subject: "pages",
+    //   children: [
+    //     {
+    //       title: "FAQ",
+    //       path: "/pages/faq",
+    //     },
+    //     {
+    //       title: "Help Center",
+    //       path: "/pages/help-center",
+    //     },
+    //   ],
+    // },
   ];
 };
 
