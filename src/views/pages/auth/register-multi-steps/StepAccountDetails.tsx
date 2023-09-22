@@ -1,109 +1,241 @@
 // ** React Imports
-import { useState } from 'react'
+import { useState } from "react";
 
 // ** MUI Components
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-import InputLabel from '@mui/material/InputLabel'
-import IconButton from '@mui/material/IconButton'
-import FormControl from '@mui/material/FormControl'
-import OutlinedInput from '@mui/material/OutlinedInput'
-import InputAdornment from '@mui/material/InputAdornment'
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import FormControl from "@mui/material/FormControl";
+import InputAdornment from "@mui/material/InputAdornment";
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from "src/@core/components/icon";
+import { Tooltip } from "@mui/material";
 
-interface State {
-  showPassword: boolean
-  showConfirmPassword: boolean
+interface Props {
+  handleNext: () => void;
+  handleAddPersonalInfo: (val: any) => void;
 }
 
-const StepAccountDetails = ({ handleNext }: { handleNext: () => void }) => {
+const StepAccountDetails = (props: Props) => {
+  const { handleNext, handleAddPersonalInfo } = props;
+
   // ** States
-  const [values, setValues] = useState<State>({
-    showPassword: false,
-    showConfirmPassword: false
-  })
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [link, setLink] = useState<string>("");
+  const [address, setAddress] = useState<string>("");
+  const [city, setCity] = useState<string>("");
 
-  const handleClickShowPassword = () => {
-    setValues({ ...values, showPassword: !values.showPassword })
-  }
-
-  const handleClickShowConfirmPassword = () => {
-    setValues({ ...values, showConfirmPassword: !values.showConfirmPassword })
-  }
+  const personalInfo = {
+    firstName,
+    lastName,
+    username,
+    email,
+    phone: "+254" + phone,
+    // link,
+    address,
+    city,
+    country: "Kenya",
+  };
 
   return (
     <>
       <Box sx={{ mb: 4 }}>
-        <Typography variant='h5'>Account Information</Typography>
-        <Typography sx={{ color: 'text.secondary' }}>Enter Your Account Details</Typography>
+        <Typography variant="h5">Account Information</Typography>
+        <Typography sx={{ color: "text.secondary" }}>
+          Enter Your Account Details
+        </Typography>
       </Box>
 
       <Grid container spacing={5}>
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth>
-            <TextField label='Username' placeholder='johndoe' />
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <TextField type='email' label='Email' placeholder='john.doe@email.com' />
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <InputLabel htmlFor='input-password'>Password</InputLabel>
-            <OutlinedInput
-              label='Password'
-              id='input-password'
-              type={values.showPassword ? 'text' : 'password'}
-              endAdornment={
-                <InputAdornment position='end'>
-                  <IconButton edge='end' onClick={handleClickShowPassword} onMouseDown={e => e.preventDefault()}>
-                    <Icon fontSize={20} icon={values.showPassword ? 'bx:show' : 'bx:hide'} />
-                  </IconButton>
-                </InputAdornment>
-              }
+            <TextField
+              autoFocus
+              fullWidth
+              id="firstName"
+              aria-label="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              type="text"
+              sx={{ mb: 4 }}
+              label="First Name"
+              placeholder="e.g. John"
+              required
             />
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth>
-            <InputLabel htmlFor='input-confirm-password'>Confirm Password</InputLabel>
-            <OutlinedInput
-              label='Confirm Password'
-              id='input-confirm-password'
-              type={values.showConfirmPassword ? 'text' : 'password'}
-              endAdornment={
-                <InputAdornment position='end'>
-                  <IconButton edge='end' onMouseDown={e => e.preventDefault()} onClick={handleClickShowConfirmPassword}>
-                    <Icon fontSize={20} icon={values.showConfirmPassword ? 'bx:show' : 'bx:hide'} />
-                  </IconButton>
-                </InputAdornment>
-              }
+            <TextField
+              fullWidth
+              id="lastName"
+              aria-label="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              type="text"
+              sx={{ mb: 4 }}
+              label="Last Name"
+              placeholder="e.g. Doe"
+              required
+            />
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth>
+            <TextField
+              fullWidth
+              id="username"
+              aria-label="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              type="text"
+              sx={{ mb: 4 }}
+              label="Username"
+              placeholder="johndoe"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">@</InputAdornment>
+                ),
+              }}
+              required
+            />
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth>
+            <TextField
+              fullWidth
+              id="email"
+              aria-label="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              sx={{ mb: 4 }}
+              label="Email"
+              placeholder="e.g. johndoe@email.com"
+              required
+            />
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth>
+            <TextField
+              fullWidth
+              id="phone"
+              aria-label="phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              type="text"
+              sx={{ mb: 4 }}
+              label="Phone"
+              placeholder="711 222 333"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">KE (+254)</InputAdornment>
+                ),
+              }}
+              required
+            />
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth>
+            <TextField
+              fullWidth
+              id="link"
+              aria-label="link"
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              type="text"
+              sx={{ mb: 4 }}
+              label="Unique Garisea Link"
+              placeholder="e.g. gariseacars"
+              InputProps={{
+                endAdornment: (
+                  <Tooltip
+                    title={
+                      "This will be your permanent Garisea store url. You cannot change it later."
+                    }
+                    placement="top"
+                    sx={{ cursor: "pointer" }}
+                  >
+                    <InputAdornment position="end">
+                      <Icon
+                        icon="material-symbols:error"
+                        fontSize={20}
+                        color="blue"
+                      />
+                    </InputAdornment>
+                  </Tooltip>
+                ),
+              }}
+              required
+            />
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth>
+            <TextField
+              fullWidth
+              id="address"
+              aria-label="address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              type="text"
+              sx={{ mb: 4 }}
+              label="Address"
+              placeholder="e.g. 123 Center Ln., Garisea Mall, Ngong Rd"
+              required
+            />
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth>
+            <TextField
+              fullWidth
+              id="city"
+              aria-label="city"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              type="text"
+              sx={{ mb: 4 }}
+              label="City"
+              placeholder="e.g. Nairobi"
+              required
             />
           </FormControl>
         </Grid>
         <Grid item xs={12}>
-          <TextField fullWidth label='Profile Link' placeholder='johndoe/profile' />
-        </Grid>
-        <Grid item xs={12}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Button disabled variant='contained' startIcon={<Icon icon='bx:chevron-left' fontSize={20} />}>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Button
+              disabled
+              variant="contained"
+              startIcon={<Icon icon="bx:chevron-left" fontSize={20} />}
+            >
               Previous
             </Button>
-            <Button variant='contained' onClick={handleNext} endIcon={<Icon icon='bx:chevron-right' fontSize={20} />}>
+            <Button
+              variant="contained"
+              onClick={() => {
+                handleAddPersonalInfo(personalInfo);
+                handleNext();
+              }}
+              endIcon={<Icon icon="bx:chevron-right" fontSize={20} />}
+            >
               Next
             </Button>
           </Box>
         </Grid>
       </Grid>
     </>
-  )
-}
+  );
+};
 
-export default StepAccountDetails
+export default StepAccountDetails;
