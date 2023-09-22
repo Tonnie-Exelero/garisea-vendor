@@ -9,10 +9,10 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
 import InputAdornment from "@mui/material/InputAdornment";
+import { Tooltip } from "@mui/material";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
-import { Tooltip } from "@mui/material";
 
 interface Props {
   handleNext: () => void;
@@ -158,6 +158,9 @@ const StepAccountDetails = (props: Props) => {
               label="Unique Garisea Link"
               placeholder="e.g. gariseacars"
               InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">garisea.com/</InputAdornment>
+                ),
                 endAdornment: (
                   <Tooltip
                     title={

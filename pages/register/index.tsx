@@ -5,6 +5,7 @@ import { ReactNode, useState } from "react";
 import Box, { BoxProps } from "@mui/material/Box";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { styled, useTheme } from "@mui/material/styles";
+import { Typography } from "@mui/material";
 
 // ** Layout Import
 import BlankLayout from "src/@core/layouts/BlankLayout";
@@ -21,9 +22,15 @@ import { AppDispatch } from "@src/store";
 import { addOrganization } from "@src/store/apps/vendor/organization";
 import { addVendor } from "@src/store/apps/vendor/vendor";
 
+// ** Email Imports
+import EmailVerify from "@src/emails/EmailVerify";
+
 // ** Others
 import toast from "react-hot-toast";
-import { Typography } from "@mui/material";
+import { baseUrl } from "@src/configs/baseUrl";
+import { createToken } from "@src/configs/jwt";
+import { sendEmail } from "@src/configs/email";
+import { APP_SECRET } from "@graphql/utils/auth";
 
 // ** Styled Components
 const RegisterMultiStepsIllustration = styled("img")({
@@ -72,7 +79,6 @@ const WizardWrapper = styled(Box)<BoxProps>(({ theme }) => ({
 const Register = () => {
   // ** States
   const [personal, setPersonal] = useState<any>();
-  const [organization, setOrganization] = useState<any>();
   const [accountCreated, setAccountCreated] = useState<boolean>(false);
 
   // ** Hooks
@@ -88,14 +94,12 @@ const Register = () => {
     setPersonal(personalInfo);
   };
 
-  const handleAddOrganizationInfo = (organizationInfo: any) => {
-    setOrganization(organizationInfo);
-  };
-
-  const handleCreateVendor = async () => {
+  const handleCreateVendor = async (organizationInfo: any) => {
     setAccountCreated(false);
-    console.log(organization);
-    const resultAction = await dispatch(addOrganization({ ...organization }));
+
+    const resultAction = await dispatch(
+      addOrganization({ ...organizationInfo })
+    );
 
     if (addOrganization.fulfilled.match(resultAction)) {
       const {
@@ -117,6 +121,38 @@ const Register = () => {
 
       if (addVendor.fulfilled.match(vendorResult)) {
         setAccountCreated(true);
+
+        // vendor will have a type signature of Vendor as we passed that as the Returned parameter in createAsyncThunk
+        const vendor = vendorResult.payload;
+        const { createVendor }: any = vendor;
+
+        // ** Send verification email.
+        const newSecret = APP_SECRET + createVendor.email;
+
+        const tokenPayload = {
+          data: {
+            id: createVendor.id,
+            email: createVendor.email,
+            firstName: createVendor.firstName,
+          },
+          secret: newSecret.toString(),
+          expirationTime: "1d",
+        };
+
+        const tokenObject = await createToken(tokenPayload);
+
+        // Verification link.
+        const url = `${baseUrl}/verify-email?token=${tokenObject.token}`;
+
+        const payload = {
+          name: createVendor.firstName,
+          to: createVendor.email,
+          subject: "Welcome to Garisea",
+          template: EmailVerify(url, createVendor.firstName),
+        };
+
+        sendEmail({ ...payload });
+        // ** End Send verification email.
 
         toast.success(`Account created successfully!`);
       } else {
@@ -148,7 +184,6 @@ const Register = () => {
           <WizardWrapper>
             <RegisterMultiStepsWizard
               handleAddPersonalInfo={handleAddPersonalInfo}
-              handleAddOrganizationInfo={handleAddOrganizationInfo}
               handleCreateVendor={handleCreateVendor}
             />
           </WizardWrapper>
@@ -159,7 +194,7 @@ const Register = () => {
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              marginInline: 6,
+              marginInline: { xs: 10, md: 20 },
             }}
           >
             <Typography variant="h4" sx={{ color: "green", mb: 6 }}>

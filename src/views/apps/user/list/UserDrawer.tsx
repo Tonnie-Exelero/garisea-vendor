@@ -29,7 +29,6 @@ import { fetchRoles } from "@src/store/apps/admin/role";
 
 // ** Types Imports
 import { RootState, AppDispatch } from "src/store";
-import { UserRowType } from "src/types/apps/userTypes";
 
 // ** Email Imports
 import EmailVerify from "@src/emails/EmailVerify";

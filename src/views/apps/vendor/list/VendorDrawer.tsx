@@ -33,11 +33,18 @@ import {
 } from "@src/store/apps/vendor/vendor";
 import { fetchOrganizations } from "@src/store/apps/vendor/organization";
 
+// ** Email Imports
+import EmailVerify from "@src/emails/EmailVerify";
+
 // ** Types Imports
 import { RootState, AppDispatch } from "src/store";
 
 // ** Others
 import toast from "react-hot-toast";
+import { baseUrl } from "@src/configs/baseUrl";
+import { createToken } from "@src/configs/jwt";
+import { sendEmail } from "@src/configs/email";
+import { APP_SECRET } from "@graphql/utils/auth";
 
 interface SidebarVendorType {
   open: boolean;
@@ -171,6 +178,34 @@ const SidebarVendor = (props: SidebarVendorType) => {
         const { createVendor }: any = vendor;
 
         toast.success(`Vendor ${createVendor.firstName} created successfully!`);
+
+        // ** Send verification email.
+        const newSecret = APP_SECRET + createVendor.email;
+
+        const tokenPayload = {
+          data: {
+            id: createVendor.id,
+            email: createVendor.email,
+            firstName: createVendor.firstName,
+          },
+          secret: newSecret.toString(),
+          expirationTime: "1d",
+        };
+
+        const tokenObject = await createToken(tokenPayload);
+
+        // Verification link.
+        const url = `${baseUrl}/verify-email?token=${tokenObject.token}`;
+
+        const payload = {
+          name: createVendor.firstName,
+          to: createVendor.email,
+          subject: "Welcome to Garisea",
+          template: EmailVerify(url, createVendor.firstName),
+        };
+
+        sendEmail({ ...payload });
+        // ** End Send verification email.
 
         // Clear local state
         resetData();

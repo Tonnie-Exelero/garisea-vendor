@@ -19,12 +19,11 @@ import { CircularProgress, Tooltip } from "@mui/material";
 
 interface Props {
   handlePrev: () => void;
-  handleAddOrganizationInfo: (val: any) => void;
-  handleCreateVendor: () => void;
+  handleCreateVendor: (val: any) => void;
 }
 
 const StepOrganizationInfo = (props: Props) => {
-  const { handlePrev, handleAddOrganizationInfo, handleCreateVendor } = props;
+  const { handlePrev, handleCreateVendor } = props;
 
   // ** States
   const [name, setName] = useState<string>("");
@@ -171,78 +170,94 @@ const StepOrganizationInfo = (props: Props) => {
 
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth>
-            {uploadingLogo ? (
-              <Box
-                sx={{
-                  ml: 4,
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                }}
-              >
-                <CircularProgress size="1.2rem" sx={{ mr: 2 }} />
-              </Box>
+            {logo ? (
+              <Typography sx={{ color: "green", textAlign: "center" }}>
+                Uploaded!
+              </Typography>
             ) : (
-              <Tooltip
-                title="Allowed PNG/JPEG/SVG. Max size of 2MB."
-                placement="top"
-              >
-                <Button
-                  // @ts-ignore
-                  component={"label"}
-                  variant="contained"
-                  htmlFor="upload-logo"
-                >
-                  Logo
-                  <input
-                    hidden
-                    type="file"
-                    value={inputValue}
-                    accept="image/png, image/jpeg, image/svg"
-                    onChange={handleInputLogoChange}
-                    id="upload-logo"
-                  />
-                </Button>
-              </Tooltip>
+              <>
+                {uploadingLogo ? (
+                  <Box
+                    sx={{
+                      ml: 4,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <CircularProgress size="1.5rem" sx={{ mr: 2 }} />
+                  </Box>
+                ) : (
+                  <Tooltip
+                    title="Allowed PNG/JPEG/SVG. Max size of 2MB."
+                    placement="top"
+                  >
+                    <Button
+                      // @ts-ignore
+                      component={"label"}
+                      variant="contained"
+                      htmlFor="upload-logo"
+                    >
+                      Logo
+                      <input
+                        hidden
+                        type="file"
+                        value={inputValue}
+                        accept="image/png, image/jpeg, image/svg"
+                        onChange={handleInputLogoChange}
+                        id="upload-logo"
+                      />
+                    </Button>
+                  </Tooltip>
+                )}
+              </>
             )}
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth>
-            {uploadingFile ? (
-              <Box
-                sx={{
-                  ml: 4,
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                }}
-              >
-                <CircularProgress size="1.2rem" sx={{ mr: 2 }} />
-              </Box>
+            {certificate ? (
+              <Typography sx={{ color: "green", textAlign: "center" }}>
+                Uploaded!
+              </Typography>
             ) : (
-              <Tooltip
-                title="Allowed PDF only. Max size of 2MB."
-                placement="top"
-              >
-                <Button
-                  // @ts-ignore
-                  component={"label"}
-                  variant="contained"
-                  color="info"
-                  htmlFor="upload-certificate"
-                >
-                  Registration Certificate
-                  <input
-                    hidden
-                    type="file"
-                    value={certInputValue}
-                    accept="application/pdf"
-                    onChange={handleInputCertificateChange}
-                    id="upload-certificate"
-                  />
-                </Button>
-              </Tooltip>
+              <>
+                {uploadingFile ? (
+                  <Box
+                    sx={{
+                      ml: 4,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <CircularProgress size="1.5rem" sx={{ mr: 2 }} />
+                  </Box>
+                ) : (
+                  <Tooltip
+                    title="Allowed PDF only. Max size of 2MB."
+                    placement="top"
+                  >
+                    <Button
+                      // @ts-ignore
+                      component={"label"}
+                      variant="contained"
+                      color="info"
+                      htmlFor="upload-certificate"
+                    >
+                      Registration Certificate
+                      <input
+                        hidden
+                        type="file"
+                        value={certInputValue}
+                        accept="application/pdf"
+                        onChange={handleInputCertificateChange}
+                        id="upload-certificate"
+                      />
+                    </Button>
+                  </Tooltip>
+                )}
+              </>
             )}
           </FormControl>
         </Grid>
@@ -261,8 +276,7 @@ const StepOrganizationInfo = (props: Props) => {
               color="success"
               variant="contained"
               onClick={() => {
-                handleAddOrganizationInfo(organizationData);
-                handleCreateVendor();
+                handleCreateVendor(organizationData);
               }}
             >
               Submit

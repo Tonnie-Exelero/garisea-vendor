@@ -9,6 +9,10 @@ import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
+import { IconButton, Tooltip } from "@mui/material";
+
+// ** Icon Imports
+import Icon from "src/@core/components/icon";
 
 // ** Others
 import CustomChip from "src/@core/components/mui/chip";
@@ -28,7 +32,7 @@ interface AboutOverviewProps {
   user: any;
 }
 const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
-  const { username, email, phone, language, status, role } = user;
+  const { username, email, phone, language, status } = user;
 
   return (
     <Grid container spacing={6}>
@@ -56,7 +60,7 @@ const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
                   {email}
                 </Typography>
               </Box>
-              <Box sx={{ display: "flex", mb: 4 }}>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
                 <Typography
                   sx={{ mr: 2, fontWeight: 700, color: "text.secondary" }}
                 >
@@ -67,9 +71,48 @@ const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
                   skin="light"
                   size="small"
                   label={status}
-                  sx={{ fontWeight: 500 }}
+                  sx={{ fontWeight: 500, mr: 2 }}
                   color={statusColors[status]}
                 />
+                {status === "pending" && (
+                  <Tooltip
+                    title={
+                      "Your information is being verified by Garisea. Once completed successfully, your account will be activated."
+                    }
+                    placement="top"
+                    sx={{ cursor: "pointer" }}
+                  >
+                    <IconButton>
+                      <Icon icon="material-symbols:error" fontSize={20} />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {status === "suspended" && (
+                  <Tooltip
+                    title={
+                      "Your account has been suspended. Please contact support to resolve."
+                    }
+                    placement="top"
+                    sx={{ cursor: "pointer" }}
+                  >
+                    <IconButton>
+                      <Icon icon="material-symbols:error" fontSize={20} />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {status === "inactive" && (
+                  <Tooltip
+                    title={
+                      "Your account has been deactivated. Please contact support to resolve."
+                    }
+                    placement="top"
+                    sx={{ cursor: "pointer" }}
+                  >
+                    <IconButton>
+                      <Icon icon="material-symbols:error" fontSize={20} />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </Box>
               <Box sx={{ display: "flex", mb: 4 }}>
                 <Typography

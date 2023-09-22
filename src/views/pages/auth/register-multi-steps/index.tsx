@@ -82,16 +82,11 @@ const Step = styled(MuiStep)<StepProps>(({ theme }) => ({
 
 interface Props {
   handleAddPersonalInfo: (val: any) => void;
-  handleAddOrganizationInfo: (val: any) => void;
-  handleCreateVendor: () => void;
+  handleCreateVendor: (val: any) => void;
 }
 
 const RegisterMultiSteps = (props: Props) => {
-  const {
-    handleAddPersonalInfo,
-    handleAddOrganizationInfo,
-    handleCreateVendor,
-  } = props;
+  const { handleAddPersonalInfo, handleCreateVendor } = props;
 
   // ** States
   const [activeStep, setActiveStep] = useState<number>(0);
@@ -119,7 +114,6 @@ const RegisterMultiSteps = (props: Props) => {
         return (
           <StepOrganizationInfo
             handlePrev={handlePrev}
-            handleAddOrganizationInfo={handleAddOrganizationInfo}
             handleCreateVendor={handleCreateVendor}
           />
         );
