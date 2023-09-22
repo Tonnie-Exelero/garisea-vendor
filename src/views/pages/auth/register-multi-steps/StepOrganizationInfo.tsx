@@ -1,6 +1,9 @@
 // ** React Imports
 import { ChangeEvent, useState } from "react";
 
+// ** Next Import
+import Link from "next/link";
+
 // ** MUI Components
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
@@ -9,13 +12,26 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
 import InputAdornment from "@mui/material/InputAdornment";
+import { styled } from "@mui/material/styles";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
 
 // ** Others
 import { uploadFile } from "@core/utils/file-manager";
-import { CircularProgress, Tooltip } from "@mui/material";
+import {
+  Checkbox,
+  CircularProgress,
+  FormControlLabel,
+  Tooltip,
+} from "@mui/material";
+
+// ** Styled Components
+const LinkStyled = styled(Link)(({ theme }) => ({
+  fontSize: "0.875rem",
+  textDecoration: "none",
+  color: theme.palette.primary.main,
+}));
 
 interface Props {
   handlePrev: () => void;
@@ -38,6 +54,7 @@ const StepOrganizationInfo = (props: Props) => {
   const [certInputValue, setCertInputValue] = useState<string>("");
   const [uploadingLogo, setUploadingLogo] = useState<boolean>(false);
   const [uploadingFile, setUploadingFile] = useState<boolean>(false);
+  const [termsChecked, setTermsChecked] = useState<boolean>(false);
 
   const handleInputLogoChange = async (file: ChangeEvent) => {
     setUploadingLogo(true);
@@ -108,6 +125,7 @@ const StepOrganizationInfo = (props: Props) => {
             sx={{ mb: 4 }}
             label="Email"
             placeholder="e.g. garisea@email.com"
+            required
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -126,6 +144,7 @@ const StepOrganizationInfo = (props: Props) => {
                 <InputAdornment position="start">KE (+254)</InputAdornment>
               ),
             }}
+            required
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -139,6 +158,7 @@ const StepOrganizationInfo = (props: Props) => {
             sx={{ mb: 4 }}
             label="Address"
             placeholder="e.g. 123 Center Plaza"
+            required
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -165,6 +185,7 @@ const StepOrganizationInfo = (props: Props) => {
             sx={{ mb: 4 }}
             label="City"
             placeholder="e.g. Nairobi"
+            required
           />
         </Grid>
 
@@ -261,6 +282,30 @@ const StepOrganizationInfo = (props: Props) => {
             )}
           </FormControl>
         </Grid>
+        <Grid item xs={12}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={termsChecked}
+                onChange={() => setTermsChecked(!termsChecked)}
+              />
+            }
+            sx={{
+              "& .MuiFormControlLabel-label": {
+                fontSize: "0.875rem",
+                color: "text.secondary",
+              },
+            }}
+            label={
+              <>
+                <span>I agree to </span>
+                <LinkStyled href="/" onClick={(e) => e.preventDefault()}>
+                  privacy policy & terms
+                </LinkStyled>
+              </>
+            }
+          />
+        </Grid>
 
         <Grid item xs={12}>
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -278,6 +323,14 @@ const StepOrganizationInfo = (props: Props) => {
               onClick={() => {
                 handleCreateVendor(organizationData);
               }}
+              disabled={
+                !termsChecked ||
+                name === "" ||
+                email === "" ||
+                phone === "" ||
+                address === "" ||
+                city === ""
+              }
             >
               Submit
             </Button>

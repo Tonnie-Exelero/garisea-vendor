@@ -38,6 +38,7 @@ import { AppDispatch } from "@redux/index";
 import { addVehicle } from "@src/store/apps/vendor/vehicle/single";
 import toast from "react-hot-toast";
 import { uuid } from "uuidv4";
+import { CircularProgress } from "@mui/material";
 
 const steps = [
   {
@@ -132,6 +133,7 @@ const VehicleListingWizard: React.FC<any> = () => {
   const [opticsData, setOpticsData] = useState<any>();
   const [featuresData, setFeaturesData] = useState<any>();
   const [priceData, setPriceData] = useState<any>();
+  const [creatingListing, setCreatingListing] = useState<string>("");
 
   const vehicleData = {
     entryNo: uuid(),
@@ -231,9 +233,12 @@ const VehicleListingWizard: React.FC<any> = () => {
   };
 
   const handleSubmitData = async () => {
+    setCreatingListing("ongoing");
     const resultAction = await dispatch(addVehicle({ ...vehicleData }));
 
     if (addVehicle.fulfilled.match(resultAction)) {
+      setCreatingListing("complete");
+
       toast.success(`Vehicle listing created successfully!`);
     } else {
       toast.error(`Error creating vehicle: ${resultAction.error}`);
@@ -254,17 +259,48 @@ const VehicleListingWizard: React.FC<any> = () => {
         >
           Previous
         </Button>
-        <Button
-          variant="contained"
-          color={stepCondition ? "success" : "primary"}
-          {...(!stepCondition
-            ? { endIcon: <Icon icon="bx:chevron-right" /> }
-            : {})}
-          onClick={() => (stepCondition ? handleSubmitData() : handleNext())}
-          disabled={!canGoNext}
-        >
-          {stepCondition ? "Submit" : "Next"}
-        </Button>
+        {creatingListing === "ongoing" ? (
+          <Box
+            sx={{
+              mt: 4,
+              mb: 4,
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress size="1.5rem" sx={{ mr: 2 }} />
+            <Typography variant="h6" sx={{ color: "text.secondary" }}>
+              Creating...
+            </Typography>
+          </Box>
+        ) : creatingListing === "complete" ? (
+          <Box
+            sx={{
+              mt: 4,
+              mb: 4,
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h6" sx={{ color: "green" }}>
+              Created!
+            </Typography>
+          </Box>
+        ) : (
+          <Button
+            variant="contained"
+            color={stepCondition ? "success" : "primary"}
+            {...(!stepCondition
+              ? { endIcon: <Icon icon="bx:chevron-right" /> }
+              : {})}
+            onClick={() => (stepCondition ? handleSubmitData() : handleNext())}
+            disabled={!canGoNext}
+          >
+            {stepCondition ? "Submit" : "Next"}
+          </Button>
+        )}
       </Box>
     );
   };

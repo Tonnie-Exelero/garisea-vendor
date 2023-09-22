@@ -9,7 +9,7 @@ export const Vendor = builder.prismaObject("Vendor", {
     id: t.exposeID("id"),
     firstName: t.exposeString("firstName", { nullable: true }),
     lastName: t.exposeString("lastName", { nullable: true }),
-    username: t.exposeString("username", { nullable: false }),
+    username: t.exposeString("username", { nullable: true }),
     email: t.exposeString("email", { nullable: false }),
     password: t.exposeString("password", { nullable: true }),
     phone: t.exposeString("phone", { nullable: true }),
@@ -211,7 +211,7 @@ builder.mutationFields((t) => ({
     args: {
       firstName: t.arg.string(),
       lastName: t.arg.string(),
-      username: t.arg.string({ required: true }),
+      username: t.arg.string(),
       email: t.arg.string({ required: true }),
       password: t.arg.string(),
       phone: t.arg.string(),
