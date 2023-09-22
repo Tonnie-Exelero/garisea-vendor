@@ -6,12 +6,6 @@ import {
   InferGetStaticPropsType,
 } from "next/types";
 
-// ** Third Party Imports
-import axios from "axios";
-
-// ** Types
-import { PricingDataType } from "src/@core/components/plan-details/types";
-
 // ** Demo Components Imports
 import AccountSettings from "src/views/pages/authed-user/account/AccountSettings";
 
@@ -22,21 +16,16 @@ import { idleTimer } from "@src/configs/idleOrReload";
 
 const AccountSettingsTab = ({
   tab,
-  apiPricingPlanData,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
   // ** Watch for idle time or reload
   idleTimer();
 
   // ** Hooks
-  const { authedVendor } = useSelector((state: RootState) => state.authedVendor);
-
-  return (
-    <AccountSettings
-      tab={tab}
-      apiPricingPlanData={apiPricingPlanData}
-      user={authedVendor}
-    />
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
   );
+
+  return <AccountSettings tab={tab} user={authedVendor} />;
 };
 
 export const getStaticPaths: GetStaticPaths = () => {
@@ -55,13 +44,9 @@ export const getStaticPaths: GetStaticPaths = () => {
 export const getStaticProps: GetStaticProps = async ({
   params,
 }: GetStaticPropsContext) => {
-  const res = await axios.get("/pages/pricing");
-  const data: PricingDataType = res.data;
-
   return {
     props: {
       tab: params?.tab,
-      apiPricingPlanData: data.pricingPlans,
     },
   };
 };

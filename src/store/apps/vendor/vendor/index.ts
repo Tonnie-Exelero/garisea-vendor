@@ -32,6 +32,7 @@ const vendorsInitialState = {
         email: "",
         phone: "",
         image: "",
+        storeLink: "",
         language: "",
         status: "",
         address: "",

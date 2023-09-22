@@ -24,6 +24,7 @@ const vendorInitialState = {
   password: "",
   phone: "",
   image: "",
+  storeLink: "",
   language: "",
   status: "",
   address: "",
