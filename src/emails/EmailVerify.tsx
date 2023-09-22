@@ -1,3 +1,4 @@
+import * as React from "react";
 import {
   Body,
   Container,
@@ -12,7 +13,7 @@ import {
   Section,
   Text,
 } from "@react-email/components";
-import * as React from "react";
+import { baseUrl } from "@src/configs/baseUrl";
 
 const logoUrl =
   "https://vendor.garisea.com/images/logos/garisea/logo-green-dark.png";
@@ -51,7 +52,43 @@ export const EmailVerify = (url: string, name: string) => (
             <Column style={{ width: "66%" }}>
               <Img src={logoUrl} width="142" height="auto" alt="Garisea" />
             </Column>
-            <Column></Column>
+            <Column>
+              <Row>
+                <Column>
+                  <Link href="https://twitter.com/Gari_sea" target="_blank">
+                    <Img
+                      src={`${baseUrl}/images/logos/x.png`}
+                      width="32"
+                      height="32"
+                      alt="Garisea"
+                      style={socialMediaIcon}
+                    />
+                  </Link>
+                </Column>
+                <Column>
+                  <Link href="https://facebook.com/Garisea" target="_blank">
+                    <Img
+                      src={`${baseUrl}/images/logos/facebook.png`}
+                      width="32"
+                      height="32"
+                      alt="Garisea"
+                      style={socialMediaIcon}
+                    />
+                  </Link>
+                </Column>
+                <Column>
+                  <Link href="https://instagram.com/gari_sea" target="_blank">
+                    <Img
+                      src={`${baseUrl}/images/logos/instagram.png`}
+                      width="32"
+                      height="32"
+                      alt="Garisea"
+                      style={socialMediaIcon}
+                    />
+                  </Link>
+                </Column>
+              </Row>
+            </Column>
           </Row>
         </Section>
 
