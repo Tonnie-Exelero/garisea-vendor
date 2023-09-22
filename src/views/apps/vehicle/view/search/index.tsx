@@ -56,6 +56,9 @@ const VehicleSearch = (props: Props) => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
   const { brands } = useSelector((state: RootState) => state.brands);
   const { models } = useSelector((state: RootState) => state.models);
 
@@ -65,6 +68,7 @@ const VehicleSearch = (props: Props) => {
 
   const handleSearch = () => {
     const searchParams = {
+      vendorId: authedVendor.id,
       brandId,
       modelId,
       condition,
