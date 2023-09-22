@@ -376,7 +376,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
                 </IconButton>
               </Tooltip>
               {isLoadingBrands ? (
-                <CircularProgress />
+                <CircularProgress size="1.5rem" />
               ) : (
                 <Tooltip title="Refresh" placement="top">
                   <IconButton onClick={handleRefreshBrands}>
@@ -439,7 +439,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
                 </IconButton>
               </Tooltip>
               {isLoadingModels ? (
-                <CircularProgress />
+                <CircularProgress size="1.5rem" />
               ) : (
                 <Tooltip title="Refresh" placement="top">
                   <IconButton onClick={handleRefreshModels}>
