@@ -9,10 +9,12 @@ import {
   Drawer,
   FormControl,
   IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -64,6 +66,7 @@ const SidebarVendor = (props: SidebarVendorType) => {
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [image, setImage] = useState<string>("");
+  const [storeLink, setStoreLink] = useState<string>("");
   const [language, setLanguage] = useState<string>("");
   const [status, setStatus] = useState<string>("");
   const [address, setAddress] = useState<string>("");
@@ -86,6 +89,7 @@ const SidebarVendor = (props: SidebarVendorType) => {
     setEmail("");
     setPhone("");
     setImage("");
+    setStoreLink("");
     setLanguage("");
     setStatus("");
     setAddress("");
@@ -103,6 +107,7 @@ const SidebarVendor = (props: SidebarVendorType) => {
     setEmail(data.email);
     setPhone(data.phone);
     setImage(data.image);
+    setStoreLink(data.storeLink);
     setLanguage(data.language);
     setStatus(data.status);
     setAddress(data.address);
@@ -147,6 +152,7 @@ const SidebarVendor = (props: SidebarVendorType) => {
         password: "",
         phone,
         image: "",
+        storeLink,
         language: "english",
         status: "pending",
         address,
@@ -290,6 +296,37 @@ const SidebarVendor = (props: SidebarVendorType) => {
           sx={{ mb: 4 }}
           label="Phone"
           placeholder="+254 711 222 333"
+        />
+        <TextField
+          fullWidth
+          id="storeLink"
+          aria-label="storeLink"
+          value={storeLink}
+          onChange={(e) => setStoreLink(e.target.value)}
+          type="text"
+          sx={{ mb: 4 }}
+          label="Unique Garisea Link"
+          placeholder="e.g. gariseacars"
+          InputProps={{
+            endAdornment: (
+              <Tooltip
+                title={
+                  "This will be your permanent Garisea store url. You cannot change it later."
+                }
+                placement="top"
+                sx={{ cursor: "pointer" }}
+              >
+                <InputAdornment position="end">
+                  <Icon
+                    icon="material-symbols:error"
+                    fontSize={20}
+                    color="blue"
+                  />
+                </InputAdornment>
+              </Tooltip>
+            ),
+          }}
+          required
         />
         <TextField
           fullWidth

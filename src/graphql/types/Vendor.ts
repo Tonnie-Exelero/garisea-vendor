@@ -16,6 +16,7 @@ export const Vendor = builder.prismaObject("Vendor", {
     token: t.exposeString("token", { nullable: true }),
     status: t.exposeString("status", { nullable: true }),
     image: t.exposeString("image", { nullable: true }),
+    storeLink: t.exposeString("storeLink", { nullable: true }),
     language: t.exposeString("language", { nullable: true }),
     address: t.exposeString("address", { nullable: true }),
     city: t.exposeString("city", { nullable: true }),
@@ -141,6 +142,20 @@ builder.queryFields((t) => ({
         },
       }),
   }),
+  vendorStoreLink: t.prismaField({
+    type: Vendor,
+    nullable: true,
+    args: {
+      storeLink: t.arg.string({ required: true }),
+    },
+    resolve: (query, _parent, args, _info) =>
+      prisma.vendor.findUniqueOrThrow({
+        ...query,
+        where: {
+          storeLink: args.storeLink,
+        },
+      }),
+  }),
 }));
 
 builder.mutationFields((t) => ({
@@ -202,6 +217,7 @@ builder.mutationFields((t) => ({
       phone: t.arg.string(),
       status: t.arg.string(),
       image: t.arg.string(),
+      storeLink: t.arg.string(),
       language: t.arg.string(),
       address: t.arg.string(),
       city: t.arg.string(),
@@ -220,6 +236,7 @@ builder.mutationFields((t) => ({
         phone,
         status,
         image,
+        storeLink,
         language,
         address,
         city,
@@ -242,6 +259,7 @@ builder.mutationFields((t) => ({
           phone,
           status,
           image,
+          storeLink,
           language,
           address,
           city,

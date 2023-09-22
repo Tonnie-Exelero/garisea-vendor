@@ -3,7 +3,11 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // ** API
 import apolloClient from "@lib/apollo";
-import { UPDATE_LOGO, UPDATE_CERTIFICATE } from "@api/vendor/organization";
+import {
+  GET_ORGANIZATION_BY_NAME,
+  UPDATE_LOGO,
+  UPDATE_CERTIFICATE,
+} from "@api/vendor/organization";
 
 // ** Others
 import { Organization } from "../types";
@@ -21,6 +25,28 @@ const organizationInitialState = {
   logo: "",
   certificate: "",
 };
+
+// ** Fetch Organization By Name
+export const fetchOrganizationByName = createAsyncThunk<Organization, any, {}>(
+  "appOrganization/fetchOrganizationByName",
+  async (name, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_ORGANIZATION_BY_NAME,
+        variables: { ...name },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
 // ** Update Logo
 export const editLogo = createAsyncThunk<Organization, any, {}>(
@@ -78,6 +104,14 @@ export const appOrganizationSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(fetchOrganizationByName.fulfilled, (state, { payload }) => {
+        // Reset organization state.
+        state.organization = { ...organizationInitialState };
+
+        const { organizationByName }: any = payload;
+
+        state.organization = { ...organizationByName };
+      })
       .addCase(editLogo.fulfilled, (state, { payload }) => {
         // Reset organization state.
         state.organization = { ...organizationInitialState };

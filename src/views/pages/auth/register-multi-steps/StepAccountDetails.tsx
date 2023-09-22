@@ -28,7 +28,7 @@ const StepAccountDetails = (props: Props) => {
   const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
-  const [link, setLink] = useState<string>("");
+  const [storeLink, setStoreLink] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [city, setCity] = useState<string>("");
 
@@ -38,7 +38,7 @@ const StepAccountDetails = (props: Props) => {
     username,
     email,
     phone: "+254" + phone,
-    // link,
+    storeLink,
     address,
     city,
     country: "Kenya",
@@ -149,10 +149,10 @@ const StepAccountDetails = (props: Props) => {
           <FormControl fullWidth>
             <TextField
               fullWidth
-              id="link"
-              aria-label="link"
-              value={link}
-              onChange={(e) => setLink(e.target.value)}
+              id="storeLink"
+              aria-label="storeLink"
+              value={storeLink}
+              onChange={(e) => setStoreLink(e.target.value)}
               type="text"
               sx={{ mb: 4 }}
               label="Unique Garisea Link"

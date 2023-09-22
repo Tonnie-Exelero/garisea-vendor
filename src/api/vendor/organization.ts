@@ -75,6 +75,23 @@ export const GET_ORGANIZATION_BY_ID = gql`
   }
 `;
 
+export const GET_ORGANIZATION_BY_NAME = gql`
+  query GetOrganizationByName($name: String!) {
+    organizationByName(name: $name) {
+      id
+      name
+      email
+      phone
+      address
+      address2
+      city
+      country
+      logo
+      certificate
+    }
+  }
+`;
+
 export const CREATE_ORGANIZATION = gql`
   mutation CreateOrganization(
     $name: String!
