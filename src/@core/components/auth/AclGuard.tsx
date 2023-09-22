@@ -21,9 +21,6 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 // ** Hooks
 import { useAuth } from "src/hooks/useAuth";
 
-// ** Util Import
-import getHomeRoute from "src/layouts/components/acl/getHomeRoute";
-
 interface AclGuardProps {
   children: ReactNode;
   authGuard?: boolean;
@@ -47,32 +44,25 @@ const AclGuard = (props: AclGuardProps) => {
   // ** Vars
   let ability: AppAbility;
 
-  const createSubjectsArray = (permissions: any[]) => {
-    const subjectsArr = permissions.map((i) => i.subjects);
-
-    return [...new Set(subjectsArr.toString().split(","))];
-  };
-
   useEffect(() => {
     if (
-      auth.user &&
-      auth.user.role.slug &&
+      auth.vendor &&
+      auth.vendor.role &&
       !guestGuard &&
       router.route === "/"
     ) {
-      const homeRoute = getHomeRoute(auth.user.role.slug);
-      router.replace(homeRoute);
+      router.replace("/home");
     }
-  }, [auth.user, guestGuard, router]);
+  }, [auth.vendor, guestGuard, router]);
 
-  // User is logged in, build ability for the user based on his role
-  if (auth.user && !ability) {
-    const permissions = auth.user.role.permissions;
-    const subjects = createSubjectsArray(permissions);
+  // User is logged in, build ability for the vendor based on his role
+  if (auth.vendor && !ability) {
+    const actions = ["create", "read", "update", "delete"];
+    const subjects = ["profile", "vehicles", "organizations"];
 
     ability = buildAbilityFor(
-      auth.user.role.slug,
-      auth.user.role.ability,
+      auth.vendor.role,
+      actions.toString(),
       subjects.toString()
     );
 
@@ -88,23 +78,23 @@ const AclGuard = (props: AclGuardProps) => {
     router.route === "/500" ||
     !authGuard
   ) {
-    // If user is logged in and his ability is built
-    if (auth.user && ability) {
+    // If vendor is logged in and his ability is built
+    if (auth.vendor && ability) {
       return (
         <AbilityContext.Provider value={ability}>
           {children}
         </AbilityContext.Provider>
       );
     } else {
-      // If user is not logged in (render pages like login, register etc..)
+      // If vendor is not logged in (render pages like login, register etc..)
       return <>{children}</>;
     }
   }
 
-  // Check the access of current user and render pages
+  // Check the access of current vendor and render pages
   if (
     ability &&
-    auth.user &&
+    auth.vendor &&
     ability.can(aclAbilities.action, aclAbilities.subject)
   ) {
     if (router.route === "/") {
@@ -118,7 +108,7 @@ const AclGuard = (props: AclGuardProps) => {
     );
   }
 
-  // Render Not Authorized component if the current user has limited access
+  // Render Not Authorized component if the current vendor has limited access
   return (
     <BlankLayout>
       <NotAuthorized />

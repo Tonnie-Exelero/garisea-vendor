@@ -17,22 +17,13 @@ import MuiTabList, { TabListProps } from "@mui/lab/TabList";
 import CircularProgress from "@mui/material/CircularProgress";
 
 // ** Type Import
-import {
-  TeamsTabType,
-  ProfileTabType,
-  ProjectsTabType,
-  ConnectionsTabType,
-  UserProfileActiveTab,
-} from "src/@fake-db/types";
+import { ProfileTabType, UserProfileActiveTab } from "src/@fake-db/types";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
 
 // ** Demo Components
-import Teams from "./teams";
 import Profile from "./profile";
-import Projects from "./projects";
-import Connections from "./connections";
 import UserProfileHeader from "./UserProfileHeader";
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
@@ -100,9 +91,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ tab, data, user }) => {
 
   const tabContentList: { [key: string]: ReactElement } = {
     profile: <Profile data={data as ProfileTabType} user={user} />,
-    teams: <Teams data={data as TeamsTabType[]} />,
-    projects: <Projects data={data as ProjectsTabType[]} />,
-    connections: <Connections data={data as ConnectionsTabType[]} />,
   };
 
   return (
@@ -136,33 +124,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ tab, data, user }) => {
                       </Box>
                     }
                   />
-                  {/* <Tab
-                    value='teams'
-                    label={
-                      <Box sx={{ display: 'flex', alignItems: 'center', ...(!hideText && { '& svg': { mr: 2 } }) }}>
-                        <Icon icon='bx:group' />
-                        {!hideText && 'Teams'}
-                      </Box>
-                    }
-                  />
-                  <Tab
-                    value='projects'
-                    label={
-                      <Box sx={{ display: 'flex', alignItems: 'center', ...(!hideText && { '& svg': { mr: 2 } }) }}>
-                        <Icon icon='bx:grid-alt' />
-                        {!hideText && 'Projects'}
-                      </Box>
-                    }
-                  />
-                  <Tab
-                    value='connections'
-                    label={
-                      <Box sx={{ display: 'flex', alignItems: 'center', ...(!hideText && { '& svg': { mr: 2 } }) }}>
-                        <Icon icon='bx:link-alt' />
-                        {!hideText && 'Connections'}
-                      </Box>
-                    }
-                  /> */}
                 </TabList>
               </Grid>
               <Grid item xs={12}>

@@ -66,7 +66,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({ user }) => {
         alt="profile-header"
         image={data.coverImg}
         sx={{
-          height: { xs: 150, md: 250 },
+          height: { xs: 80, md: 120 },
         }}
       />
       <CardContent

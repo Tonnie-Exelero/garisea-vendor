@@ -86,6 +86,20 @@ builder.queryFields((t) => ({
         },
       }),
   }),
+  organizationByName: t.prismaField({
+    type: Organization,
+    nullable: true,
+    args: {
+      name: t.arg.string({ required: true }),
+    },
+    resolve: (query, _parent, args, _info) =>
+      prisma.organization.findUniqueOrThrow({
+        ...query,
+        where: {
+          name: args.name,
+        },
+      }),
+  }),
 }));
 
 builder.mutationFields((t) => ({

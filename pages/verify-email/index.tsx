@@ -31,9 +31,9 @@ import EmailVerify from "@src/emails/EmailVerify";
 import { AppDispatch, RootState } from "src/store";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  fetchVendorById,
   editEmailVerified,
-  fetchUserById,
-} from "@src/store/apps/admin/user/single";
+} from "@src/store/apps/vendor/vendor/single";
 
 // ** Others
 import jwt from "jsonwebtoken";
@@ -64,20 +64,19 @@ const VerifyEmail = (props: Props) => {
 
   // ** States
   const [sending, setSending] = useState<string>("");
-  const [verified, setVerified] = useState<boolean>(false);
 
   // ** Hooks
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.singleUser);
+  const { vendor } = useSelector((state: RootState) => state.singleVendor);
 
   // ** Local Storage
   const fromLocalStore = window.localStorage.getItem("settings");
   const appSettings = fromLocalStore && JSON.parse(fromLocalStore);
 
   useEffect(() => {
-    dispatch(fetchUserById({ id }));
-  }, [dispatch, user]);
+    dispatch(fetchVendorById({ id }));
+  }, [dispatch, vendor]);
 
   // Update Email Verification status
   const updateEmailVerified = async () => {
@@ -89,12 +88,12 @@ const VerifyEmail = (props: Props) => {
 
     const resetPasswordTokenObj = await createToken(resetPasswordTokenPayload);
 
-    const userData = {
+    const vendorData = {
       id,
       emailVerified: "Yes",
     };
 
-    const resultAction = await dispatch(editEmailVerified({ ...userData }));
+    const resultAction = await dispatch(editEmailVerified({ ...vendorData }));
 
     if (editEmailVerified.fulfilled.match(resultAction)) {
       // Proceed to set password
@@ -181,7 +180,7 @@ const VerifyEmail = (props: Props) => {
                 </Box>
               </Box>
             </Box>
-            {user && user.emailVerified === "Yes" && (
+            {vendor && vendor.emailVerified === "Yes" && (
               <>
                 <Typography
                   variant="h5"
@@ -202,8 +201,8 @@ const VerifyEmail = (props: Props) => {
                 </Box>
               </>
             )}
-            {user &&
-              user.emailVerified === "No" &&
+            {vendor &&
+              vendor.emailVerified === "No" &&
               isEmailValid &&
               !isTokenExpired && (
                 <>
@@ -220,8 +219,8 @@ const VerifyEmail = (props: Props) => {
                   </Box>
                 </>
               )}
-            {user &&
-              user.emailVerified === "No" &&
+            {vendor &&
+              vendor.emailVerified === "No" &&
               isTokenExpired &&
               !isEmailValid && (
                 <>

@@ -41,7 +41,7 @@ import CustomAvatar from "@components/mui/avatar";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@src/store";
-import { editUser, editImage, removeUser } from "@src/store/apps/auth";
+import { editVendor, editImage, removeVendor } from "@src/store/apps/auth";
 import { ThemeColor } from "@core/layouts/types";
 import { getInitials } from "@utils/get-initials";
 import { removeFile, uploadFile } from "@core/utils/file-manager";
@@ -83,7 +83,7 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
   const [address, setAddress] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [country, setCountry] = useState<string>("");
-  const [role, setRole] = useState<any>();
+  const [organization, setOrganization] = useState<any>();
   const [avatarColor, setAvatarColor] = useState<string | undefined>("");
   const [open, setOpen] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>("");
@@ -113,7 +113,7 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
     setAddress(user.address);
     setCity(user.city);
     setCountry(user.country);
-    setRole(user.role);
+    setOrganization(user.organization);
     setAvatarColor(user.avatarColor);
   };
 
@@ -182,12 +182,12 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
       address,
       city,
       country,
-      roleId: role.id,
+      organizationId: organization.id,
     };
 
-    const resultAction = await dispatch(editUser({ ...userData }));
+    const resultAction = await dispatch(editVendor({ ...userData }));
 
-    if (editUser.fulfilled.match(resultAction)) {
+    if (editVendor.fulfilled.match(resultAction)) {
       toast.success(`Profile updated successfully!`);
     } else {
       toast.error(`Error updating profile: ${resultAction.error}`);
@@ -197,9 +197,9 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
   const handleDeleteAccount = async (e: any) => {
     e.preventDefault();
 
-    const resultAction = await dispatch(removeUser({ id }));
+    const resultAction = await dispatch(removeVendor({ id }));
 
-    if (removeUser.fulfilled.match(resultAction)) {
+    if (removeVendor.fulfilled.match(resultAction)) {
       toast.success(`Account deleted successfully!`);
     } else {
       toast.error(`Error deleting account: ${resultAction.error}`);
@@ -424,11 +424,11 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  id="role"
-                  aria-label="role"
-                  value={role ? role.name : "Editor"}
+                  id="organization"
+                  aria-label="organization"
+                  value={organization ? organization.name : "Editor"}
                   type="text"
-                  label="Role"
+                  label="Organization"
                   disabled
                 />
               </Grid>
@@ -456,64 +456,62 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
       </Grid>
 
       {/* Delete Account Card */}
-      {user.role.slug === "superadmin" && (
-        <Grid item xs={12}>
-          <Card>
-            <CardHeader title="Delete Account" />
-            <CardContent>
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <Box sx={{ mb: 2 }}>
-                  <FormControl>
-                    <Controller
-                      name="checkbox"
-                      control={control}
-                      rules={{ required: true }}
-                      render={({ field }) => (
-                        <FormControlLabel
-                          label="I confirm my account deactivation"
-                          sx={{
-                            "& .MuiTypography-root": {
-                              color: errors.checkbox
-                                ? "error.main"
-                                : "text.secondary",
-                            },
-                          }}
-                          control={
-                            <Checkbox
-                              {...field}
-                              size="small"
-                              name="validation-basic-checkbox"
-                              sx={
-                                errors.checkbox ? { color: "error.main" } : null
-                              }
-                            />
-                          }
-                        />
-                      )}
-                    />
-                    {errors.checkbox && (
-                      <FormHelperText
-                        sx={{ color: "error.main" }}
-                        id="validation-basic-checkbox"
-                      >
-                        Please confirm you want to delete account
-                      </FormHelperText>
+      <Grid item xs={12}>
+        <Card>
+          <CardHeader title="Delete Account" />
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Box sx={{ mb: 2 }}>
+                <FormControl>
+                  <Controller
+                    name="checkbox"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        label="I confirm my account deactivation"
+                        sx={{
+                          "& .MuiTypography-root": {
+                            color: errors.checkbox
+                              ? "error.main"
+                              : "text.secondary",
+                          },
+                        }}
+                        control={
+                          <Checkbox
+                            {...field}
+                            size="small"
+                            name="validation-basic-checkbox"
+                            sx={
+                              errors.checkbox ? { color: "error.main" } : null
+                            }
+                          />
+                        }
+                      />
                     )}
-                  </FormControl>
-                </Box>
-                <Button
-                  variant="contained"
-                  color="error"
-                  type="submit"
-                  disabled={errors.checkbox !== undefined}
-                >
-                  Deactivate Account
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </Grid>
-      )}
+                  />
+                  {errors.checkbox && (
+                    <FormHelperText
+                      sx={{ color: "error.main" }}
+                      id="validation-basic-checkbox"
+                    >
+                      Please confirm you want to delete account
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </Box>
+              <Button
+                variant="contained"
+                color="error"
+                type="submit"
+                disabled={errors.checkbox !== undefined}
+              >
+                Deactivate Account
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </Grid>
 
       {/* Deactivate Account Dialogs */}
       <Dialog fullWidth maxWidth="xs" open={open} onClose={handleClose}>

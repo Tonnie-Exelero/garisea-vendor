@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   FormControl,
-  FormLabel,
   Grid,
   InputAdornment,
   InputLabel,
@@ -21,14 +20,11 @@ import {
 // ** API
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@src/store";
-import { fetchVendors } from "@src/store/apps/vendor/vendor";
 import { fetchBrands } from "@src/store/apps/admin/brand";
 import { fetchModelsByBrand } from "@src/store/apps/admin/model";
 
 // ** Others
 import { currency, vehicleBodyTypes } from "../../config";
-
-const PAGE_SIZE = 20;
 
 interface Props {
   handleVehiclesFilter: (params: any) => void;
@@ -38,7 +34,6 @@ const VehicleSearch = (props: Props) => {
   const { handleVehiclesFilter } = props;
 
   // ** States
-  const [vendorId, setVendorId] = useState<string>("");
   const [brandId, setBrandId] = useState<string>("");
   const [modelId, setModelId] = useState<string>("");
   const [condition, setCondition] = useState<string>("");
@@ -61,18 +56,19 @@ const VehicleSearch = (props: Props) => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
-  const { vendors } = useSelector((state: RootState) => state.vendors);
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
   const { brands } = useSelector((state: RootState) => state.brands);
   const { models } = useSelector((state: RootState) => state.models);
 
   useEffect(() => {
-    dispatch(fetchVendors({ first: 100 }));
     dispatch(fetchBrands({ first: 100 }));
-  }, [dispatch, vendors]);
+  }, [dispatch, brands]);
 
   const handleSearch = () => {
     const searchParams = {
-      vendorId,
+      vendorId: authedVendor.id,
       brandId,
       modelId,
       condition,
@@ -134,42 +130,6 @@ const VehicleSearch = (props: Props) => {
 
   return (
     <Grid container spacing={5}>
-      <Grid item md={2} sm={3} xs={12}>
-        <FormControl fullWidth sx={{ mb: 4 }} size="small">
-          <InputLabel id="vendor-select">Vendor</InputLabel>
-          <Select
-            fullWidth
-            value={vendorId}
-            id="vendor"
-            label="Vendor"
-            labelId="vendor-select"
-            onChange={(e) => setVendorId(e.target.value)}
-            inputProps={{ placeholder: "Select Vendor" }}
-          >
-            {vendors.edges.length > 0 ? (
-              vendors.edges.map((vendor, index) => {
-                const { id, firstName, lastName } = vendor.node;
-
-                return (
-                  <MenuItem key={index} value={id}>
-                    {firstName + " " + lastName}
-                  </MenuItem>
-                );
-              })
-            ) : (
-              <Typography
-                sx={{
-                  padding: 3,
-                  color: "text.secondary",
-                  fontStyle: "italic",
-                }}
-              >
-                No vendors available
-              </Typography>
-            )}
-          </Select>
-        </FormControl>
-      </Grid>
       <Grid item md={2} sm={3} xs={12}>
         <FormControl fullWidth sx={{ mb: 4 }} size="small">
           <InputLabel htmlFor="brand-select">Brand</InputLabel>

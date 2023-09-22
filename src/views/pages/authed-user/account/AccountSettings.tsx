@@ -19,15 +19,9 @@ import CircularProgress from "@mui/material/CircularProgress";
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
 
-// ** Types
-import { PricingPlanType } from "src/@core/components/plan-details/types";
-
 // ** Demo Tabs Imports
 import TabAccount from "./TabAccount";
-import TabBilling from "./TabBilling";
 import TabSecurity from "./TabSecurity";
-import TabConnections from "./TabConnections";
-import TabNotifications from "./TabNotifications";
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   "& .MuiTabs-indicator": {
@@ -48,15 +42,10 @@ const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
 
 interface AccountSettingsProps {
   tab: string;
-  apiPricingPlanData: PricingPlanType[];
   user: any;
 }
 
-const AccountSettings: React.FC<AccountSettingsProps> = ({
-  tab,
-  apiPricingPlanData,
-  user,
-}) => {
+const AccountSettings: React.FC<AccountSettingsProps> = ({ tab, user }) => {
   // ** State
   const [activeTab, setActiveTab] = useState<string>(tab);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -84,9 +73,6 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
   const tabContentList: { [key: string]: ReactElement } = {
     account: <TabAccount user={user} />,
     security: <TabSecurity user={user} />,
-    connections: <TabConnections />,
-    notifications: <TabNotifications />,
-    "billing-plan": <TabBilling apiPricingPlanData={apiPricingPlanData} />,
   };
 
   return (
@@ -131,33 +117,6 @@ const AccountSettings: React.FC<AccountSettingsProps> = ({
                     </Box>
                   }
                 />
-                {/* <Tab
-                  value='billing-plan'
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', ...(!hideText && { '& svg': { mr: 2 } }) }}>
-                      <Icon icon='bx:detail' />
-                      {!hideText && 'Billing & Plans'}
-                    </Box>
-                  }
-                />
-                <Tab
-                  value='notifications'
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', ...(!hideText && { '& svg': { mr: 2 } }) }}>
-                      <Icon icon='bx:bell' />
-                      {!hideText && 'Notifications'}
-                    </Box>
-                  }
-                />
-                <Tab
-                  value='connections'
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', ...(!hideText && { '& svg': { mr: 2 } }) }}>
-                      <Icon icon='bx:link-alt' />
-                      {!hideText && 'Connections'}
-                    </Box>
-                  }
-                /> */}
               </TabList>
             </Grid>
             <Grid item xs={12}>

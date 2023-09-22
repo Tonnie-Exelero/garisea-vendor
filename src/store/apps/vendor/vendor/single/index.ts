@@ -5,6 +5,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import apolloClient from "@lib/apollo";
 import {
   GET_VENDOR_BY_ID,
+  GET_VENDOR_BY_EMAIL,
   CREATE_VENDOR,
   UPDATE_VENDOR,
   UPDATE_PASSWORD,
@@ -25,6 +26,7 @@ const vendorInitialState = {
   password: "",
   phone: "",
   image: "",
+  storeLink: "",
   language: "",
   status: "",
   address: "",
@@ -67,6 +69,29 @@ export const fetchVendorById = createAsyncThunk<Vendor, { id: string }, {}>(
     }
   }
 );
+
+// ** Fetch Vendor By Email
+export const fetchVendorByEmail = createAsyncThunk<
+  Vendor,
+  { email: string },
+  {}
+>("appVendor/fetchVendorByEmail", async (email, { rejectWithValue }) => {
+  try {
+    const { data } = await apolloClient.query({
+      query: GET_VENDOR_BY_EMAIL,
+      variables: { ...email },
+    });
+
+    return data;
+  } catch (err) {
+    let error: any = err; // cast the error for access
+    if (!error.response) {
+      throw err;
+    }
+    // We got validation errors, let's return those so we can reference in our component and set form errors
+    return rejectWithValue(error.response.data);
+  }
+});
 
 // ** Create Vendor
 export const addVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
@@ -210,6 +235,17 @@ export const appVendorSlice = createSlice({
         if (state.loading === "pending") {
           state.loading = "";
           state.error = <any>action.error.message;
+        }
+      })
+      .addCase(fetchVendorByEmail.fulfilled, (state, { payload }) => {
+        // Reset vendor state.
+        state.vendor = { ...vendorInitialState };
+
+        if (state.loading === "pending") {
+          const { vendorByEmail }: any = payload;
+
+          state.loading = "";
+          state.vendor = vendorByEmail;
         }
       })
       .addCase(addVendor.pending, (state, action) => {

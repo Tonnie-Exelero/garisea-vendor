@@ -38,16 +38,8 @@ interface UserProfileHeaderProps {
 }
 
 const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({ user }) => {
-  const {
-    firstName,
-    lastName,
-    image,
-    address,
-    city,
-    country,
-    role,
-    avatarColor,
-  } = user;
+  const { firstName, lastName, image, address, city, country, avatarColor } =
+    user;
   // ** State
   const [data, setData] = useState<ProfileHeaderType | null>(null);
 
@@ -57,8 +49,6 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({ user }) => {
     });
   }, []);
 
-  const designationIcon = data?.designationIcon || "bx:briefcase";
-
   return data !== null ? (
     <Card>
       <CardMedia
@@ -66,7 +56,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({ user }) => {
         alt="profile-header"
         image={data.coverImg}
         sx={{
-          height: { xs: 150, md: 250 },
+          height: { xs: 80, md: 120 },
         }}
       />
       <CardContent
@@ -137,19 +127,6 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({ user }) => {
                 justifyContent: ["center", "flex-start"],
               }}
             >
-              <Box
-                sx={{
-                  mr: 4,
-                  display: "flex",
-                  alignItems: "center",
-                  "& svg": { mr: 1, color: "text.secondary" },
-                }}
-              >
-                <Icon icon={designationIcon} />
-                <Typography sx={{ color: "text.secondary", fontWeight: 600 }}>
-                  {role.name}
-                </Typography>
-              </Box>
               <Box
                 sx={{
                   mr: 4,

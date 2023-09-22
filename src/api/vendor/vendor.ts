@@ -13,6 +13,7 @@ export const GET_VENDORS = gql`
           email
           phone
           image
+          storeLink
           language
           status
           address
@@ -70,6 +71,7 @@ export const GET_VENDORS_BY_STATUS = gql`
           email
           phone
           image
+          storeLink
           language
           status
           address
@@ -115,6 +117,7 @@ export const GET_FILTERED_VENDORS = gql`
           email
           phone
           image
+          storeLink
           language
           status
           address
@@ -157,6 +160,41 @@ export const GET_VENDOR_BY_ID = gql`
       email
       phone
       image
+      storeLink
+      language
+      status
+      address
+      city
+      country
+      emailVerified
+      addedOrganization
+      organization {
+        id
+        name
+        email
+        phone
+        address
+        address2
+        city
+        country
+        logo
+        certificate
+      }
+    }
+  }
+`;
+
+export const GET_VENDOR_BY_EMAIL = gql`
+  query GetVendorByEmail($email: String!) {
+    vendorByEmail(email: $email) {
+      id
+      firstName
+      lastName
+      username
+      email
+      phone
+      image
+      storeLink
       language
       status
       address
@@ -189,6 +227,7 @@ export const CREATE_VENDOR = gql`
     $password: String
     $phone: String
     $image: String
+    $storeLink: String
     $language: String
     $status: String
     $address: String
@@ -206,6 +245,7 @@ export const CREATE_VENDOR = gql`
       password: $password
       phone: $phone
       image: $image
+      storeLink: $storeLink
       language: $language
       status: $status
       address: $address
@@ -222,6 +262,7 @@ export const CREATE_VENDOR = gql`
       email
       phone
       image
+      storeLink
       language
       status
       address
@@ -281,6 +322,7 @@ export const UPDATE_VENDOR = gql`
       email
       phone
       image
+      storeLink
       language
       status
       address
@@ -310,16 +352,98 @@ export const UPDATE_PASSWORD = gql`
       id
       firstName
       lastName
+      username
+      email
+      phone
+      image
+      storeLink
+      language
+      status
+      address
+      city
+      country
+      emailVerified
+      addedOrganization
+      organization {
+        id
+        name
+        email
+        phone
+        address
+        address2
+        city
+        country
+        logo
+        certificate
+      }
     }
   }
 `;
+
+export const UPDATE_IMAGE = gql`
+  mutation UpdateImage($id: String!, $image: String!) {
+    updateVendorImage(id: $id, image: $image) {
+      id
+      firstName
+      lastName
+      username
+      email
+      phone
+      image
+      storeLink
+      language
+      status
+      address
+      city
+      country
+      emailVerified
+      addedOrganization
+      organization {
+        id
+        name
+        email
+        phone
+        address
+        address2
+        city
+        country
+        logo
+        certificate
+      }
+    }
+  }
+`;
+
 export const UPDATE_VENDOR_STATUS = gql`
   mutation UpdateVendorStatus($id: String!, $status: String!) {
     updateVendorStatus(id: $id, status: $status) {
       id
       firstName
       lastName
+      username
+      email
+      phone
+      image
+      storeLink
+      language
       status
+      address
+      city
+      country
+      emailVerified
+      addedOrganization
+      organization {
+        id
+        name
+        email
+        phone
+        address
+        address2
+        city
+        country
+        logo
+        certificate
+      }
     }
   }
 `;
@@ -330,7 +454,30 @@ export const UPDATE_EMAIL_VERIFIED = gql`
       id
       firstName
       lastName
+      username
       email
+      phone
+      image
+      storeLink
+      language
+      status
+      address
+      city
+      country
+      emailVerified
+      addedOrganization
+      organization {
+        id
+        name
+        email
+        phone
+        address
+        address2
+        city
+        country
+        logo
+        certificate
+      }
     }
   }
 `;
@@ -346,7 +493,30 @@ export const UPDATE_ADDED_ORGANIZATION = gql`
       id
       firstName
       lastName
+      username
+      email
+      phone
+      image
+      storeLink
+      language
+      status
+      address
+      city
+      country
+      emailVerified
       addedOrganization
+      organization {
+        id
+        name
+        email
+        phone
+        address
+        address2
+        city
+        country
+        logo
+        certificate
+      }
     }
   }
 `;

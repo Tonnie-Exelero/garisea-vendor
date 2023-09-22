@@ -91,7 +91,6 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
 
   // ** States
   const [condition, setCondition] = useState<string>(initialIconSelected);
-  const [vendorId, setVendorId] = useState<string>("");
   const [brandId, setBrandId] = useState<string>("");
   const [modelId, setModelId] = useState<string>("");
   const [trim, setTrim] = useState<string>("");
@@ -106,7 +105,9 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
   // ** Hook
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
-  const { vendors } = useSelector((state: RootState) => state.vendors);
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
   const { brands } = useSelector((state: RootState) => state.brands);
   const { models } = useSelector((state: RootState) => state.models);
 
@@ -144,7 +145,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
 
   const basicData = {
     condition,
-    vendorId,
+    vendorId: authedVendor.id,
     brandId,
     modelId,
     trim,
@@ -210,38 +211,6 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
             iconProps={icons[index].iconProps}
           />
         ))}
-        <Grid item xs={12} md={6}>
-          <FormControl fullWidth sx={{ mb: 4 }}>
-            <InputLabel htmlFor="vendor-select">Vendor</InputLabel>
-            <Select
-              fullWidth
-              id="vendor"
-              labelId="vendor-select"
-              label="Vendor"
-              value={vendorId}
-              onChange={(e) => setVendorId(e.target.value)}
-              inputProps={{ placeholder: "Select Vendor" }}
-            >
-              {vendors.edges.length > 0 ? (
-                vendors.edges.map((vendor: any, index: any) => (
-                  <MenuItem key={index} value={vendor.node.id}>
-                    {vendor.node.firstName + " " + vendor.node.lastName}
-                  </MenuItem>
-                ))
-              ) : (
-                <Typography
-                  sx={{
-                    padding: 3,
-                    color: "text.secondary",
-                    fontStyle: "italic",
-                  }}
-                >
-                  No vendors available
-                </Typography>
-              )}
-            </Select>
-          </FormControl>
-        </Grid>
         <Grid item xs={12} md={6}>
           <FormControl fullWidth sx={{ mb: 4 }}>
             <InputLabel htmlFor="brand-select">Brand</InputLabel>

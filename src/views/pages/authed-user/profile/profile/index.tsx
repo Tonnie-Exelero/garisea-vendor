@@ -1,11 +1,9 @@
 // ** MUI Components
 import Grid from "@mui/material/Grid";
 
-// ** Demo Components
+// ** Components
 import AboutOverview from "./AboutOverview";
-import ProjectsTable from "./ProjectsTable";
-import ActivityTimeline from "./ActivityTimeline";
-import ConnectionsTeams from "./ConnectionsTeams";
+import OrganizationInfo from "./OrganizationInfo";
 
 // ** Types
 import { ProfileTabType } from "src/@fake-db/types";
@@ -21,17 +19,9 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ data, user }) => {
       <Grid item lg={4} md={5} xs={12}>
         <AboutOverview user={user} />
       </Grid>
-      {/* <Grid item lg={8} md={7} xs={12}>
-        <Grid container spacing={6}>
-          <Grid item xs={12}>
-            <ActivityTimeline />
-          </Grid>
-          <ConnectionsTeams connections={data.connections} teams={data.teamsTech} />
-          <Grid item xs={12}>
-            <ProjectsTable />
-          </Grid>
-        </Grid>
-      </Grid> */}
+      <Grid item lg={8} md={7} xs={12}>
+        <OrganizationInfo vendor={user} />
+      </Grid>
     </Grid>
   ) : null;
 };

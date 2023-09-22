@@ -10,6 +10,7 @@ export type VendorNode = {
   email: string;
   phone: string;
   image: string;
+  storeLink: string;
   language: string;
   status: string;
   address: string;
