@@ -66,7 +66,10 @@ export const EmailVerify = (url: string, name: string) => (
                   </Link>
                 </Column>
                 <Column>
-                  <Link href="https://facebook.com/Garisea" target="_blank">
+                  <Link
+                    href="https://www.facebook.com/profile.php?id=61550932202109&mibextid=ZbWKwL"
+                    target="_blank"
+                  >
                     <Img
                       src={`${baseUrl}/images/logos/facebook.png`}
                       width="32"
