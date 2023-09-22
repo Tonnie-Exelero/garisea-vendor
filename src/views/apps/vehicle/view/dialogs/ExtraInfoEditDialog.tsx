@@ -12,14 +12,20 @@ import {
   DialogTitle,
   FormControl,
   Grid,
+  IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   OutlinedInput,
   Select,
   SelectChangeEvent,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
+
+// ** Icon Imports
+import Icon from "src/@core/components/icon";
 
 // ** Types
 import { VehicleNode } from "src/types/apps/vehicleTypes";
@@ -57,6 +63,8 @@ const ExtraInfoEditDialog: React.FC<ExtraInfoEditDialogProps> = ({
     features ? features.split(",") : []
   );
   const [vExtraInfo, setVExtraInfo] = useState<string>(extraInfo);
+  const [newFeature, setNewFeature] = useState<string>("");
+  const [showTextField, setShowTextField] = useState<boolean>(false);
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
@@ -101,6 +109,13 @@ const ExtraInfoEditDialog: React.FC<ExtraInfoEditDialogProps> = ({
     }
 
     handleEditDialogToggle();
+  };
+
+  const addNewFeature = (value: string) => {
+    setShowTextField(false);
+    setNewFeature("");
+
+    return setVFeatures((prev) => (prev ? [...prev, value] : [value]));
   };
 
   return (
@@ -208,18 +223,58 @@ const ExtraInfoEditDialog: React.FC<ExtraInfoEditDialogProps> = ({
               <Typography variant="body2" sx={{ mb: 4 }}>
                 Vehicle Features
               </Typography>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                {featuresArray.map((feature, index) => (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  gap: 2,
+                }}
+              >
+                {vFeatures.map((feature, index) => (
                   <CustomChip
                     rounded
                     key={index}
                     label={feature}
                     skin="light"
-                    color={vFeatures.includes(feature) ? "info" : "secondary"}
+                    color={"info"}
                     onClick={() => handleFeatureSelect(feature)}
                     sx={{ cursor: "pointer", "&:hover": { color: "#FFF" } }}
                   />
                 ))}
+                {showTextField && (
+                  <TextField
+                    autoFocus
+                    fullWidth
+                    id="new-feature"
+                    aria-label="new-feature"
+                    type="text"
+                    size="small"
+                    variant="standard"
+                    placeholder="e.g. Stereo"
+                    label="Feature"
+                    value={newFeature}
+                    onChange={(e) => setNewFeature(e.target.value)}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => addNewFeature(newFeature)}>
+                            <Icon
+                              icon="bx:bxs-right-arrow-circle"
+                              fontSize={20}
+                            />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{ width: 200 }}
+                  />
+                )}
+                <Tooltip title="Add feature" placement="top">
+                  <IconButton onClick={() => setShowTextField(!showTextField)}>
+                    <Icon icon="bx:plus" fontSize={20} />
+                  </IconButton>
+                </Tooltip>
               </Box>
             </Grid>
             <Grid item xs={12}>
