@@ -57,7 +57,7 @@ export const PasswordReset = ({
           <Row style={footerLogos}>
             <Column style={{ width: "66%" }}>
               <Img
-                src={`${baseUrl}/static/logo-green-dark.svg`}
+                src={`${baseUrl}/images/logos/garisea/logo-green-dark.png`}
                 width="142"
                 height="auto"
                 alt="Garisea"
@@ -68,7 +68,7 @@ export const PasswordReset = ({
                 <Column>
                   <Link href="https://twitter.com/Gari_sea" target="_blank">
                     <Img
-                      src={`${baseUrl}/images/logos/garisea/logo-green-dark.png`}
+                      src={`${baseUrl}/images/logos/twitter-x.png`}
                       width="32"
                       height="32"
                       alt="Garisea"
