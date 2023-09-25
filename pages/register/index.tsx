@@ -30,7 +30,7 @@ import { addOrganization } from "@src/store/apps/vendor/organization";
 import { addVendor } from "@src/store/apps/vendor/vendor";
 
 // ** Email Imports
-import EmailVerify from "@src/emails/EmailVerify";
+import EmailVerify from "@emails/EmailVerify";
 
 // ** Others
 import toast from "react-hot-toast";
@@ -42,8 +42,9 @@ import { APP_SECRET } from "@graphql/utils/auth";
 // ** Styled Components
 const RegisterMultiStepsIllustration = styled("img")({
   height: "auto",
-  maxHeight: 650,
-  maxWidth: "100%",
+  maxHeight: 250,
+  width: "100%",
+  objectFit: "cover",
 });
 
 const LeftWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -168,7 +169,7 @@ const Register = () => {
           name: createVendor.firstName,
           to: createVendor.email,
           subject: "Welcome to Garisea",
-          template: EmailVerify(url, createVendor.firstName),
+          template: EmailVerify({ url, name: createVendor.firstName }),
         };
 
         sendEmail({ ...payload });
@@ -191,6 +192,7 @@ const Register = () => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
+            paddingInlineEnd: 8,
           }}
         >
           <Box
@@ -238,9 +240,35 @@ const Register = () => {
             </Box>
           </Box>
 
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 4,
+              justifyContent: "center",
+            }}
+          >
+            <Typography variant="h4" sx={{ color: "green" }}>
+              Sell your cars better, and faster
+            </Typography>
+            <Typography variant="h6">
+              Garisea is an advanced vehicle marketplace primarily focused on
+              making the car selling process smarter through a ton of curated
+              solutions, value-adding analytics, and AI-based car buyer
+              acquisition for you as a car seller.
+            </Typography>
+            <Typography variant="h6">
+              Sign up to create your Garisea shop and start selling your
+              vehicles smartly to millions of potential customers.
+            </Typography>
+            <Typography variant="h6">
+              Using Garisea is <strong>FREE</strong>.
+            </Typography>
+          </Box>
+
           <RegisterMultiStepsIllustration
-            alt="register-multi-steps-illustration"
-            src={`/images/pages/create-account-${theme.palette.mode}.png`}
+            alt="Garisea vendor"
+            src={`/static/car.png`}
           />
         </LeftWrapper>
       ) : null}

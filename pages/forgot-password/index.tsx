@@ -28,7 +28,7 @@ import AuthIllustrationWrapper from "src/views/pages/auth/AuthIllustrationWrappe
 import CustomAvatar from "@components/mui/avatar";
 
 // ** Email Imports
-import PasswordReset from "@src/emails/PasswordReset";
+import PasswordReset from "@emails/PasswordReset";
 
 // ** API
 import { useDispatch } from "react-redux";
@@ -90,7 +90,7 @@ const ForgotPassword = () => {
         name: firstName,
         to: email,
         subject: "Garisea Password Reset",
-        template: PasswordReset(url, firstName),
+        template: PasswordReset({ url, name: firstName }),
       };
       sendEmail({ ...payload });
 

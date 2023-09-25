@@ -25,7 +25,8 @@ import AuthIllustrationWrapper from "src/views/pages/auth/AuthIllustrationWrappe
 import CustomAvatar from "@components/mui/avatar";
 
 // ** Email Imports
-import EmailVerify from "@src/emails/EmailVerify";
+import EmailVerify from "@emails/EmailVerify";
+import VendorWelcome from "@emails/VendorWelcome";
 
 // ** API
 import { AppDispatch, RootState } from "src/store";
@@ -96,6 +97,16 @@ const VerifyEmail = (props: Props) => {
     const resultAction = await dispatch(editEmailVerified({ ...vendorData }));
 
     if (editEmailVerified.fulfilled.match(resultAction)) {
+      // Send Vendor Welcome email
+      const payload = {
+        name: firstName,
+        to: email,
+        subject: "Get Started with Garisea",
+        template: VendorWelcome(),
+      };
+      sendEmail({ ...payload });
+      // Finish sending email
+
       // Proceed to set password
       Router.replace(`/reset-password?token=${resetPasswordTokenObj.token}`);
 
@@ -122,7 +133,7 @@ const VerifyEmail = (props: Props) => {
       name: firstName,
       to: email,
       subject: "Welcome to Garisea",
-      template: EmailVerify(url, firstName),
+      template: EmailVerify({ url, name: firstName }),
     };
     sendEmail({ ...payload });
 

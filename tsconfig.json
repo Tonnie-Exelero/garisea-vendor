@@ -21,6 +21,7 @@
       "apexcharts/*": ["./node_modules/apexcharts-clevision/*"],
       "@app/*": ["app/*"],
       "@pages/*": ["pages/*"],
+      "@emails/*": ["emails/*"],
       "@components/*": ["src/@core/components/*"],
       "@core/*": ["src/@core/*"],
       "@utils/*": ["src/@core/utils/*"],

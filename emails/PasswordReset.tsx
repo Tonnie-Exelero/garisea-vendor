@@ -13,30 +13,37 @@ import {
   Section,
   Text,
 } from "@react-email/components";
-import { baseUrl } from "@src/configs/baseUrl";
 
-const logoUrl =
-  "https://vendor.garisea.com/images/logos/garisea/logo-green-dark.png";
+const baseUrl = process.env.BASE_URL ? `https://${process.env.BASE_URL}` : "";
 
-export const EmailVerify = (url: string, name: string) => (
+export const PasswordReset = ({
+  url = "#",
+  name = "JohnDoe",
+}: {
+  url: string;
+  name: string;
+}) => (
   <Html>
     <Head />
-    <Preview>Verify your email address</Preview>
+    <Preview>Reset Password</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoContainer}>
-          <Img src={logoUrl} width="142" height="auto" alt="Garisea" />
+          <Img
+            src={`${baseUrl}/static/logo-green-dark.svg`}
+            width="142"
+            height="auto"
+            alt="Garisea"
+          />
         </Section>
-        <Heading style={h2}>Hello {name}, welcome to Garisea!</Heading>
-        <Text style={heroText}>Kindly confirm your email address.</Text>
-        <Text style={text}>
-          Thank your for joining Garisea community. To verify your email
-          address, follow the link below.
+        <Heading style={h2}>Hello {name},</Heading>
+        <Text style={heroText}>
+          Follow the link below to reset your password.
         </Text>
 
         <Section style={codeBox}>
           <Text style={confirmationCodeText}>
-            <Link href={url}>Verification Link</Link>
+            <Link href={url}>Reset Link</Link>
           </Text>
         </Section>
 
@@ -50,14 +57,19 @@ export const EmailVerify = (url: string, name: string) => (
         <Section>
           <Row style={footerLogos}>
             <Column style={{ width: "66%" }}>
-              <Img src={logoUrl} width="142" height="auto" alt="Garisea" />
+              <Img
+                src={`${baseUrl}/static/logo-green-dark.svg`}
+                width="142"
+                height="auto"
+                alt="Garisea"
+              />
             </Column>
             <Column>
               <Row>
                 <Column>
                   <Link href="https://twitter.com/Gari_sea" target="_blank">
                     <Img
-                      src={`${baseUrl}/images/logos/x.png`}
+                      src={`${baseUrl}/static/x.svg`}
                       width="32"
                       height="32"
                       alt="Garisea"
@@ -71,7 +83,7 @@ export const EmailVerify = (url: string, name: string) => (
                     target="_blank"
                   >
                     <Img
-                      src={`${baseUrl}/images/logos/facebook.png`}
+                      src={`${baseUrl}/static/facebook.svg`}
                       width="32"
                       height="32"
                       alt="Garisea"
@@ -82,7 +94,7 @@ export const EmailVerify = (url: string, name: string) => (
                 <Column>
                   <Link href="https://instagram.com/gari_sea" target="_blank">
                     <Img
-                      src={`${baseUrl}/images/logos/instagram.png`}
+                      src={`${baseUrl}/static/instagram.svg`}
                       width="32"
                       height="32"
                       alt="Garisea"
@@ -134,7 +146,7 @@ export const EmailVerify = (url: string, name: string) => (
   </Html>
 );
 
-export default EmailVerify;
+export default PasswordReset;
 
 const footerText = {
   fontSize: "12px",
@@ -175,15 +187,6 @@ const container = {
 
 const logoContainer = {
   marginTop: "32px",
-};
-
-const h1 = {
-  color: "#1d1c1d",
-  fontSize: "36px",
-  fontWeight: "700",
-  margin: "30px 0",
-  padding: "0",
-  lineHeight: "42px",
 };
 
 const h2 = {

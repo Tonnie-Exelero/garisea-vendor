@@ -173,7 +173,6 @@ const StepAccountDetails = (props: Props) => {
                       <Icon
                         icon="material-symbols:error"
                         fontSize={20}
-                        color="blue"
                       />
                     </InputAdornment>
                   </Tooltip>

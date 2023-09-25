@@ -611,14 +611,6 @@
   dependencies:
     "@fullcalendar/daygrid" "~6.1.8"
 
-"@garisea/api@git+https://Tonnie-Exelero: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@github.com/Tonnie-Exelero/garisea-api#main":
-  version "0.0.0"
-  resolved "git+https://Tonnie-Exelero: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@github.com/Tonnie-Exelero/garisea-api#b26bde324a660f7a68c4e04dcf223aa219578cdf"
-
-"@garisea/emails@git+https://Tonnie-Exelero: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@github.com/Tonnie-Exelero/garisea-emails#main":
-  version "0.0.0"
-  resolved "git+https://Tonnie-Exelero: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@github.com/Tonnie-Exelero/garisea-emails#fc37755741dbfb2a3968dc1b48535da034638820"
-
 "@graphql-tools/executor@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@graphql-tools/executor/-/executor-1.1.0.tgz#bafddb7c56d8250c5eda83437c10664e702109a8"
@@ -1344,7 +1336,7 @@
     "@react-email/text" "0.0.5"
     react "18.2.0"
 
-"@react-email/container@0.0.8", "@react-email/container@^0.0.8":
+"@react-email/container@0.0.8":
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/@react-email/container/-/container-0.0.8.tgz#a5442b217247d7fe6134dc63564094ffbaca7c12"
   integrity sha512-MQZQxvTOoLWjJR+Jm689jltm0I/mtZbEaDnwZbNkkHKgccr++wwb9kOKMgXG777Y7tGa1JATAsZpvFYiCITwUg==
@@ -1380,7 +1372,7 @@
   dependencies:
     react "18.2.0"
 
-"@react-email/html@0.0.4", "@react-email/html@^0.0.4":
+"@react-email/html@0.0.4":
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/@react-email/html/-/html-0.0.4.tgz#3de13cad8c1f4c487227b3f8fd79e790d239d8c0"
   integrity sha512-7tRYSnudYAWez+NkPWOM8yLZH7EuYFtYdiLPnzpD+pf4cdk16Gz4up531DaIX6dNBbfbyEFpQxhXZxGeJ5ZkfQ==
@@ -1431,7 +1423,7 @@
   resolved "https://registry.yarnpkg.com/@react-email/row/-/row-0.0.5.tgz#665d7db896fd38c7d9d3a8094624410f66e2f9c3"
   integrity sha512-dir5l1M7Z/1BQqQkUrKUPIIDPt6ueEf6ScMGoBOcUh+VNNqmnqJE2Q2CH5X3w2uo6a5X7tnVhoJHGa2KTKe8Sw==
 
-"@react-email/section@0.0.9", "@react-email/section@^0.0.9":
+"@react-email/section@0.0.9":
   version "0.0.9"
   resolved "https://registry.yarnpkg.com/@react-email/section/-/section-0.0.9.tgz#77151d94d2ee883e8ade4c48c218313ba972fb94"
   integrity sha512-3EbcWJ1jUZrzquWSvXrv8Hbk9V+BGvLcMWQIli4NdIpQlddmlGKUYfXU2mB2d2pf+5ojqkGcFZZ9fWxycB84jQ==
@@ -1448,7 +1440,7 @@
     react-dom "18.2.0"
     tw-to-css "0.0.11"
 
-"@react-email/text@0.0.5", "@react-email/text@^0.0.5":
+"@react-email/text@0.0.5":
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/@react-email/text/-/text-0.0.5.tgz#99a2e04a709f59f6b742588aad6fc93ed349cfce"
   integrity sha512-LXhHiaC6oRRsNAfOzJDos4wQA22eIdVJvR6G7uu4QzUvYNOAatDMf89jRQcKGrxX7InkS640v8sHd9jl5ztM5w==
