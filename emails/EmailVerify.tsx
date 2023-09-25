@@ -29,7 +29,7 @@ export const EmailVerify = ({
       <Container style={container}>
         <Section style={logoContainer}>
           <Img
-            src={`${baseUrl}/static/logo-green-dark.svg`}
+            src={`${baseUrl}/images/logos/garisea/logo-green-dark.png`}
             width="142"
             height="auto"
             alt="Garisea"
@@ -59,7 +59,7 @@ export const EmailVerify = ({
           <Row style={footerLogos}>
             <Column style={{ width: "66%" }}>
               <Img
-                src={`${baseUrl}/static/logo-green-dark.svg`}
+                src={`${baseUrl}/images/logos/garisea/logo-green-dark.png`}
                 width="142"
                 height="auto"
                 alt="Garisea"
@@ -70,7 +70,7 @@ export const EmailVerify = ({
                 <Column>
                   <Link href="https://twitter.com/Gari_sea" target="_blank">
                     <Img
-                      src={`${baseUrl}/static/x.svg`}
+                      src={`${baseUrl}/images/logos/twitter-x.png`}
                       width="32"
                       height="32"
                       alt="Garisea"
@@ -84,7 +84,7 @@ export const EmailVerify = ({
                     target="_blank"
                   >
                     <Img
-                      src={`${baseUrl}/static/facebook.svg`}
+                      src={`${baseUrl}/images/logos/facebook.png`}
                       width="32"
                       height="32"
                       alt="Garisea"
@@ -95,7 +95,7 @@ export const EmailVerify = ({
                 <Column>
                   <Link href="https://instagram.com/gari_sea" target="_blank">
                     <Img
-                      src={`${baseUrl}/static/instagram.svg`}
+                      src={`${baseUrl}/images/logos/instagram.png`}
                       width="32"
                       height="32"
                       alt="Garisea"
