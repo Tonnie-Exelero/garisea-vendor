@@ -13,8 +13,7 @@ import {
   Section,
   Text,
 } from "@react-email/components";
-
-const baseUrl = process.env.BASE_URL ? `https://${process.env.BASE_URL}` : "";
+import { baseUrl } from "@src/configs/baseUrl";
 
 export const EmailVerify = ({
   url = "#",

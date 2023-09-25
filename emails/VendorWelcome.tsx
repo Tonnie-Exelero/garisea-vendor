@@ -14,8 +14,7 @@ import {
   Text,
   Row,
 } from "@react-email/components";
-
-const baseUrl = process.env.BASE_URL ? `https://${process.env.BASE_URL}` : "";
+import { baseUrl } from "@src/configs/baseUrl";
 
 const tips = [
   {
