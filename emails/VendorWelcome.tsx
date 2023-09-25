@@ -16,43 +16,35 @@ import {
 } from "@react-email/components";
 import { baseUrl } from "@src/configs/baseUrl";
 
-interface VendorWelcomeProps {
-  tips?: { id: number; description: string }[];
-}
+const tips = [
+  {
+    id: 1,
+    description:
+      "When creating your account, the Store Link you entered is going to be your permanent shop link on Garisea. So you can be sharing this link with your customers to see your vehicle listings",
+  },
+  {
+    id: 2,
+    description:
+      "Images sell. Use Good Quality photos to sell your vehicles faster",
+  },
+  {
+    id: 3,
+    description:
+      "The more information about a vehicle you enter, the higher value your listing gets, and the easier you make it for the customer to make a decision on purchasing your vehicle",
+  },
+  {
+    id: 4,
+    description:
+      "Ensure the contact information you provided is up-to-date and active, because customers will use it to contact you",
+  },
+  {
+    id: 5,
+    description:
+      "At Garisea, we don't participate in the buyer/seller negotiations, and we don't charge any commission from a successful purchase",
+  },
+];
 
-const PropDefaults: VendorWelcomeProps = {
-  tips: [
-    {
-      id: 1,
-      description:
-        "When creating your account, the Store Link you entered is going to be your permanent shop link on Garisea. So you can be sharing this link with your customers to see your vehicle listings",
-    },
-    {
-      id: 2,
-      description:
-        "Images sell. Use Good Quality photos to sell your vehicles faster",
-    },
-    {
-      id: 3,
-      description:
-        "The more information about a vehicle you enter, the higher value your listing gets, and the easier you make it for the customer to make a decision on purchasing your vehicle",
-    },
-    {
-      id: 4,
-      description:
-        "Ensure the contact information you provided is up-to-date and active, because customers will use it to contact you",
-    },
-    {
-      id: 5,
-      description:
-        "At Garisea, we don't participate in the buyer/seller negotiations, and we don't charge any commission from a successful purchase",
-    },
-  ],
-};
-
-export const VendorWelcome = ({
-  tips = PropDefaults.tips,
-}: VendorWelcomeProps) => (
+export const VendorWelcome = () => (
   <Html>
     <Head />
     <Preview>Garisea startup and tips</Preview>
