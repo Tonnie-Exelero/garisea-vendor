@@ -4,6 +4,7 @@ import { createYoga } from "graphql-yoga";
 // import { useResponseCache } from "@graphql-yoga/plugin-response-cache";
 import { schema } from "@graphql/schema";
 import { createContext } from "@graphql/context";
+import { baseUrl } from "@src/configs/baseUrl";
 
 const { handleRequest } = createYoga({
   cors: (request: any) => {
@@ -29,7 +30,7 @@ const { handleRequest } = createYoga({
   context: createContext,
 
   // While using Next.js file convention for routing, we need to configure Yoga to use the correct endpoint
-  graphqlEndpoint: `${process.env.BASE_URL}/api/graphql/`,
+  graphqlEndpoint: `${baseUrl}/api/graphql/`,
 
   // Yoga needs to know how to create a valid Next response
   fetchAPI: { Response },
