@@ -29,10 +29,7 @@ const { handleRequest } = createYoga({
   context: createContext,
 
   // While using Next.js file convention for routing, we need to configure Yoga to use the correct endpoint
-  graphqlEndpoint:
-    process.env.NODE_ENV === "production"
-      ? "https://vendor.garisea.com/api/graphql/"
-      : "http://localhost:3000/api/graphql/",
+  graphqlEndpoint: `${process.env.NODE_ENV}/api/graphql/`,
 
   // Yoga needs to know how to create a valid Next response
   fetchAPI: { Response },
