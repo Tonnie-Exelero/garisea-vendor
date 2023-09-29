@@ -5,14 +5,10 @@ import { ChangeEvent, ElementType, useContext, useState } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
-import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import { styled } from "@mui/material/styles";
-import TimelineDot from "@mui/lab/TimelineDot";
-import TimelineItem from "@mui/lab/TimelineItem";
 import CardHeader from "@mui/material/CardHeader";
 import Typography from "@mui/material/Typography";
-import AvatarGroup from "@mui/material/AvatarGroup";
 import CardContent from "@mui/material/CardContent";
 import {
   Button,
@@ -38,6 +34,7 @@ import Icon from "@components/icon";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@src/store";
 import {
+  editOrganization,
   editLogo,
   editCertificate,
 } from "@src/store/apps/vendor/organization/single";
@@ -77,6 +74,13 @@ const OrganizationInfo = ({ vendor }: Props) => {
   } = vendor.organization;
 
   // ** States
+  const [oName, setOName] = useState<string>(name);
+  const [oEmail, setOEmail] = useState<string>(email);
+  const [oPhone, setOPhone] = useState<string>(phone);
+  const [oAddress, setOAddress] = useState<string>(address);
+  const [oAddress2, setOAddress2] = useState<string>(address2);
+  const [oCity, setOCity] = useState<string>(city);
+  const [oCountry, setOCountry] = useState<string>(country);
   const [oLogo, setOLogo] = useState<string>(logo);
   const [oCertificate, setOCertificate] = useState<string>(certificate);
   const [inputValue, setInputValue] = useState<string>("");
@@ -89,6 +93,17 @@ const OrganizationInfo = ({ vendor }: Props) => {
   // ** Hooks
   const ability = useContext(AbilityContext);
   const dispatch = useDispatch<AppDispatch>();
+
+  const orgData = {
+    id,
+    name: oName,
+    email: oEmail,
+    phone: oPhone,
+    address: oAddress,
+    address2: oAddress2,
+    city: oCity,
+    country: oCountry,
+  };
 
   // Handle Edit dialog
   const handleEditDialogToggle = () => setOpenEdit(!openEdit);
@@ -154,12 +169,46 @@ const OrganizationInfo = ({ vendor }: Props) => {
     }
   };
 
+  const handleUpdateOrganization = async (val: any) => {
+    // Update local state
+    setOName(val.name);
+    setOEmail(val.email);
+    setOPhone(val.phone);
+    setOAddress(val.address);
+    setOAddress2(val.address2);
+    setOCity(val.city);
+    setOCountry(val.country);
+
+    const organizationData = {
+      id: val.id,
+      name: val.name,
+      email: val.email,
+      phone: val.phone,
+      address: val.address,
+      address2: val.address2,
+      city: val.city,
+      country: val.country,
+    };
+
+    const resultAction: any = await dispatch(
+      editOrganization({ ...organizationData })
+    );
+
+    if (editOrganization.fulfilled.match(resultAction)) {
+      toast.success(`Organization information updated successfully!`);
+    } else {
+      toast.error(`Error updating organization: ${resultAction.error}`);
+    }
+
+    handleEditDialogToggle();
+  };
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
           <CardHeader
-            title="Organization"
+            title="Organization Information"
             action={
               ability?.can("update", "organizations") && (
                 <Button
@@ -205,9 +254,9 @@ const OrganizationInfo = ({ vendor }: Props) => {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          {name && (
+                          {oName && (
                             <Typography sx={{ color: "text.secondary" }}>
-                              {name}
+                              {oName}
                             </Typography>
                           )}
                         </TableCell>
@@ -226,9 +275,9 @@ const OrganizationInfo = ({ vendor }: Props) => {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          {email && (
+                          {oEmail && (
                             <Typography sx={{ color: "text.secondary" }}>
-                              {email}
+                              {oEmail}
                             </Typography>
                           )}
                         </TableCell>
@@ -247,9 +296,9 @@ const OrganizationInfo = ({ vendor }: Props) => {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          {phone && (
+                          {oPhone && (
                             <Typography sx={{ color: "text.secondary" }}>
-                              {phone}
+                              {oPhone}
                             </Typography>
                           )}
                         </TableCell>
@@ -268,10 +317,10 @@ const OrganizationInfo = ({ vendor }: Props) => {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          {address ||
-                            (address2 && (
+                          {oAddress ||
+                            (oAddress2 && (
                               <Typography sx={{ color: "text.secondary" }}>
-                                {address}, {address2}
+                                {oAddress}, {oAddress2}
                               </Typography>
                             ))}
                         </TableCell>
@@ -290,9 +339,9 @@ const OrganizationInfo = ({ vendor }: Props) => {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          {city && (
+                          {oCity && (
                             <Typography sx={{ color: "text.secondary" }}>
-                              {city}
+                              {oCity}
                             </Typography>
                           )}
                         </TableCell>
@@ -311,9 +360,9 @@ const OrganizationInfo = ({ vendor }: Props) => {
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ verticalAlign: "top" }}>
-                          {country && (
+                          {oCountry && (
                             <Typography sx={{ color: "text.secondary" }}>
-                              {country}
+                              {oCountry}
                             </Typography>
                           )}
                         </TableCell>
@@ -505,8 +554,9 @@ const OrganizationInfo = ({ vendor }: Props) => {
           aria-describedby="organization-view-edit-description"
         >
           <OrganizationEditDialog
-            organization={vendor.organization}
+            organization={orgData}
             handleEditDialogToggle={handleEditDialogToggle}
+            handleUpdateOrganization={handleUpdateOrganization}
           />
         </Dialog>
 

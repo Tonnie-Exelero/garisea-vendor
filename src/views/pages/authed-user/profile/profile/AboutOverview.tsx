@@ -130,7 +130,9 @@ const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
                 >
                   Language:
                 </Typography>
-                <Typography sx={{ color: "text.secondary" }}>
+                <Typography
+                  sx={{ color: "text.secondary", textTransform: "capitalize" }}
+                >
                   {language}
                 </Typography>
               </Box>

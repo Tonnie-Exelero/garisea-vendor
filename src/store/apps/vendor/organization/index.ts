@@ -6,14 +6,10 @@ import apolloClient from "@lib/apollo";
 import {
   GET_ORGANIZATIONS,
   GET_FILTERED_ORGANIZATIONS,
-  CREATE_ORGANIZATION,
-  UPDATE_ORGANIZATION,
-  DELETE_ORGANIZATION,
 } from "@api/vendor/organization";
 
 // ** Others
 import { Organization } from "./types";
-import { generateRandomString } from "@utils/random-string";
 
 // Initial state
 const organizationsInitialState = {
@@ -105,72 +101,6 @@ export const fetchFilteredOrganizations = createAsyncThunk<
   }
 );
 
-// ** Create Organization
-export const addOrganization = createAsyncThunk<Organization, any, {}>(
-  "appOrganizations/addOrganization",
-  async (organizationData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: CREATE_ORGANIZATION,
-        variables: { ...organizationData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Update Organization
-export const editOrganization = createAsyncThunk<Organization, any, {}>(
-  "appOrganizations/editOrganization",
-  async (organizationData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: UPDATE_ORGANIZATION,
-        variables: { ...organizationData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Delete Organization
-export const removeOrganization = createAsyncThunk<Organization, any, {}>(
-  "appOrganizations/removeOrganization",
-  async (organizationData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: DELETE_ORGANIZATION,
-        variables: { id: organizationData.id },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
 export const appOrganizationsSlice = createSlice({
   name: "appOrganizations",
   initialState: {
@@ -215,44 +145,6 @@ export const appOrganizationsSlice = createSlice({
 
         const { organizationsFiltered }: any = payload;
         state.organizations = organizationsFiltered;
-      })
-      .addCase(addOrganization.fulfilled, (state, { payload }) => {
-        const { createOrganization }: any = payload;
-
-        const newOrganization = {
-          cursor: generateRandomString(12),
-          node: { ...createOrganization },
-        };
-        state.organizations && state.organizations.edges.push(newOrganization);
-      })
-      .addCase(editOrganization.fulfilled, (state, { payload }) => {
-        const { updateOrganization }: any = payload;
-        const { id, ...rest } = updateOrganization;
-
-        state.organizations.edges.map((organization) => {
-          if (organization.node.id === updateOrganization.id) {
-            return {
-              ...organization,
-              node: {
-                ...organization.node,
-                rest,
-              },
-            };
-          }
-        });
-      })
-      .addCase(removeOrganization.fulfilled, (state, { payload }) => {
-        const { deleteOrganization }: any = payload;
-
-        if (
-          state.organizations.edges.some(
-            (organization) => organization.node.id === deleteOrganization.id
-          )
-        ) {
-          state.organizations.edges.filter(
-            (organization) => organization.node.id !== deleteOrganization.id
-          );
-        }
       });
   },
 });

@@ -7,14 +7,10 @@ import {
   GET_MODELS,
   GET_FILTERED_MODELS,
   GET_MODELS_BY_BRAND_ID,
-  CREATE_MODEL,
-  UPDATE_MODEL,
-  DELETE_MODEL,
 } from "@api/admin/model";
 
 // ** Others
 import { Model } from "./types";
-import { generateRandomString } from "@utils/random-string";
 
 // Initial state.
 const modelsInitialState = {
@@ -122,72 +118,6 @@ export const fetchModelsByBrand = createAsyncThunk<Model, any, {}>(
   }
 );
 
-// ** Create Model
-export const addModel = createAsyncThunk<Model, Partial<Model>, {}>(
-  "appModels/addModel",
-  async (modelData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: CREATE_MODEL,
-        variables: { ...modelData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Update Model
-export const editModel = createAsyncThunk<Model, Partial<Model>, {}>(
-  "appModels/editModel",
-  async (modelData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: UPDATE_MODEL,
-        variables: { ...modelData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Delete Model
-export const removeModel = createAsyncThunk<Model, Partial<Model>, {}>(
-  "appModels/removeModel",
-  async (modelData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: DELETE_MODEL,
-        variables: { id: modelData.id },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
 export const appModelsSlice = createSlice({
   name: "appModels",
   initialState: {
@@ -254,42 +184,6 @@ export const appModelsSlice = createSlice({
 
         const { modelsFiltered }: any = payload;
         state.models = modelsFiltered;
-      })
-      .addCase(addModel.fulfilled, (state, { payload }) => {
-        const { createModel }: any = payload;
-
-        const newModel = {
-          cursor: generateRandomString(12),
-          node: { ...createModel },
-        };
-        state.models.edges.push(newModel);
-      })
-      .addCase(editModel.fulfilled, (state, { payload }) => {
-        const { updateModel }: any = payload;
-        const { id, ...rest } = updateModel;
-
-        state.models.edges.some((perm) => {
-          if (perm.node.id === updateModel.id) {
-            return {
-              ...perm,
-              node: {
-                ...perm.node,
-                rest,
-              },
-            };
-          }
-        });
-      })
-      .addCase(removeModel.fulfilled, (state, { payload }) => {
-        const { deleteModel }: any = payload;
-
-        if (
-          state.models.edges.some((model) => model.node.id === deleteModel.id)
-        ) {
-          state.models.edges.filter(
-            (model) => model.node.id !== deleteModel.id
-          );
-        }
       });
   },
 });

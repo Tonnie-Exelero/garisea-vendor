@@ -3,17 +3,10 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // ** API
 import apolloClient from "@lib/apollo";
-import {
-  GET_BRANDS,
-  GET_FILTERED_BRANDS,
-  CREATE_BRAND,
-  UPDATE_BRAND,
-  DELETE_BRAND,
-} from "@api/admin/brand";
+import { GET_BRANDS, GET_FILTERED_BRANDS } from "@api/admin/brand";
 
 // ** Others
 import { Brand } from "./types";
-import { generateRandomString } from "@utils/random-string";
 
 // Initial state.
 export const brandsInitialState = {
@@ -95,72 +88,6 @@ export const fetchFilteredBrands = createAsyncThunk<Brand, any, {}>(
   }
 );
 
-// ** Create Brand
-export const addBrand = createAsyncThunk<Brand, Partial<Brand>, {}>(
-  "appBrands/addBrand",
-  async (brandData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: CREATE_BRAND,
-        variables: { ...brandData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Update Brand
-export const editBrand = createAsyncThunk<Brand, Partial<Brand>, {}>(
-  "appBrands/editBrand",
-  async (brandData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: UPDATE_BRAND,
-        variables: { ...brandData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Delete Brand
-export const removeBrand = createAsyncThunk<Brand, Partial<Brand>, {}>(
-  "appBrands/removeBrand",
-  async (brandData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: DELETE_BRAND,
-        variables: { id: brandData.id },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
 export const appBrandsSlice = createSlice({
   name: "appBrands",
   initialState: {
@@ -205,42 +132,6 @@ export const appBrandsSlice = createSlice({
 
         const { brandsFiltered }: any = payload;
         state.brands = brandsFiltered;
-      })
-      .addCase(addBrand.fulfilled, (state, { payload }) => {
-        const { createBrand }: any = payload;
-
-        const newBrand = {
-          cursor: generateRandomString(12),
-          node: { ...createBrand },
-        };
-        state.brands.edges.push(newBrand);
-      })
-      .addCase(editBrand.fulfilled, (state, { payload }) => {
-        const { updateBrand }: any = payload;
-        const { id, ...rest } = updateBrand;
-
-        state.brands.edges.some((perm) => {
-          if (perm.node.id === updateBrand.id) {
-            return {
-              ...perm,
-              node: {
-                ...perm.node,
-                rest,
-              },
-            };
-          }
-        });
-      })
-      .addCase(removeBrand.fulfilled, (state, { payload }) => {
-        const { deleteBrand }: any = payload;
-
-        if (
-          state.brands.edges.some((brand) => brand.node.id === deleteBrand.id)
-        ) {
-          state.brands.edges.filter(
-            (brand) => brand.node.id !== deleteBrand.id
-          );
-        }
       });
   },
 });

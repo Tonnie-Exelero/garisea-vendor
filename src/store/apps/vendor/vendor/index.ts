@@ -7,17 +7,10 @@ import {
   GET_VENDORS,
   GET_VENDORS_BY_STATUS,
   GET_FILTERED_VENDORS,
-  CREATE_VENDOR,
-  UPDATE_VENDOR,
-  UPDATE_PASSWORD,
-  UPDATE_EMAIL_VERIFIED,
-  DELETE_VENDOR,
-  UPDATE_ADDED_ORGANIZATION,
 } from "@api/vendor/vendor";
 
 // ** Others
 import { Vendor } from "./types";
-import { generateRandomString } from "@utils/random-string";
 
 // Initial state
 const vendorsInitialState = {
@@ -144,138 +137,6 @@ export const fetchFilteredVendors = createAsyncThunk<Vendor, any, {}>(
   }
 );
 
-// ** Create Vendor
-export const addVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
-  "appVendors/addVendor",
-  async (vendorData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: CREATE_VENDOR,
-        variables: { ...vendorData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Update Vendor
-export const editVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
-  "appVendors/editVendor",
-  async (vendorData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: UPDATE_VENDOR,
-        variables: { ...vendorData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Update Password
-export const editPassword = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
-  "appVendors/editPassword",
-  async (vendorData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: UPDATE_PASSWORD,
-        variables: { ...vendorData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Update Email Verified
-export const editEmailVerified = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
-  "appVendors/editEmailVerified",
-  async (vendorData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: UPDATE_EMAIL_VERIFIED,
-        variables: { ...vendorData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Update Added Organization
-export const editAddedOrganization = createAsyncThunk<Vendor, any, {}>(
-  "appVendors/editAddedOrganization",
-  async (vendorData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: UPDATE_ADDED_ORGANIZATION,
-        variables: { ...vendorData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Delete Vendor
-export const removeVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
-  "appVendors/removeVendor",
-  async (vendorData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: DELETE_VENDOR,
-        variables: { id: vendorData.id },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
 export const appVendorsSlice = createSlice({
   name: "appVendors",
   initialState: {
@@ -331,70 +192,6 @@ export const appVendorsSlice = createSlice({
 
         const { vendorsByStatus }: any = payload;
         state.vendors = vendorsByStatus;
-      })
-      .addCase(addVendor.fulfilled, (state, { payload }) => {
-        const { createVendor }: any = payload;
-
-        const newVendor = {
-          cursor: generateRandomString(12),
-          node: { ...createVendor },
-        };
-        state.vendors && state.vendors.edges.push(newVendor);
-      })
-      .addCase(editVendor.fulfilled, (state, { payload }) => {
-        const { updateVendor }: any = payload;
-        const { id, ...rest } = updateVendor;
-
-        state.vendors.edges.map((vendor) => {
-          if (vendor.node.id === updateVendor.id) {
-            return {
-              ...vendor,
-              node: {
-                ...vendor.node,
-                rest,
-              },
-            };
-          }
-        });
-      })
-      .addCase(editPassword.fulfilled, (state, { payload }) => {
-        const { updateVendorPassword }: any = payload;
-        const { id, ...rest } = updateVendorPassword;
-
-        state.vendors.edges.map((vendor) => {
-          if (vendor.node.id === updateVendorPassword.id) {
-            return {
-              ...vendor,
-              node: {
-                ...vendor.node,
-                rest,
-              },
-            };
-          }
-        });
-      })
-      .addCase(editEmailVerified.fulfilled, (state, { payload }) => {
-        const { updateVendorEmailVerified }: any = payload;
-
-        state.vendors = { ...state.vendors, ...updateVendorEmailVerified };
-      })
-      .addCase(editAddedOrganization.fulfilled, (state, { payload }) => {
-        const { updateVendorAddedOrganization }: any = payload;
-
-        state.vendors = { ...state.vendors, ...updateVendorAddedOrganization };
-      })
-      .addCase(removeVendor.fulfilled, (state, { payload }) => {
-        const { deleteVendor }: any = payload;
-
-        if (
-          state.vendors.edges.some(
-            (vendor) => vendor.node.id === deleteVendor.id
-          )
-        ) {
-          state.vendors.edges.filter(
-            (vendor) => vendor.node.id !== deleteVendor.id
-          );
-        }
       });
   },
 });

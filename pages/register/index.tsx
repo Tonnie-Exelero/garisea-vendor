@@ -26,8 +26,8 @@ import themeConfig from "src/configs/themeConfig";
 // ** API
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@src/store";
-import { addOrganization } from "@src/store/apps/vendor/organization";
-import { addVendor } from "@src/store/apps/vendor/vendor";
+import { addOrganization } from "@src/store/apps/vendor/organization/single";
+import { addVendor } from "@src/store/apps/vendor/vendor/single";
 
 // ** Email Imports
 import EmailVerify from "@emails/EmailVerify";
