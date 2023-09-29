@@ -4,7 +4,9 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 // ** API
 import apolloClient from "@lib/apollo";
 import {
+  GET_ORGANIZATION_BY_ID,
   GET_ORGANIZATION_BY_NAME,
+  UPDATE_ORGANIZATION,
   UPDATE_LOGO,
   UPDATE_CERTIFICATE,
 } from "@api/vendor/organization";
@@ -26,6 +28,29 @@ const organizationInitialState = {
   certificate: "",
 };
 
+// ** Fetch Organization By ID
+export const fetchOrganizationById = createAsyncThunk<
+  Organization,
+  { id: string },
+  {}
+>("appOrganization/fetchOrganizationById", async (id, { rejectWithValue }) => {
+  try {
+    const { data } = await apolloClient.query({
+      query: GET_ORGANIZATION_BY_ID,
+      variables: { ...id },
+    });
+
+    return data;
+  } catch (err) {
+    let error: any = err; // cast the error for access
+    if (!error.response) {
+      throw err;
+    }
+    // We got validation errors, let's return those so we can reference in our component and set form errors
+    return rejectWithValue(error.response.data);
+  }
+});
+
 // ** Fetch Organization By Name
 export const fetchOrganizationByName = createAsyncThunk<Organization, any, {}>(
   "appOrganization/fetchOrganizationByName",
@@ -34,6 +59,28 @@ export const fetchOrganizationByName = createAsyncThunk<Organization, any, {}>(
       const { data } = await apolloClient.query({
         query: GET_ORGANIZATION_BY_NAME,
         variables: { ...name },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Update Organization
+export const editOrganization = createAsyncThunk<Organization, any, {}>(
+  "appOrganization/editOrganization",
+  async (organizationData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_ORGANIZATION,
+        variables: { ...organizationData },
       });
 
       return data;
@@ -104,6 +151,28 @@ export const appOrganizationSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(fetchOrganizationById.pending, (state, action) => {
+        if (state.loading === "") {
+          state.loading = "pending";
+        }
+      })
+      .addCase(fetchOrganizationById.fulfilled, (state, { payload }) => {
+        // Reset organization state.
+        state.organization = { ...organizationInitialState };
+
+        if (state.loading === "pending") {
+          const { organizationById }: any = payload;
+
+          state.loading = "";
+          state.organization = organizationById;
+        }
+      })
+      .addCase(fetchOrganizationById.rejected, (state, action) => {
+        if (state.loading === "pending") {
+          state.loading = "";
+          state.error = <any>action.error.message;
+        }
+      })
       .addCase(fetchOrganizationByName.fulfilled, (state, { payload }) => {
         // Reset organization state.
         state.organization = { ...organizationInitialState };
@@ -111,6 +180,14 @@ export const appOrganizationSlice = createSlice({
         const { organizationByName }: any = payload;
 
         state.organization = { ...organizationByName };
+      })
+      .addCase(editOrganization.fulfilled, (state, { payload }) => {
+        // Reset organization state.
+        state.organization = { ...organizationInitialState };
+
+        const { updateOrganization }: any = payload;
+
+        state.organization = { ...updateOrganization };
       })
       .addCase(editLogo.fulfilled, (state, { payload }) => {
         // Reset organization state.
