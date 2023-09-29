@@ -50,10 +50,8 @@ import { getInitials } from "src/@core/utils/get-initials";
 // ** Actions Imports
 import apolloClient from "@lib/apollo";
 import { fetchVendors } from "@src/store/apps/vendor/vendor";
-import {
-  fetchFilteredVehicles,
-  removeVehicle,
-} from "@src/store/apps/vendor/vehicle";
+import { fetchFilteredVehicles } from "@src/store/apps/vendor/vehicle";
+import { removeVehicle } from "@src/store/apps/vendor/vehicle/single";
 import { GET_FILTERED_VEHICLES } from "@src/api/vendor/vehicle";
 
 // ** Third Party Components
