@@ -140,8 +140,8 @@ model Model {
   id          String    @id @default(cuid())
   createdAt   DateTime  @default(now()) @map(name: "created_at")
   updatedAt   DateTime  @updatedAt @map(name: "updated_at")
-  name        String    @unique
-  slug        String    @unique
+  name        String
+  slug        String
   description String?
   brand       Brand?    @relation(fields: [brandId], references: [id])
   brandId     String?
