@@ -1,0 +1,123 @@
+// ** Redux Imports
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+
+// ** API
+import apolloClient from "@lib/apollo";
+import { CREATE_MODEL, UPDATE_MODEL, DELETE_MODEL } from "@api/admin/model";
+
+// ** Others
+import { Model } from "../types";
+
+// Initial state.
+const modelInitialState = {
+  id: "",
+  name: "",
+  slug: "",
+  description: "",
+  brand: {
+    id: "",
+    name: "",
+  },
+};
+
+// ** Create Model
+export const addModel = createAsyncThunk<Model, Partial<Model>, {}>(
+  "appModel/addModel",
+  async (modelData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: CREATE_MODEL,
+        variables: { ...modelData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Update Model
+export const editModel = createAsyncThunk<Model, Partial<Model>, {}>(
+  "appModel/editModel",
+  async (modelData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_MODEL,
+        variables: { ...modelData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Delete Model
+export const removeModel = createAsyncThunk<Model, Partial<Model>, {}>(
+  "appModel/removeModel",
+  async (modelData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: DELETE_MODEL,
+        variables: { id: modelData.id },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const appModelSlice = createSlice({
+  name: "appModel",
+  initialState: {
+    model: <Model>{
+      ...modelInitialState,
+    },
+    loading: "",
+    error: null,
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(addModel.fulfilled, (state, { payload }) => {
+        // Reset model state.
+        state.model = { ...modelInitialState };
+
+        const { createModel }: any = payload;
+
+        state.model = { ...createModel };
+      })
+      .addCase(editModel.fulfilled, (state, { payload }) => {
+        // Reset model state.
+        state.model = { ...modelInitialState };
+
+        const { updateModel }: any = payload;
+
+        state.model = { ...updateModel };
+      })
+      .addCase(removeModel.fulfilled, (state, { payload }) => {
+        const { deleteModel }: any = payload;
+      });
+  },
+});
+
+export default appModelSlice.reducer;

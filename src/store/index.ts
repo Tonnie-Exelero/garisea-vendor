@@ -10,6 +10,7 @@ import singleCustomer from "@redux/apps/frontend/customer/single";
 import brands from "@redux/apps/admin/brand";
 import singleBrand from "@redux/apps/admin/brand/single";
 import models from "@redux/apps/admin/model";
+import singleModel from "@redux/apps/admin/model/single";
 import vehicles from "@redux/apps/vendor/vehicle";
 import singleVehicle from "@redux/apps/vendor/vehicle/single";
 import organizations from "@redux/apps/vendor/organization";
@@ -25,6 +26,7 @@ export const store = configureStore({
     brands,
     singleBrand,
     models,
+    singleModel,
     vehicles,
     singleVehicle,
     organizations,

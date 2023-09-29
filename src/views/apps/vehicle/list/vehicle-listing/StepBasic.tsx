@@ -46,7 +46,7 @@ import { GET_BRANDS } from "@src/api/admin/brand";
 import { GET_MODELS_BY_BRAND_ID } from "@src/api/admin/model";
 import { fetchBrands } from "@src/store/apps/admin/brand";
 import { addBrand } from "@src/store/apps/admin/brand/single";
-import { addModel } from "@src/store/apps/admin/model";
+import { addModel } from "@src/store/apps/admin/model/single";
 
 // ** Others
 import { useDispatch, useSelector } from "react-redux";
