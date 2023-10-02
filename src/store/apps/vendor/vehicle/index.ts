@@ -7,7 +7,6 @@ import {
   GET_VEHICLES,
   GET_VEHICLES_BY_VENDOR_ID,
   GET_FILTERED_VEHICLES,
-  DELETE_VEHICLE,
 } from "@api/vendor/vehicle";
 
 // ** Others
@@ -164,28 +163,6 @@ export const fetchFilteredVehicles = createAsyncThunk<Vehicle, any, {}>(
   }
 );
 
-// ** Delete Vehicle
-export const removeVehicle = createAsyncThunk<Vehicle, Partial<Vehicle>, {}>(
-  "appVehicles/removeVehicle",
-  async (vehicleData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: DELETE_VEHICLE,
-        variables: { id: vehicleData.id },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
 export const appVehiclesSlice = createSlice({
   name: "appVehicles",
   initialState: {
@@ -252,19 +229,6 @@ export const appVehiclesSlice = createSlice({
 
         const { vehiclesFiltered }: any = payload;
         state.vehicles = vehiclesFiltered;
-      })
-      .addCase(removeVehicle.fulfilled, (state, { payload }) => {
-        const { deleteVehicle }: any = payload;
-
-        if (
-          state.vehicles.edges.some(
-            (vehicle) => vehicle.node.id === deleteVehicle.id
-          )
-        ) {
-          state.vehicles.edges.filter(
-            (vehicle) => vehicle.node.id !== deleteVehicle.id
-          );
-        }
       });
   },
 });

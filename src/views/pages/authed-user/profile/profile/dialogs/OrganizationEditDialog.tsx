@@ -1,6 +1,5 @@
 // ** React Imports
 import { useState } from "react";
-import toast from "react-hot-toast";
 
 // ** MUI Imports
 import {
@@ -20,48 +19,30 @@ import {
 // ** Types
 import { OrganizationNode } from "src/types/apps/organizationTypes";
 
-// ** API/Redux
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@src/store";
-import { editOrganization } from "@src/store/apps/vendor/organization";
-
 interface OrganizationEditDialogProps {
-  organization: OrganizationNode;
+  organization: Partial<OrganizationNode>;
   handleEditDialogToggle: () => void;
+  handleUpdateOrganization: (val: any) => void;
 }
 
 const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
   organization,
   handleEditDialogToggle,
+  handleUpdateOrganization,
 }) => {
-  const {
-    id,
-    name,
-    email,
-    phone,
-    address,
-    address2,
-    city,
-    country,
-    logo,
-    certificate,
-  } = organization;
+  const { id, name, email, phone, address, address2, city, country } =
+    organization;
 
   // ** State
-  const [oName, setOName] = useState<string>(name);
-  const [oEmail, setOEmail] = useState<string>(email);
-  const [oPhone, setOPhone] = useState<string>(phone);
-  const [oAddress, setOAddress] = useState<string>(address);
-  const [oAddress2, setOAddress2] = useState<string>(address2);
-  const [oCity, setOCity] = useState<string>(city);
-  const [oCountry, setOCountry] = useState<string>(country);
-  const [oLogo, setOLogo] = useState<string>(logo);
-  const [oCertificate, setOCertificate] = useState<string>(certificate);
+  const [oName, setOName] = useState<string>(name || "");
+  const [oEmail, setOEmail] = useState<string>(email || "");
+  const [oPhone, setOPhone] = useState<string>(phone || "");
+  const [oAddress, setOAddress] = useState<string>(address || "");
+  const [oAddress2, setOAddress2] = useState<string>(address2 || "");
+  const [oCity, setOCity] = useState<string>(city || "");
+  const [oCountry, setOCountry] = useState<string>(country || "");
 
-  // ** Hooks
-  const dispatch = useDispatch<AppDispatch>();
-
-  const handleUpdateOrganization = async (e: any) => {
+  const handleEditOrganization = async (e: any) => {
     e.preventDefault();
 
     const organizationData = {
@@ -73,21 +54,9 @@ const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
       address2: oAddress2,
       city: oCity,
       country: oCountry,
-      logo: oLogo,
-      certificate: oCertificate,
     };
 
-    const resultAction: any = await dispatch(
-      editOrganization({ ...organizationData })
-    );
-
-    if (editOrganization.fulfilled.match(resultAction)) {
-      toast.success(`Organization information updated successfully!`);
-    } else {
-      toast.error(`Error updating organization: ${resultAction.error}`);
-    }
-
-    handleEditDialogToggle();
+    handleUpdateOrganization(organizationData);
   };
 
   return (
@@ -229,7 +198,7 @@ const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
         <Button
           variant="contained"
           sx={{ mr: 2 }}
-          onClick={(e) => handleUpdateOrganization(e)}
+          onClick={(e) => handleEditOrganization(e)}
         >
           Update
         </Button>

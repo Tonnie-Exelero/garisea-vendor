@@ -14,6 +14,7 @@ import {
   UPDATE_VEHICLE_BASIC,
   UPDATE_VEHICLE_SPECIFICATIONS,
   UPDATE_VEHICLE_EXTRA_INFO,
+  DELETE_VEHICLE,
 } from "@api/vendor/vehicle";
 
 // ** Others
@@ -319,6 +320,28 @@ export const editVehicleExtraInfo = createAsyncThunk<
   }
 );
 
+// ** Delete Vehicle
+export const removeVehicle = createAsyncThunk<Vehicle, Partial<Vehicle>, {}>(
+  "appSingleVehicle/removeVehicle",
+  async (vehicleData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: DELETE_VEHICLE,
+        variables: { id: vehicleData.id },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const appSingleVehicleSlice = createSlice({
   name: "appSingleVehicle",
   initialState: {
@@ -435,6 +458,9 @@ export const appSingleVehicleSlice = createSlice({
         const { updateVehicleExtraInfo }: any = payload;
 
         state.vehicle = { ...updateVehicleExtraInfo };
+      })
+      .addCase(removeVehicle.fulfilled, (state, { payload }) => {
+        const { deleteVehicle }: any = payload;
       });
   },
 });

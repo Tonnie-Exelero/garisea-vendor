@@ -4,7 +4,6 @@ export interface Customer {
   lastName: string;
   username: string;
   email: string;
-  password: string;
   phone: string;
   image: string;
   language: string;
