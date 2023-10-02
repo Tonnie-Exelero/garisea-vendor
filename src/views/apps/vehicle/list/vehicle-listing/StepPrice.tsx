@@ -95,6 +95,7 @@ const StepPrice: React.FC<StepPriceProps> = (props) => {
               ),
             }}
             sx={{ mb: 4 }}
+            required
           />
         </Grid>
         <Grid item xs={12} md={6}>
@@ -182,7 +183,12 @@ const StepPrice: React.FC<StepPriceProps> = (props) => {
             Confirm data entered is correct by clicking below
           </Typography>
           <Box>
-            <Button color="info" variant="outlined" onClick={confirmData}>
+            <Button
+              color="info"
+              variant="outlined"
+              onClick={confirmData}
+              disabled={!listingPrice || listingPrice === 0}
+            >
               Confirm Data
             </Button>
           </Box>

@@ -26,6 +26,7 @@ const statusColors: ColorsType = {
   active: "success",
   pending: "warning",
   inactive: "secondary",
+  suspended: "warning",
 };
 
 interface AboutOverviewProps {
