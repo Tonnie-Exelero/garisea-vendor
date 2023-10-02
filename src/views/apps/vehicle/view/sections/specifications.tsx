@@ -295,7 +295,7 @@ const Specifications: React.FC<SpecificationsProps> = ({ vehicle }) => {
                       <TableCell>
                         {upholstery && (
                           <Typography sx={{ color: "text.secondary" }}>
-                            {upholstery} upholstery
+                            {upholstery}
                           </Typography>
                         )}
                       </TableCell>

@@ -264,14 +264,17 @@ const defaultColumns: GridColDef[] = [
                 </Typography>
               ) : (
                 <>
-                  {listingPrice === 0 && discountedPrice === 0 && (
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "text.secondary" }}
-                    >
-                      Set price
-                    </Typography>
-                  )}
+                  {listingPrice === 0 &&
+                    (discountedPrice === 0 ||
+                      discountedPrice === null ||
+                      !discountedPrice) && (
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "text.secondary" }}
+                      >
+                        Set price
+                      </Typography>
+                    )}
                 </>
               )}
             </>
