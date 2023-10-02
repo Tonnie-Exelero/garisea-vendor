@@ -304,7 +304,10 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                       </Box>
                     ) : (
                       <>
-                        {listingPrice !== 0 && discountedPrice === 0 ? (
+                        {listingPrice !== 0 &&
+                        (discountedPrice === 0 ||
+                          discountedPrice === null ||
+                          !discountedPrice) ? (
                           <Typography
                             variant="body2"
                             sx={{ color: "text.secondary" }}

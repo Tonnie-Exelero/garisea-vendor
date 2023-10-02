@@ -255,10 +255,12 @@ const defaultColumns: GridColDef[] = [
             </Box>
           ) : (
             <>
-              {listingPrice !== 0 || discountedPrice !== 0 ? (
+              {listingPrice !== 0 &&
+              (discountedPrice === 0 ||
+                discountedPrice === null ||
+                !discountedPrice) ? (
                 <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                  {new Intl.NumberFormat().format(listingPrice) ||
-                    new Intl.NumberFormat().format(discountedPrice)}
+                  {new Intl.NumberFormat().format(listingPrice)}
                 </Typography>
               ) : (
                 <>
