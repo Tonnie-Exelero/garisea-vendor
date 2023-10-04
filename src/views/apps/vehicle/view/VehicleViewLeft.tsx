@@ -286,7 +286,7 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                     >
                       Price ({currency}):
                     </Typography>
-                    {listingPrice !== 0 && discountedPrice !== 0 ? (
+                    {listingPrice !== 0 && discountedPrice ? (
                       <Box
                         sx={{ display: "flex", alignItems: "center", gap: 2 }}
                       >
@@ -297,7 +297,10 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                         >
                           {new Intl.NumberFormat().format(listingPrice)}
                         </Typography>
-                        <Typography variant="body1">
+                        <Typography
+                          variant="body1"
+                          sx={{ color: "text.secondary" }}
+                        >
                           {" " +
                             new Intl.NumberFormat().format(discountedPrice)}
                         </Typography>
@@ -309,7 +312,7 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                           discountedPrice === null ||
                           !discountedPrice) ? (
                           <Typography
-                            variant="body2"
+                            variant="body1"
                             sx={{ color: "text.secondary" }}
                           >
                             {new Intl.NumberFormat().format(listingPrice)}

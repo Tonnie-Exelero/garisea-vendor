@@ -22,6 +22,8 @@ const HomePage = () => {
     (state: RootState) => state.authedVendor
   );
 
+  const vendorApps = ["vehicles"];
+
   return (
     <>
       <Typography variant="h4" sx={{ marginBlock: 4 }}>
@@ -50,7 +52,11 @@ const HomePage = () => {
                     </Typography>
                     <Button
                       component={Link}
-                      href={subject.path}
+                      href={
+                        vendorApps.includes(subject.name)
+                          ? `${authedVendor.id}${subject.path}`
+                          : subject.path
+                      }
                       variant="contained"
                     >
                       Go To {subject.name}

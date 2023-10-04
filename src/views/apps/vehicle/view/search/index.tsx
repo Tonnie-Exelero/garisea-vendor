@@ -48,10 +48,13 @@ const VehicleSearch = (props: Props) => {
   const [modelId, setModelId] = useState<string>("");
   const [condition, setCondition] = useState<string>("");
   const [registered, setRegistered] = useState<string>("");
-  const [yearRange, setYearRange] = useState<number[]>([2010, 2024]);
-  const [mileage, setMileage] = useState<number[]>([1000, 150000]);
+  const [yearRange, setYearRange] = useState<number[]>([
+    1950,
+    new Date().getFullYear() + 2,
+  ]);
+  const [mileage, setMileage] = useState<number[]>([0, 1000000]);
   const [engineType, setEngineType] = useState<string>("");
-  const [engineCapacity, setEngineCapacity] = useState<number[]>([1000, 6000]);
+  const [engineCapacity, setEngineCapacity] = useState<number[]>([50, 20000]);
   const [fuelType, setFuelType] = useState<string>("");
   const [transmissionType, setTransmissionType] = useState<string>("");
   const [driveType, setDriveType] = useState<string>("");
@@ -59,16 +62,13 @@ const VehicleSearch = (props: Props) => {
   const [interiorColor, setInteriorColor] = useState<string>("");
   const [bodyType, setBodyType] = useState<string>("");
   const [upholstery, setUpholstery] = useState<string>("");
-  const [seats, setSeats] = useState<number>();
-  const [doors, setDoors] = useState<number>();
+  const [seats, setSeats] = useState<number | string>("");
+  const [doors, setDoors] = useState<number | string>("");
   const [steering, setSteering] = useState<string>("");
-  const [price, setPrice] = useState<number[]>([200000, 20000000]);
+  const [price, setPrice] = useState<number[]>([0, 100000000]);
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
-  const { authedVendor } = useSelector(
-    (state: RootState) => state.authedVendor
-  );
   const { brands } = useSelector((state: RootState) => state.brands);
   const { models } = useSelector((state: RootState) => state.models);
 
@@ -77,10 +77,10 @@ const VehicleSearch = (props: Props) => {
     setModelId("");
     setCondition("");
     setRegistered("");
-    setYearRange([2010, 2024]);
-    setMileage([1000, 150000]);
+    setYearRange([1950, new Date().getFullYear() + 2]);
+    setMileage([0, 1000000]);
     setEngineType("");
-    setEngineCapacity([1000, 6000]);
+    setEngineCapacity([50, 20000]);
     setFuelType("");
     setTransmissionType("");
     setDriveType("");
@@ -88,10 +88,10 @@ const VehicleSearch = (props: Props) => {
     setInteriorColor("");
     setBodyType("");
     setUpholstery("");
-    setSeats(0);
-    setDoors(0);
+    setSeats("");
+    setDoors("");
     setSteering("");
-    setPrice([200000, 20000000]);
+    setPrice([0, 100000000]);
   };
 
   useEffect(() => {
@@ -100,28 +100,27 @@ const VehicleSearch = (props: Props) => {
 
   const handleSearch = () => {
     const searchParams = {
-      vendorId: authedVendor.id,
-      brandId,
-      modelId,
-      condition,
-      registered,
+      ...(brandId && { brandId }),
+      ...(modelId && { modelId }),
+      ...(condition && { condition }),
+      ...(registered && { registered }),
       minYear: yearRange[0].toString(),
       maxYear: yearRange[1].toString(),
       minMileage: mileage[0],
       maxMileage: mileage[1],
-      transmissionType,
-      fuelType,
+      ...(transmissionType && { transmissionType }),
+      ...(fuelType && { fuelType }),
       minEngineCapacity: engineCapacity[0],
       maxEngineCapacity: engineCapacity[1],
-      exteriorColor,
-      upholstery,
-      engineType,
-      driveType,
-      bodyType,
-      interiorColor,
-      steering,
-      seats,
-      doors,
+      ...(exteriorColor && { exteriorColor }),
+      ...(upholstery && { upholstery }),
+      ...(engineType && { engineType }),
+      ...(driveType && { driveType }),
+      ...(bodyType && { bodyType }),
+      ...(interiorColor && { interiorColor }),
+      ...(steering && { steering }),
+      ...(seats && { seats: Number(seats) }),
+      ...(doors && { doors: Number(doors) }),
       minPrice: price[0],
       maxPrice: price[1],
     };
@@ -437,7 +436,7 @@ const VehicleSearch = (props: Props) => {
           label="Seats"
           size="small"
           value={seats}
-          onChange={(e) => setSeats(Number(e.target.value))}
+          onChange={(e) => setSeats(e.target.value)}
           InputProps={{
             endAdornment: <InputAdornment position="end">seats</InputAdornment>,
           }}
@@ -454,7 +453,7 @@ const VehicleSearch = (props: Props) => {
           label="Doors"
           size="small"
           value={doors}
-          onChange={(e) => setDoors(Number(e.target.value))}
+          onChange={(e) => setDoors(e.target.value)}
           InputProps={{
             endAdornment: <InputAdornment position="end">doors</InputAdornment>,
           }}
@@ -467,7 +466,7 @@ const VehicleSearch = (props: Props) => {
         <FormControl fullWidth sx={{ mb: 4 }} size="small">
           <Slider
             id="year"
-            min={1990}
+            min={1950}
             max={new Date().getFullYear() + 2}
             value={yearRange}
             onChange={handleYearChange}
@@ -483,7 +482,7 @@ const VehicleSearch = (props: Props) => {
           <Slider
             id="mileage"
             min={0}
-            max={500000}
+            max={1000000}
             value={mileage}
             onChange={handleMileageChange}
             valueLabelDisplay="auto"
@@ -498,7 +497,7 @@ const VehicleSearch = (props: Props) => {
           <Slider
             id="engine"
             min={50}
-            max={10000}
+            max={20000}
             value={engineCapacity}
             onChange={handleEngineCapacityChange}
             valueLabelDisplay="auto"
@@ -512,8 +511,8 @@ const VehicleSearch = (props: Props) => {
         <FormControl fullWidth sx={{ mb: 4 }} size="small">
           <Slider
             id="price"
-            min={100000}
-            max={50000000}
+            min={0}
+            max={100000000}
             value={price}
             onChange={handlePriceChange}
             valueLabelDisplay="auto"
