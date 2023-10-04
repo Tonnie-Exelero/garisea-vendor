@@ -3,8 +3,6 @@ import { useState, useEffect, useCallback, useContext } from "react";
 
 // ** Next Imports
 import Link from "next/link";
-import { GetStaticProps, InferGetStaticPropsType } from "next/types";
-import { useRouter } from "next/router";
 
 // ** MUI Imports
 import {
@@ -20,14 +18,9 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
-  FormControl,
   FormGroup,
   Grid,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -50,9 +43,15 @@ import { getInitials } from "src/@core/utils/get-initials";
 // ** Actions Imports
 import apolloClient from "@lib/apollo";
 import { fetchVendors } from "@src/store/apps/vendor/vendor";
-import { fetchFilteredVehicles } from "@src/store/apps/vendor/vehicle";
+import {
+  fetchFilteredVehicles,
+  fetchVehiclesByVendor,
+} from "@src/store/apps/vendor/vehicle";
 import { removeVehicle } from "@src/store/apps/vendor/vehicle/single";
-import { GET_FILTERED_VEHICLES } from "@src/api/vendor/vehicle";
+import {
+  GET_FILTERED_VEHICLES,
+  GET_VEHICLES_BY_VENDOR_ID,
+} from "@src/api/vendor/vehicle";
 
 // ** Third Party Components
 import axios from "axios";
@@ -122,6 +121,10 @@ const defaultColumns: GridColDef[] = [
     field: "basic",
     headerName: "Basic Info",
     renderCell: ({ row }: CellType) => {
+      const { authedVendor } = useSelector(
+        (state: RootState) => state.authedVendor
+      );
+
       const {
         id,
         brand,
@@ -153,7 +156,9 @@ const defaultColumns: GridColDef[] = [
               flexDirection: "column",
             }}
           >
-            <LinkStyled href={`/apps/vehicles/${id}/view/details`}>
+            <LinkStyled
+              href={`/${authedVendor.id}/apps/vehicles/${id}/view/details`}
+            >
               {fullName}
             </LinkStyled>
             <Typography
@@ -240,7 +245,7 @@ const defaultColumns: GridColDef[] = [
 
       return (
         <>
-          {listingPrice !== 0 && discountedPrice !== 0 ? (
+          {listingPrice !== 0 && discountedPrice ? (
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <Typography
                 variant="body2"
@@ -249,7 +254,7 @@ const defaultColumns: GridColDef[] = [
               >
                 {new Intl.NumberFormat().format(listingPrice)}
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body1" sx={{ color: "text.secondary" }}>
                 {" " + new Intl.NumberFormat().format(discountedPrice)}
               </Typography>
             </Box>
@@ -259,7 +264,7 @@ const defaultColumns: GridColDef[] = [
               (discountedPrice === 0 ||
                 discountedPrice === null ||
                 !discountedPrice) ? (
-                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                <Typography variant="body1" sx={{ color: "text.secondary" }}>
                   {new Intl.NumberFormat().format(listingPrice)}
                 </Typography>
               ) : (
@@ -285,12 +290,21 @@ const defaultColumns: GridColDef[] = [
   },
 ];
 
-const VehiclesList = () => {
+interface Props {
+  vendorId: string;
+  vehicles: any;
+}
+
+const VehiclesList = (props: Partial<Props>) => {
   // ** Watch for idle time or reload
   idleTimer();
 
+  const { vendorId, vehicles } = props;
+
+  console.log(props);
+
   // ** State
-  const [vVehicles, setVVehicles] = useState<any>();
+  const [vVehicles, setVVehicles] = useState<any>(vehicles);
   const [id, setId] = useState<string>("");
   const [images, setImages] = useState<string>("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
@@ -300,9 +314,9 @@ const VehiclesList = () => {
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [vehiclesSearchParams, setVehiclesSearchParams] = useState<any>();
+  const [type, setType] = useState<string>("");
 
   // ** Hooks
-  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const ability = useContext(AbilityContext);
   const { vendors } = useSelector((state: RootState) => state.vendors);
@@ -314,9 +328,11 @@ const VehiclesList = () => {
   const handleRefresh = useCallback(async () => {
     setIsLoading(true);
     const { data } = await apolloClient.query({
-      query: GET_FILTERED_VEHICLES,
+      query:
+        type === "filter" ? GET_FILTERED_VEHICLES : GET_VEHICLES_BY_VENDOR_ID,
       variables: {
-        ...vehiclesSearchParams,
+        vendorId,
+        ...(type === "filter" ? { ...vehiclesSearchParams } : {}),
         first: PAGE_SIZE,
       },
       fetchPolicy: "no-cache",
@@ -327,18 +343,30 @@ const VehiclesList = () => {
       pageSize: PAGE_SIZE,
     });
 
-    const { vehiclesFiltered }: any = data;
+    setVVehicles(
+      type === "filter"
+        ? () => {
+            const { vehiclesFiltered }: any = data;
 
-    setVVehicles(vehiclesFiltered);
+            return vehiclesFiltered;
+          }
+        : () => {
+            const { vehiclesByVendorId }: any = data;
+
+            return vehiclesByVendorId;
+          }
+    );
 
     setIsLoading(false);
   }, [paginationModel, vVehicles, isLoading]);
 
   const handleVehiclesFilter = async (params: any) => {
+    setType("filter");
     setVehiclesSearchParams(params);
 
     const filteredVehicles = await dispatch(
       fetchFilteredVehicles({
+        vendorId,
         ...params,
         first: paginationModel.pageSize,
       })
@@ -363,36 +391,66 @@ const VehiclesList = () => {
       if (vVehicles.pageInfo.hasNextPage && page > paginationModel.page) {
         setPaginationModel(newPaginationModel);
         const newVehicles = await dispatch(
-          fetchFilteredVehicles({
-            ...vehiclesSearchParams,
-            first: paginationModel.pageSize,
-            after: vVehicles.pageInfo.endCursor,
-          })
+          type === "filter"
+            ? fetchFilteredVehicles({
+                vendorId,
+                ...vehiclesSearchParams,
+                first: paginationModel.pageSize,
+                after: vVehicles.pageInfo.endCursor,
+              })
+            : fetchVehiclesByVendor({
+                vendorId,
+                first: paginationModel.pageSize,
+                after: vVehicles.pageInfo.endCursor,
+              })
         );
 
-        setVVehicles(() => {
-          const { vehiclesFiltered }: any = newVehicles.payload;
+        setVVehicles(
+          type === "filter"
+            ? () => {
+                const { vehiclesFiltered }: any = newVehicles.payload;
 
-          return vehiclesFiltered;
-        });
+                return vehiclesFiltered;
+              }
+            : () => {
+                const { vehiclesByVendorId }: any = newVehicles.payload;
+
+                return vehiclesByVendorId;
+              }
+        );
       }
 
       if (vVehicles.pageInfo.hasPreviousPage && page < paginationModel.page) {
         setPaginationModel(newPaginationModel);
 
         const newVehicles = await dispatch(
-          fetchFilteredVehicles({
-            ...vehiclesSearchParams,
-            last: paginationModel.pageSize,
-            before: vVehicles.pageInfo.startCursor,
-          })
+          type === "filter"
+            ? fetchFilteredVehicles({
+                vendorId,
+                ...vehiclesSearchParams,
+                last: paginationModel.pageSize,
+                before: vVehicles.pageInfo.startCursor,
+              })
+            : fetchVehiclesByVendor({
+                vendorId,
+                last: paginationModel.pageSize,
+                before: vVehicles.pageInfo.startCursor,
+              })
         );
 
-        setVVehicles(() => {
-          const { vehiclesFiltered }: any = newVehicles.payload;
+        setVVehicles(
+          type === "filter"
+            ? () => {
+                const { vehiclesFiltered }: any = newVehicles.payload;
 
-          return vehiclesFiltered;
-        });
+                return vehiclesFiltered;
+              }
+            : () => {
+                const { vehiclesByVendorId }: any = newVehicles.payload;
+
+                return vehiclesByVendorId;
+              }
+        );
       }
 
       setIsLoading(false);
@@ -413,13 +471,6 @@ const VehiclesList = () => {
   }, [vVehicles, vVehicles && vVehicles.totalCount, setRowCountState]);
 
   const handleDeleteDialogToggle = () => setDeleteDialogOpen(!deleteDialogOpen);
-
-  const handleEditVehicle = (row: any) => {
-    setId(row.node.id);
-    router.push({
-      pathname: `/apps/vehicles/${row.node.id}/edit`,
-    });
-  };
 
   const handleDeleteVehicle = (row: any) => {
     setId(row.node.id);
@@ -497,61 +548,44 @@ const VehiclesList = () => {
             </CardContent>
             <Divider sx={{ m: "0 !important" }} />
             <TableHeader handleRefresh={handleRefresh} />
-            {vehiclesSearchParams ? (
+
+            {vVehicles &&
+            vVehicles.edges &&
+            vVehicles.edges.length &&
+            vVehicles.edges[0]?.cursor === "" ? (
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
+                <CircularProgress sx={{ mt: 6, mb: 6 }} />
+              </Box>
+            ) : (
               <>
-                {vVehicles &&
-                vVehicles.edges &&
-                vVehicles.edges.length &&
-                vVehicles.edges[0]?.cursor === "" ? (
-                  <Box sx={{ display: "flex", justifyContent: "center" }}>
-                    <CircularProgress sx={{ mt: 6, mb: 6 }} />
-                  </Box>
+                {vVehicles && vVehicles.edges && vVehicles.edges.length > 0 ? (
+                  <DataGrid
+                    autoHeight
+                    rows={vVehicles.edges}
+                    columns={columns}
+                    getRowId={(vehicle) => vehicle.cursor}
+                    rowCount={rowCountState}
+                    paginationMode="server"
+                    disableRowSelectionOnClick
+                    pageSizeOptions={[PAGE_SIZE]}
+                    paginationModel={paginationModel}
+                    onPaginationModelChange={handlePaginationModelChange}
+                    loading={isLoading}
+                  />
                 ) : (
-                  <>
-                    {vVehicles &&
-                    vVehicles.edges &&
-                    vVehicles.edges.length > 0 ? (
-                      <DataGrid
-                        autoHeight
-                        rows={vVehicles.edges}
-                        columns={columns}
-                        getRowId={(vehicle) => vehicle.cursor}
-                        rowCount={rowCountState}
-                        paginationMode="server"
-                        disableRowSelectionOnClick
-                        pageSizeOptions={[PAGE_SIZE]}
-                        paginationModel={paginationModel}
-                        onPaginationModelChange={handlePaginationModelChange}
-                        loading={isLoading}
-                      />
-                    ) : (
-                      <Box sx={{ margin: "2rem" }}>
-                        <Typography
-                          sx={{
-                            color: "text.secondary",
-                            fontStyle: "italic",
-                            textAlign: "center",
-                          }}
-                        >
-                          There are no vehicles matching criteria.
-                        </Typography>
-                      </Box>
-                    )}
-                  </>
+                  <Box sx={{ margin: "2rem" }}>
+                    <Typography
+                      sx={{
+                        color: "text.secondary",
+                        fontStyle: "italic",
+                        textAlign: "center",
+                      }}
+                    >
+                      There are no vehicles matching criteria.
+                    </Typography>
+                  </Box>
                 )}
               </>
-            ) : (
-              <Box sx={{ margin: "2rem" }}>
-                <Typography
-                  sx={{
-                    color: "text.secondary",
-                    fontStyle: "italic",
-                    textAlign: "center",
-                  }}
-                >
-                  Please select some parameters to show vehicle listings.
-                </Typography>
-              </Box>
             )}
           </Card>
         </Grid>
@@ -625,6 +659,37 @@ const VehiclesList = () => {
       </Dialog>
     </>
   );
+};
+
+export const getServerSideProps: any = async ({ params }: any) => {
+  const { vendorId } = params;
+
+  const { data, loading, error } = await apolloClient.query({
+    query: GET_VEHICLES_BY_VENDOR_ID,
+    variables: {
+      vendorId,
+      first: PAGE_SIZE,
+    },
+  });
+
+  if (loading) {
+    toast.loading("Fetching vehicles...");
+  }
+
+  if (error) {
+    console.error(error);
+    toast.error(`An error occurred while fetching vehicles: ${error}`);
+    return undefined;
+  }
+
+  const { vehiclesByVendorId }: any = data;
+
+  return {
+    props: {
+      vendorId,
+      vehicles: { ...vehiclesByVendorId },
+    },
+  };
 };
 
 // export const getStaticProps: GetStaticProps = async () => {

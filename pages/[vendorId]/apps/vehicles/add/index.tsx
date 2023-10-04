@@ -10,11 +10,18 @@ import Icon from "@components/icon";
 // ** Others
 import VehicleListing from "src/views/apps/vehicle/list/vehicle-listing";
 import DatePickerWrapper from "src/@core/styles/libs/react-datepicker";
+import { useSelector } from "react-redux";
+import { RootState } from "@src/store";
 import { idleTimer } from "@src/configs/idleOrReload";
 
 const AddVehicle = () => {
   // ** Watch for idle time or reload
   idleTimer();
+
+  // ** Hooks
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
 
   return (
     <DatePickerWrapper>
@@ -24,7 +31,7 @@ const AddVehicle = () => {
       <Button
         component={Link}
         variant="contained"
-        href={`/apps/vehicles/list`}
+        href={`/${authedVendor.id}/apps/vehicles/list`}
         startIcon={<Icon icon="bx:arrow-back" />}
         sx={{ mb: 4 }}
       >
