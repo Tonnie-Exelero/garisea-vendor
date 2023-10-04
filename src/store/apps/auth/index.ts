@@ -9,10 +9,12 @@ import {
   UPDATE_IMAGE,
   DELETE_VENDOR,
 } from "@api/vendor/vendor";
-import { VENDOR_LOGIN } from "@src/api/vendor/auth";
+import { VENDOR_LOGIN, VENDOR_LOGOUT } from "@src/api/vendor/auth";
 
 // ** Others
+import jwt from "jsonwebtoken";
 import { Vendor } from "../vendor/vendor/types";
+import { decryptData } from "@core/utils/encryption";
 
 // ** Vendor initial state
 const vendorInitialState = {
@@ -53,6 +55,28 @@ export const signIn = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
     try {
       const { data } = await apolloClient.mutate({
         mutation: VENDOR_LOGIN,
+        variables: { ...vendorData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Logout Vendor
+export const logOut = createAsyncThunk<Vendor, any, {}>(
+  "appAuth/logOut",
+  async (vendorData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: VENDOR_LOGOUT,
         variables: { ...vendorData },
       });
 
@@ -174,12 +198,22 @@ export const authedVendorSlice = createSlice({
         }
       })
       .addCase(signIn.fulfilled, (state, { payload }) => {
-        const { loginVendor }: any = payload;
+        const {
+          loginVendor: { token },
+        }: any = payload;
 
         if (state.loading === "pending") {
           state.loading = "";
-          state.authedVendor = loginVendor;
         }
+
+        // ** Decrypt data and decode token, then save vendor data in state
+        // Decrypt token
+        const decryptedToken = decryptData(token);
+
+        // Decode token to get vendor data
+        const data: any = jwt.decode(decryptedToken, { complete: true });
+
+        state.authedVendor = data.payload.vendor;
       })
       .addCase(signIn.rejected, (state, action) => {
         if (state.loading === "pending") {
@@ -210,6 +244,9 @@ export const authedVendorSlice = createSlice({
         const { updateVendorImage }: any = payload;
 
         state.authedVendor = { ...updateVendorImage };
+      })
+      .addCase(logOut.fulfilled, (state, { payload }) => {
+        const { logoutVendor }: any = payload;
       })
       .addCase(removeVendor.fulfilled, (state, { payload }) => {
         const { deleteVendor }: any = payload;
