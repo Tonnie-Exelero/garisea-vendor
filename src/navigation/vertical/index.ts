@@ -1,12 +1,18 @@
 // ** Type import
 import { VerticalNavItemsType } from "src/@core/layouts/types";
+import { useSelector } from "react-redux";
+import { RootState } from "src/store";
 
 const navigation = (): VerticalNavItemsType => {
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
+
   return [
     {
       title: "Vehicles",
       icon: "bx:car",
-      path: "/apps/vehicles/list",
+      path: `/${authedVendor.id}/apps/vehicles/list`,
       action: "read",
       subject: "vehicles",
     },
@@ -15,14 +21,14 @@ const navigation = (): VerticalNavItemsType => {
       icon: "bx:bxs-user-account",
       action: "read",
       subject: "profile",
-      path: "/account/user/profile",
+      path: `/account/user/profile`,
     },
     {
       title: "Settings",
       icon: "bx:cog",
       action: "read",
       subject: "profile",
-      path: "/account/settings/account",
+      path: `/account/settings/account`,
     },
     // {
     //   title: "Pages",

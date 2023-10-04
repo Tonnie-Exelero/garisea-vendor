@@ -30,6 +30,9 @@ const VehicleView = ({
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const { vehicle } = useSelector((state: RootState) => state.singleVehicle);
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
 
   useEffect(() => {
     dispatch(fetchVehicleById({ id }));
@@ -40,7 +43,7 @@ const VehicleView = ({
       <Button
         component={Link}
         variant="contained"
-        href={`/apps/vehicles/list`}
+        href={`/${authedVendor.id}/apps/vehicles/list`}
         startIcon={<Icon icon="bx:arrow-back" />}
         sx={{ mb: 4 }}
       >

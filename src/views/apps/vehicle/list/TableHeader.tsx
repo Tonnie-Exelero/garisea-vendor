@@ -12,6 +12,8 @@ import Icon from "src/@core/components/icon";
 
 // ** Others
 import { AbilityContext } from "src/layouts/components/acl/Can";
+import { useSelector } from "react-redux";
+import { RootState } from "@src/store";
 
 interface TableHeaderProps {
   handleRefresh: () => void;
@@ -23,6 +25,9 @@ const TableHeader = (props: TableHeaderProps) => {
 
   // ** Hooks
   const ability = useContext(AbilityContext);
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
 
   return (
     <Box
@@ -45,7 +50,7 @@ const TableHeader = (props: TableHeaderProps) => {
           <Button
             component={Link}
             variant="contained"
-            href={`/apps/vehicles/add`}
+            href={`/${authedVendor.id}/apps/vehicles/add`}
           >
             Add
           </Button>
