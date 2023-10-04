@@ -12,32 +12,15 @@ export const REGISTER = gql`
 export const LOGIN = gql`
   mutation Login($email: String!, $password: String!) {
     loginUser(email: $email, password: $password) {
-      id
-      firstName
-      lastName
-      username
-      email
-	  password
-      phone
-      image
-      language
-      status
-      address
-      city
-      country
       token
-      role {
-        id
-        name
-        slug
-        ability
-        permissions {
-          id
-          name
-          slug
-          subjects
-        }
-      }
+    }
+  }
+`;
+
+export const LOGOUT = gql`
+  mutation Logout($email: String!) {
+    logoutUser(email: $email) {
+      email
     }
   }
 `;

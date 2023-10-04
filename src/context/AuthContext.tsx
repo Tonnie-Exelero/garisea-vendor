@@ -10,12 +10,13 @@ import authConfig from "src/configs/auth";
 
 // ** Types
 import { AuthValuesType, LoginParams, VendorDataType } from "./types";
-import { signIn } from "@redux/apps/auth";
+import { signIn, logOut } from "@redux/apps/auth";
 
 // ** Others
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@redux/index";
-import { encryptData, decryptData } from "@utils/encryption";
+import { decryptData, encryptData } from "@utils/encryption";
+import { decodeToken } from "@src/configs/jwt";
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -35,7 +36,9 @@ type Props = {
 
 const AuthProvider = ({ children }: Props) => {
   // ** States
-  const [vendor, setVendor] = useState<VendorDataType | null>(defaultProvider.vendor);
+  const [vendor, setVendor] = useState<VendorDataType | null>(
+    defaultProvider.vendor
+  );
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading);
 
   // ** Hooks
@@ -83,7 +86,10 @@ const AuthProvider = ({ children }: Props) => {
 
           const returnUrl = router.query.returnUrl;
 
-          setVendor({ ...loginVendor, role: "superadmin" });
+          const decryptedPayload = decryptData(loginVendor.token);
+          const vendorData: any = await decodeToken(decryptedPayload);
+
+          setVendor({ ...vendorData?.vendor, role: "superadmin" });
           window.localStorage.setItem("uD", encryptData(loginVendor));
 
           const redirectURL = returnUrl && returnUrl !== "/" ? returnUrl : "/";
@@ -118,11 +124,36 @@ const AuthProvider = ({ children }: Props) => {
     }
   };
 
-  const handleLogout = () => {
-    setVendor(null);
-    window.localStorage.removeItem("uD");
-    window.localStorage.removeItem(authConfig.storageTokenKeyName);
-    router.push("/login");
+  const handleLogout = async () => {
+    setLoading(true);
+
+    try {
+      const resultAction = await dispatch(logOut({ email: vendor?.email }));
+
+      if (logOut.fulfilled.match(resultAction)) {
+        // vendor will have a type signature of Vendor as we passed that as the Returned parameter in createAsyncThunk
+        const vendor = resultAction.payload;
+        const { logoutVendor }: any = vendor;
+
+        if (logoutVendor.email) {
+          toast.success(`Logged out successfully.`, { duration: 2000 });
+
+          setVendor(null);
+          setLoading(false);
+
+          window.localStorage.removeItem("uD");
+          window.localStorage.removeItem(authConfig.storageTokenKeyName);
+          router.push("/login");
+        } else {
+          toast.error(`An error occurred while logging out. Try again.`);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(`An error occurred while logging out. Try again.`);
+      setLoading(false);
+      return;
+    }
   };
 
   const values = {

@@ -3,6 +3,7 @@ import * as jwt from "jsonwebtoken";
 import prisma from "@src/lib/prisma";
 import { APP_SECRET } from "@graphql/utils/auth";
 import { builder } from "../builder";
+import { encryptData } from "@core/utils/encryption";
 
 export const Vendor = builder.prismaObject("Vendor", {
   fields: (t) => ({
@@ -165,13 +166,16 @@ builder.mutationFields((t) => ({
       email: t.arg.string({ required: true }),
       password: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx): Promise<any | undefined> => {
+    resolve: async (query, _parent, args, ctx): Promise<any | undefined> => {
       const { email, password } = args;
       let errMessage: string | null = null;
 
       const vendor = await prisma.vendor.findUniqueOrThrow({
         ...query,
         where: { email },
+        include: {
+          organization: true,
+        },
       });
 
       if (!vendor) {
@@ -187,13 +191,29 @@ builder.mutationFields((t) => ({
       }
 
       const authToken =
-        (vendor && valid && jwt.sign({ vendorId: vendor.id }, APP_SECRET)) ||
-        null;
+        (vendor && valid && jwt.sign({ vendor }, APP_SECRET)) || null;
 
       if (vendor && true === valid && null !== authToken) {
+        const domain =
+          process.env.NEXT_PUBLIC_BASE_URL &&
+          new URL(process.env.NEXT_PUBLIC_BASE_URL);
+
+        // Set the auth cookie on the response
+
+        await ctx.request.cookieStore.set({
+          name: "auth",
+          sameSite: "strict",
+          // @ts-ignore
+          secure: domain?.hostname.includes("localhost") ? false : true,
+          // @ts-ignore
+          domain: domain?.hostname,
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+          value: await encryptData(authToken),
+          httpOnly: true,
+        });
+
         return {
-          ...vendor,
-          token: authToken,
+          token: encryptData(authToken),
         };
       }
 
@@ -204,6 +224,27 @@ builder.mutationFields((t) => ({
           message: errMessage,
         },
       };
+    },
+  }),
+  logoutVendor: t.prismaField({
+    type: Vendor,
+    args: {
+      email: t.arg.string({ required: true }),
+    },
+    resolve: async (query, _parent, args, ctx): Promise<any | undefined> => {
+      const { email } = args;
+
+      const vendor = await prisma.vendor.findUniqueOrThrow({
+        ...query,
+        where: { email },
+      });
+
+      if (!vendor) return { email };
+
+      // Remove the auth cookie
+      await (await ctx).request.cookieStore.delete("auth");
+
+      return { email: vendor.email };
     },
   }),
   createVendor: t.prismaField({

@@ -1,6 +1,6 @@
 import { createYoga } from "graphql-yoga";
-// TODO: Enable this when going to prod
-// import { useCSRFPrevention } from '@graphql-yoga/plugin-csrf-prevention';
+import { useCookies } from "@whatwg-node/server-plugin-cookies";
+import { useCSRFPrevention } from "@graphql-yoga/plugin-csrf-prevention";
 // import { useResponseCache } from "@graphql-yoga/plugin-response-cache";
 import { schema } from "@graphql/schema";
 import { createContext } from "@graphql/context";
@@ -12,19 +12,19 @@ const { handleRequest } = createYoga({
     return {
       origin: requestOrigin,
       credentials: true,
-      allowedHeaders: ["X-Custom-Header"],
+      allowedHeaders: ["X-CSRF-Token"],
       methods: ["POST"],
     };
   },
   plugins: [
-    // TODO: Enable this when going to prod
-    // useCSRFPrevention({
-    //   requestHeaders: ['x-graphql-yoga-csrf'] // default
-    // }),
+    useCSRFPrevention({
+      requestHeaders: ["X-CSRF-Token"], // default
+    }),
     // useResponseCache({
     //   // global cache
     //   session: () => null,
     // }),
+    useCookies(),
   ],
   schema,
   context: createContext,
