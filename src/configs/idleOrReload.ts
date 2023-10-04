@@ -31,10 +31,6 @@ export const idleTimer = () => {
   let timeout: NodeJS.Timeout | null = null;
 
   const goBackToLogin = () => {
-    window.localStorage.setItem(
-      "iT",
-      "You have been logged out because you refreshed the page or have been inactive."
-    );
     logout();
   };
 
@@ -43,6 +39,10 @@ export const idleTimer = () => {
       clearTimeout(timeout);
     }
     timeout = setTimeout(() => {
+      window.localStorage.setItem(
+        "iT",
+        "Your session ended after 10 minutes of inactivity."
+      );
       goBackToLogin();
     }, 1000 * 600); // Logout after 10 minutes of inactivity or reload.
   };
@@ -70,23 +70,23 @@ export const idleTimer = () => {
     events.forEach((event) => window.addEventListener(event, onEventStart));
 
     // If page is reloaded, logout user and redirect to login
-    window.addEventListener(
-      "beforeunload",
-      (event) => {
-        goBackToLogin();
-      },
-      { capture: true }
-    );
+    window.addEventListener("beforeunload", (event) => {
+      window.localStorage.setItem(
+        "iT",
+        "Your session ended when you reloaded or closed the page."
+      );
+      goBackToLogin();
+    });
 
     // Cleanup
     return () => {
-      window.removeEventListener(
-        "beforeunload",
-        (event) => {
-          goBackToLogin();
-        },
-        { capture: true }
-      );
+      window.removeEventListener("beforeunload", (event) => {
+        window.localStorage.setItem(
+          "iT",
+          "Your session ended when you reloaded or closed the page."
+        );
+        goBackToLogin();
+      });
 
       if (timeout) {
         clearTimeout(timeout);

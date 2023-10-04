@@ -16,32 +16,15 @@ export const VENDOR_REGISTER = gql`
 export const VENDOR_LOGIN = gql`
   mutation LoginVendor($email: String!, $password: String!) {
     loginVendor(email: $email, password: $password) {
-      id
-      firstName
-      lastName
-      username
+      token
+    }
+  }
+`;
+
+export const VENDOR_LOGOUT = gql`
+  mutation LogoutVendor($email: String!) {
+    logoutVendor(email: $email) {
       email
-      phone
-      image
-      language
-      status
-      address
-      city
-      country
-      emailVerified
-      addedOrganization
-      organization {
-        id
-        name
-        email
-        phone
-        address
-        address2
-        city
-        country
-        logo
-        certificate
-      }
     }
   }
 `;
