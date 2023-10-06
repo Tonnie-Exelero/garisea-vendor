@@ -76,6 +76,9 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
     listingPrice,
     discountedPrice,
     images,
+    status,
+    viewingLocation,
+    vehicleOriginCountry,
     reserved,
     sold,
   } = vehicle;
@@ -280,7 +283,7 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                       </Typography>
                     </Box>
                   )}
-                  <Box sx={{ display: "flex", mb: 4 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
                     <Typography
                       sx={{ mr: 2, fontWeight: 700, color: "text.secondary" }}
                     >
@@ -347,6 +350,59 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                       </Typography>
                     </Box>
                   )}
+                  {viewingLocation && (
+                    <Box sx={{ display: "flex", mb: 4 }}>
+                      <Typography
+                        sx={{ mr: 2, fontWeight: 700, color: "text.secondary" }}
+                      >
+                        Viewing Location:
+                      </Typography>
+                      <Typography sx={{ color: "text.secondary" }}>
+                        {viewingLocation}
+                      </Typography>
+                    </Box>
+                  )}
+                  {vehicleOriginCountry && (
+                    <Box sx={{ display: "flex", mb: 4 }}>
+                      <Typography
+                        sx={{ mr: 2, fontWeight: 700, color: "text.secondary" }}
+                      >
+                        Country of Origin:
+                      </Typography>
+                      <Typography sx={{ color: "text.secondary" }}>
+                        {vehicleOriginCountry}
+                      </Typography>
+                    </Box>
+                  )}
+                  <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
+                    <Typography
+                      sx={{ mr: 2, fontWeight: 700, color: "text.secondary" }}
+                    >
+                      Status:
+                    </Typography>
+                    <CustomChip
+                      rounded
+                      skin="light"
+                      size="small"
+                      label={
+                        status === "active"
+                          ? "Active"
+                          : status === "pending"
+                          ? "In Review"
+                          : "Declined"
+                      }
+                      sx={{ mr: 2, fontWeight: 500 }}
+                      color={
+                        dataColors[
+                          status === "active"
+                            ? "success"
+                            : status === "pending"
+                            ? "warning"
+                            : "error"
+                        ]
+                      }
+                    />
+                  </Box>
                   <Box sx={{ display: "flex", mb: 4 }}>
                     <Typography
                       sx={{ mr: 2, fontWeight: 700, color: "text.secondary" }}
@@ -357,10 +413,10 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                       rounded
                       skin="light"
                       size="small"
-                      label={vReserved === "Yes" ? "Yes" : "No"}
+                      label={reserved === "Yes" ? "Yes" : "No"}
                       sx={{ fontWeight: 500 }}
                       color={
-                        dataColors[vReserved === "Yes" ? "success" : "error"]
+                        dataColors[reserved === "Yes" ? "success" : "error"]
                       }
                     />
                   </Box>
@@ -374,9 +430,9 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                       rounded
                       skin="light"
                       size="small"
-                      label={vSold === "Yes" ? "Yes" : "No"}
+                      label={sold === "Yes" ? "Yes" : "No"}
                       sx={{ fontWeight: 500 }}
-                      color={dataColors[vSold === "Yes" ? "success" : "error"]}
+                      color={dataColors[sold === "Yes" ? "success" : "error"]}
                     />
                   </Box>
                 </Box>
@@ -389,27 +445,27 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                   <Box sx={{ display: "flex", gap: 4 }}>
                     <Button
                       variant="contained"
-                      color={vReserved === "Yes" ? "secondary" : "success"}
+                      color={reserved === "Yes" ? "secondary" : "success"}
                       size="small"
                       onClick={() =>
                         handleMarkDialogToggle(
-                          vReserved === "Yes" ? "Not Reserved" : "Reserved"
+                          reserved === "Yes" ? "Not Reserved" : "Reserved"
                         )
                       }
                     >
-                      {vReserved === "Yes" ? "Not Reserved" : "Reserved"}
+                      {reserved === "Yes" ? "Not Reserved" : "Reserved"}
                     </Button>
                     <Button
                       variant="contained"
-                      color={vSold === "Yes" ? "secondary" : "error"}
+                      color={sold === "Yes" ? "secondary" : "error"}
                       size="small"
                       onClick={() =>
                         handleMarkDialogToggle(
-                          vSold === "Yes" ? "Not Sold" : "Sold"
+                          sold === "Yes" ? "Not Sold" : "Sold"
                         )
                       }
                     >
-                      {vSold === "Yes" ? "Not Sold" : "Sold"}
+                      {sold === "Yes" ? "Not Sold" : "Sold"}
                     </Button>
                   </Box>
                   <Button
@@ -528,7 +584,7 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                     color={
                       markText === "Reserved" || markText === "Not Reserved"
                         ? "success"
-                        : "error"
+                        : "info"
                     }
                   >
                     Mark {markText}

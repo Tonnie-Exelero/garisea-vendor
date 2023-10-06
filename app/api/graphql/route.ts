@@ -18,7 +18,7 @@ const { handleRequest } = createYoga({
   },
   plugins: [
     useCSRFPrevention({
-      requestHeaders: ["X-CSRF-Token"], // default
+      requestHeaders: ["X-CSRF-Token"],
     }),
     // useResponseCache({
     //   // global cache

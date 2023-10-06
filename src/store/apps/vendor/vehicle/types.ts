@@ -9,6 +9,7 @@ export interface Vehicle {
   brand: Partial<Brand>;
   model: Partial<Model>;
   trim: string;
+  slug: string;
   yearOfManufacture: string;
   yearOfFirstRegistration: string;
   registered: string;
@@ -16,15 +17,18 @@ export interface Vehicle {
   condition: string;
   mileage: number;
   mileageMetric: string;
-  images: string;
   transmissionType: string;
   fuelType: string;
   engineCapacity: number;
+  exteriorColor: string;
+  upholstery: string;
+  images: string;
+  status: string;
+  viewingLocation: string;
+  vehicleOriginCountry: string;
   engineType: string;
   driveType: string;
   vinNo: string;
-  exteriorColor: string;
-  upholstery: string;
   bodyType: string;
   interiorColor: string;
   steering: string;
@@ -39,4 +43,8 @@ export interface Vehicle {
   extraInfo: string;
   reserved: string;
   sold: string;
+  publishedAt: string;
+  impressions: number;
+  detailExpands: number;
+  interested: number;
 }

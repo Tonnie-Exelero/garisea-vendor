@@ -11,6 +11,7 @@ import StepLabel from "@mui/material/StepLabel";
 import Typography from "@mui/material/Typography";
 import MuiStep, { StepProps } from "@mui/material/Step";
 import CardContent, { CardContentProps } from "@mui/material/CardContent";
+import { CircularProgress } from "@mui/material";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
@@ -38,7 +39,6 @@ import { AppDispatch } from "@redux/index";
 import { addVehicle } from "@src/store/apps/vendor/vehicle/single";
 import toast from "react-hot-toast";
 import { uuid } from "uuidv4";
-import { CircularProgress } from "@mui/material";
 
 const steps = [
   {
@@ -143,9 +143,12 @@ const VehicleListingWizard: React.FC<any> = () => {
     ...opticsData,
     ...featuresData,
     ...priceData,
-    views: 0,
+    status: "pending",
     reserved: "No",
     sold: "No",
+    impressions: 0,
+    detailExpands: 0,
+    interested: 0,
   };
 
   // ** Hooks

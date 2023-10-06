@@ -19,16 +19,23 @@ export const GET_VEHICLES = gql`
             address
             city
             country
+            organization {
+              id
+              name
+            }
           }
           brand {
             id
             name
+            slug
           }
           model {
             id
             name
+            slug
           }
           trim
+          slug
           yearOfManufacture
           yearOfFirstRegistration
           registered
@@ -42,6 +49,9 @@ export const GET_VEHICLES = gql`
           exteriorColor
           upholstery
           images
+          status
+          viewingLocation
+          vehicleOriginCountry
           engineType
           driveType
           vinNo
@@ -55,10 +65,13 @@ export const GET_VEHICLES = gql`
           allowedPaymentModes
           offerType
           features
-          views
           extraInfo
           reserved
           sold
+          publishedAt
+          impressions
+          detailExpands
+          interested
         }
       }
       pageInfo {
@@ -88,16 +101,23 @@ export const GET_VEHICLE_BY_ID = gql`
         address
         city
         country
+        organization {
+          id
+          name
+        }
       }
       brand {
         id
         name
+        slug
       }
       model {
         id
         name
+        slug
       }
       trim
+      slug
       yearOfManufacture
       yearOfFirstRegistration
       registered
@@ -111,6 +131,9 @@ export const GET_VEHICLE_BY_ID = gql`
       exteriorColor
       upholstery
       images
+      status
+      viewingLocation
+      vehicleOriginCountry
       engineType
       driveType
       vinNo
@@ -124,10 +147,13 @@ export const GET_VEHICLE_BY_ID = gql`
       allowedPaymentModes
       offerType
       features
-      views
       extraInfo
       reserved
       sold
+      publishedAt
+      impressions
+      detailExpands
+      interested
     }
   }
 `;
@@ -148,16 +174,23 @@ export const GET_VEHICLE_BY_ENTRY_NO = gql`
         address
         city
         country
+        organization {
+          id
+          name
+        }
       }
       brand {
         id
         name
+        slug
       }
       model {
         id
         name
+        slug
       }
       trim
+      slug
       yearOfManufacture
       yearOfFirstRegistration
       registered
@@ -171,6 +204,9 @@ export const GET_VEHICLE_BY_ENTRY_NO = gql`
       exteriorColor
       upholstery
       images
+      status
+      viewingLocation
+      vehicleOriginCountry
       engineType
       driveType
       vinNo
@@ -184,10 +220,86 @@ export const GET_VEHICLE_BY_ENTRY_NO = gql`
       allowedPaymentModes
       offerType
       features
-      views
       extraInfo
       reserved
       sold
+      publishedAt
+      impressions
+      detailExpands
+      interested
+    }
+  }
+`;
+
+export const GET_VEHICLE_BY_SLUG = gql`
+  query GetVehicleBySlug($slug: String!) {
+    vehicleBySlug(slug: $slug) {
+      id
+      entryNo
+      vendor {
+        id
+        firstName
+        lastName
+        username
+        email
+        phone
+        image
+        address
+        city
+        country
+        organization {
+          id
+          name
+        }
+      }
+      brand {
+        id
+        name
+        slug
+      }
+      model {
+        id
+        name
+        slug
+      }
+      trim
+      slug
+      yearOfManufacture
+      yearOfFirstRegistration
+      registered
+      registrationNo
+      condition
+      mileage
+      mileageMetric
+      transmissionType
+      fuelType
+      engineCapacity
+      exteriorColor
+      upholstery
+      images
+      status
+      viewingLocation
+      vehicleOriginCountry
+      engineType
+      driveType
+      vinNo
+      bodyType
+      interiorColor
+      steering
+      seats
+      doors
+      listingPrice
+      discountedPrice
+      allowedPaymentModes
+      offerType
+      features
+      extraInfo
+      reserved
+      sold
+      publishedAt
+      impressions
+      detailExpands
+      interested
     }
   }
 `;
@@ -223,16 +335,23 @@ export const GET_VEHICLES_BY_VENDOR_ID = gql`
             address
             city
             country
+            organization {
+              id
+              name
+            }
           }
           brand {
             id
             name
+            slug
           }
           model {
             id
             name
+            slug
           }
           trim
+          slug
           yearOfManufacture
           yearOfFirstRegistration
           registered
@@ -246,6 +365,9 @@ export const GET_VEHICLES_BY_VENDOR_ID = gql`
           exteriorColor
           upholstery
           images
+          status
+          viewingLocation
+          vehicleOriginCountry
           engineType
           driveType
           vinNo
@@ -259,10 +381,13 @@ export const GET_VEHICLES_BY_VENDOR_ID = gql`
           allowedPaymentModes
           offerType
           features
-          views
           extraInfo
           reserved
           sold
+          publishedAt
+          impressions
+          detailExpands
+          interested
         }
       }
       pageInfo {
@@ -291,6 +416,9 @@ export const GET_FILTERED_VEHICLES = gql`
     $condition: String
     $minMileage: Int
     $maxMileage: Int
+    $status: String
+    $viewingLocation: String
+    $vehicleOriginCountry: String
     $transmissionType: String
     $fuelType: String
     $minEngineCapacity: Int
@@ -321,6 +449,9 @@ export const GET_FILTERED_VEHICLES = gql`
       condition: $condition
       minMileage: $minMileage
       maxMileage: $maxMileage
+      status: $status
+      viewingLocation: $viewingLocation
+      vehicleOriginCountry: $vehicleOriginCountry
       transmissionType: $transmissionType
       fuelType: $fuelType
       minEngineCapacity: $minEngineCapacity
@@ -353,16 +484,23 @@ export const GET_FILTERED_VEHICLES = gql`
             address
             city
             country
+            organization {
+              id
+              name
+            }
           }
           brand {
             id
             name
+            slug
           }
           model {
             id
             name
+            slug
           }
           trim
+          slug
           yearOfManufacture
           yearOfFirstRegistration
           registered
@@ -376,6 +514,9 @@ export const GET_FILTERED_VEHICLES = gql`
           exteriorColor
           upholstery
           images
+          status
+          viewingLocation
+          vehicleOriginCountry
           engineType
           driveType
           vinNo
@@ -389,10 +530,13 @@ export const GET_FILTERED_VEHICLES = gql`
           allowedPaymentModes
           offerType
           features
-          views
           extraInfo
           reserved
           sold
+          publishedAt
+          impressions
+          detailExpands
+          interested
         }
       }
       pageInfo {
@@ -413,6 +557,7 @@ export const CREATE_VEHICLE = gql`
     $brandId: String!
     $modelId: String!
     $trim: String
+    $slug: String
     $yearOfManufacture: String
     $yearOfFirstRegistration: String
     $registered: String
@@ -426,6 +571,9 @@ export const CREATE_VEHICLE = gql`
     $exteriorColor: String
     $upholstery: String
     $images: String
+    $status: String
+    $viewingLocation: String
+    $vehicleOriginCountry: String
     $engineType: String
     $driveType: String
     $vinNo: String
@@ -439,10 +587,13 @@ export const CREATE_VEHICLE = gql`
     $allowedPaymentModes: String
     $offerType: String
     $features: String
-    $views: Int
     $extraInfo: String
     $reserved: String
     $sold: String
+    $publishedAt: String
+    $impressions: Int
+    $detailExpands: Int
+    $interested: Int
   ) {
     createVehicle(
       entryNo: $entryNo
@@ -450,6 +601,7 @@ export const CREATE_VEHICLE = gql`
       brandId: $brandId
       modelId: $modelId
       trim: $trim
+      slug: $slug
       yearOfManufacture: $yearOfManufacture
       yearOfFirstRegistration: $yearOfFirstRegistration
       registered: $registered
@@ -463,6 +615,9 @@ export const CREATE_VEHICLE = gql`
       exteriorColor: $exteriorColor
       upholstery: $upholstery
       images: $images
+      status: $status
+      viewingLocation: $viewingLocation
+      vehicleOriginCountry: $vehicleOriginCountry
       engineType: $engineType
       driveType: $driveType
       vinNo: $vinNo
@@ -476,10 +631,13 @@ export const CREATE_VEHICLE = gql`
       allowedPaymentModes: $allowedPaymentModes
       offerType: $offerType
       features: $features
-      views: $views
       extraInfo: $extraInfo
       reserved: $reserved
       sold: $sold
+      publishedAt: $publishedAt
+      impressions: $impressions
+      detailExpands: $detailExpands
+      interested: $interested
     ) {
       id
       entryNo
@@ -494,16 +652,23 @@ export const CREATE_VEHICLE = gql`
         address
         city
         country
+        organization {
+          id
+          name
+        }
       }
       brand {
         id
         name
+        slug
       }
       model {
         id
         name
+        slug
       }
       trim
+      slug
       yearOfManufacture
       yearOfFirstRegistration
       registered
@@ -517,6 +682,9 @@ export const CREATE_VEHICLE = gql`
       exteriorColor
       upholstery
       images
+      status
+      viewingLocation
+      vehicleOriginCountry
       engineType
       driveType
       vinNo
@@ -530,10 +698,13 @@ export const CREATE_VEHICLE = gql`
       allowedPaymentModes
       offerType
       features
-      views
       extraInfo
       reserved
       sold
+      publishedAt
+      impressions
+      detailExpands
+      interested
     }
   }
 `;
@@ -545,6 +716,7 @@ export const UPDATE_VEHICLE = gql`
     $brandId: String
     $modelId: String
     $trim: String
+    $slug: String
     $yearOfManufacture: String
     $yearOfFirstRegistration: String
     $registered: String
@@ -558,6 +730,8 @@ export const UPDATE_VEHICLE = gql`
     $exteriorColor: String
     $upholstery: String
     $images: String
+    $viewingLocation: String
+    $vehicleOriginCountry: String
     $engineType: String
     $driveType: String
     $vinNo: String
@@ -571,7 +745,6 @@ export const UPDATE_VEHICLE = gql`
     $allowedPaymentModes: String
     $offerType: String
     $features: String
-    $views: Int
     $extraInfo: String
     $reserved: String
     $sold: String
@@ -582,6 +755,7 @@ export const UPDATE_VEHICLE = gql`
       brandId: $brandId
       modelId: $modelId
       trim: $trim
+      slug: $slug
       yearOfManufacture: $yearOfManufacture
       yearOfFirstRegistration: $yearOfFirstRegistration
       registered: $registered
@@ -595,6 +769,8 @@ export const UPDATE_VEHICLE = gql`
       exteriorColor: $exteriorColor
       upholstery: $upholstery
       images: $images
+      viewingLocation: $viewingLocation
+      vehicleOriginCountry: $vehicleOriginCountry
       engineType: $engineType
       driveType: $driveType
       vinNo: $vinNo
@@ -608,7 +784,6 @@ export const UPDATE_VEHICLE = gql`
       allowedPaymentModes: $allowedPaymentModes
       offerType: $offerType
       features: $features
-      views: $views
       extraInfo: $extraInfo
       reserved: $reserved
       sold: $sold
@@ -626,16 +801,23 @@ export const UPDATE_VEHICLE = gql`
         address
         city
         country
+        organization {
+          id
+          name
+        }
       }
       brand {
         id
         name
+        slug
       }
       model {
         id
         name
+        slug
       }
       trim
+      slug
       yearOfManufacture
       yearOfFirstRegistration
       registered
@@ -649,6 +831,9 @@ export const UPDATE_VEHICLE = gql`
       exteriorColor
       upholstery
       images
+      status
+      viewingLocation
+      vehicleOriginCountry
       engineType
       driveType
       vinNo
@@ -662,10 +847,31 @@ export const UPDATE_VEHICLE = gql`
       allowedPaymentModes
       offerType
       features
-      views
       extraInfo
       reserved
       sold
+      publishedAt
+      impressions
+      detailExpands
+      interested
+    }
+  }
+`;
+
+export const UPDATE_VEHICLE_STATUS = gql`
+  mutation UpdateVehicleStatus($id: String!, $status: String) {
+    updateVehicleStatus(id: $id, status: $status) {
+      id
+      status
+    }
+  }
+`;
+
+export const UPDATE_VEHICLE_SLUG = gql`
+  mutation UpdateVehicleSlug($id: String!, $slug: String) {
+    updateVehicleSlug(id: $id, slug: $slug) {
+      id
+      slug
     }
   }
 `;
@@ -674,58 +880,7 @@ export const UPDATE_VEHICLE_RESERVED = gql`
   mutation UpdateVehicleReserved($id: String!, $reserved: String) {
     updateVehicleReserved(id: $id, reserved: $reserved) {
       id
-      entryNo
-      vendor {
-        id
-        firstName
-        lastName
-        username
-        email
-        phone
-        image
-        address
-        city
-        country
-      }
-      brand {
-        id
-        name
-      }
-      model {
-        id
-        name
-      }
-      trim
-      yearOfManufacture
-      yearOfFirstRegistration
-      registered
-      registrationNo
-      condition
-      mileage
-      mileageMetric
-      transmissionType
-      fuelType
-      engineCapacity
-      exteriorColor
-      upholstery
-      images
-      engineType
-      driveType
-      vinNo
-      bodyType
-      interiorColor
-      steering
-      seats
-      doors
-      listingPrice
-      discountedPrice
-      allowedPaymentModes
-      offerType
-      features
-      views
-      extraInfo
       reserved
-      sold
     }
   }
 `;
@@ -734,57 +889,6 @@ export const UPDATE_VEHICLE_SOLD = gql`
   mutation UpdateVehicleSold($id: String!, $sold: String) {
     updateVehicleSold(id: $id, sold: $sold) {
       id
-      entryNo
-      vendor {
-        id
-        firstName
-        lastName
-        username
-        email
-        phone
-        image
-        address
-        city
-        country
-      }
-      brand {
-        id
-        name
-      }
-      model {
-        id
-        name
-      }
-      trim
-      yearOfManufacture
-      yearOfFirstRegistration
-      registered
-      registrationNo
-      condition
-      mileage
-      mileageMetric
-      transmissionType
-      fuelType
-      engineCapacity
-      exteriorColor
-      upholstery
-      images
-      engineType
-      driveType
-      vinNo
-      bodyType
-      interiorColor
-      steering
-      seats
-      doors
-      listingPrice
-      discountedPrice
-      allowedPaymentModes
-      offerType
-      features
-      views
-      extraInfo
-      reserved
       sold
     }
   }
@@ -794,58 +898,43 @@ export const UPDATE_VEHICLE_IMAGES = gql`
   mutation UpdateVehicleImages($id: String!, $images: String) {
     updateVehicleImages(id: $id, images: $images) {
       id
-      entryNo
-      vendor {
-        id
-        firstName
-        lastName
-        username
-        email
-        phone
-        image
-        address
-        city
-        country
-      }
-      brand {
-        id
-        name
-      }
-      model {
-        id
-        name
-      }
-      trim
-      yearOfManufacture
-      yearOfFirstRegistration
-      registered
-      registrationNo
-      condition
-      mileage
-      mileageMetric
-      transmissionType
-      fuelType
-      engineCapacity
-      exteriorColor
-      upholstery
       images
-      engineType
-      driveType
-      vinNo
-      bodyType
-      interiorColor
-      steering
-      seats
-      doors
-      listingPrice
-      discountedPrice
-      allowedPaymentModes
-      offerType
-      features
-      views
-      extraInfo
-      reserved
-      sold
+    }
+  }
+`;
+
+export const UPDATE_VEHICLE_PUPLISHED_AT = gql`
+  mutation UpdateVehiclePublishedAt($id: String!, $publishedAt: String) {
+    updateVehiclePublishedAt(id: $id, publishedAt: $publishedAt) {
+      id
+      publishedAt
+    }
+  }
+`;
+
+export const UPDATE_VEHICLE_IMPRESSIONS = gql`
+  mutation UpdateVehicleImpressions($id: String!, $impressions: Int) {
+    updateVehicleImpressions(id: $id, impressions: $impressions) {
+      id
+      impressions
+    }
+  }
+`;
+
+export const UPDATE_VEHICLE_DETAIL_EXPANDS = gql`
+  mutation UpdateVehicleDetailExpands($id: String!, $detailExpands: Int) {
+    updateVehicleDetailExpands(id: $id, detailExpands: $detailExpands) {
+      id
+      detailExpands
+    }
+  }
+`;
+
+export const UPDATE_VEHICLE_INTERESTED = gql`
+  mutation UpdateVehicleInterested($id: String!, $interested: Int) {
+    updateVehicleInterested(id: $id, interested: $interested) {
+      id
+      interested
     }
   }
 `;
@@ -857,6 +946,7 @@ export const UPDATE_VEHICLE_BASIC = gql`
     $brandId: String
     $modelId: String
     $trim: String
+    $slug: String
     $yearOfManufacture: String
     $yearOfFirstRegistration: String
     $registered: String
@@ -873,6 +963,7 @@ export const UPDATE_VEHICLE_BASIC = gql`
       brandId: $brandId
       modelId: $modelId
       trim: $trim
+      slug: $slug
       yearOfManufacture: $yearOfManufacture
       yearOfFirstRegistration: $yearOfFirstRegistration
       registered: $registered
@@ -896,16 +987,23 @@ export const UPDATE_VEHICLE_BASIC = gql`
         address
         city
         country
+        organization {
+          id
+          name
+        }
       }
       brand {
         id
         name
+        slug
       }
       model {
         id
         name
+        slug
       }
       trim
+      slug
       yearOfManufacture
       yearOfFirstRegistration
       registered
@@ -919,6 +1017,9 @@ export const UPDATE_VEHICLE_BASIC = gql`
       exteriorColor
       upholstery
       images
+      status
+      viewingLocation
+      vehicleOriginCountry
       engineType
       driveType
       vinNo
@@ -932,10 +1033,13 @@ export const UPDATE_VEHICLE_BASIC = gql`
       allowedPaymentModes
       offerType
       features
-      views
       extraInfo
       reserved
       sold
+      publishedAt
+      impressions
+      detailExpands
+      interested
     }
   }
 `;
@@ -984,16 +1088,23 @@ export const UPDATE_VEHICLE_SPECIFICATIONS = gql`
         address
         city
         country
+        organization {
+          id
+          name
+        }
       }
       brand {
         id
         name
+        slug
       }
       model {
         id
         name
+        slug
       }
       trim
+      slug
       yearOfManufacture
       yearOfFirstRegistration
       registered
@@ -1007,6 +1118,9 @@ export const UPDATE_VEHICLE_SPECIFICATIONS = gql`
       exteriorColor
       upholstery
       images
+      status
+      viewingLocation
+      vehicleOriginCountry
       engineType
       driveType
       vinNo
@@ -1020,10 +1134,13 @@ export const UPDATE_VEHICLE_SPECIFICATIONS = gql`
       allowedPaymentModes
       offerType
       features
-      views
       extraInfo
       reserved
       sold
+      publishedAt
+      impressions
+      detailExpands
+      interested
     }
   }
 `;
@@ -1035,7 +1152,6 @@ export const UPDATE_VEHICLE_EXTRA_INFO = gql`
     $allowedPaymentModes: String
     $offerType: String
     $features: String
-    $views: Int
     $extraInfo: String
   ) {
     updateVehicleExtraInfo(
@@ -1044,7 +1160,6 @@ export const UPDATE_VEHICLE_EXTRA_INFO = gql`
       allowedPaymentModes: $allowedPaymentModes
       offerType: $offerType
       features: $features
-      views: $views
       extraInfo: $extraInfo
     ) {
       id
@@ -1060,16 +1175,23 @@ export const UPDATE_VEHICLE_EXTRA_INFO = gql`
         address
         city
         country
+        organization {
+          id
+          name
+        }
       }
       brand {
         id
         name
+        slug
       }
       model {
         id
         name
+        slug
       }
       trim
+      slug
       yearOfManufacture
       yearOfFirstRegistration
       registered
@@ -1083,6 +1205,9 @@ export const UPDATE_VEHICLE_EXTRA_INFO = gql`
       exteriorColor
       upholstery
       images
+      status
+      viewingLocation
+      vehicleOriginCountry
       engineType
       driveType
       vinNo
@@ -1096,10 +1221,13 @@ export const UPDATE_VEHICLE_EXTRA_INFO = gql`
       allowedPaymentModes
       offerType
       features
-      views
       extraInfo
       reserved
       sold
+      publishedAt
+      impressions
+      detailExpands
+      interested
     }
   }
 `;
