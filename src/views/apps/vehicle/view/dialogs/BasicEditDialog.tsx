@@ -39,6 +39,9 @@ import { editVehicleBasicInfo } from "@src/store/apps/vendor/vehicle/single";
 // ** Custom Components Imports
 import CustomChip from "@components/mui/chip";
 
+// ** Others
+import { countries } from "@src/configs/countries";
+
 const metrics = ["kms", "miles"];
 const currency = "KES";
 
@@ -64,6 +67,8 @@ const BasicEditDialog: React.FC<BasicEditDialogProps> = ({
     condition,
     mileage,
     mileageMetric,
+    viewingLocation,
+    vehicleOriginCountry,
     listingPrice,
     discountedPrice,
   } = vehicle;
@@ -84,6 +89,10 @@ const BasicEditDialog: React.FC<BasicEditDialogProps> = ({
   const [vMileage, setVMileage] = useState<number>(mileage);
   const [vMileageMetric, setVMileageMetric] = useState<string>(mileageMetric);
   const [vListingPrice, setVListingPrice] = useState<number>(listingPrice);
+  const [vViewingLocation, setVViewingLocation] =
+    useState<string>(viewingLocation);
+  const [vVehicleOriginCountry, setVVehicleOriginCountry] =
+    useState<string>(vehicleOriginCountry);
   const [vDiscountedPrice, setVDiscountedPrice] =
     useState<number>(discountedPrice);
   const [percentageDiscount, setPercentageDiscount] = useState<number>();
@@ -167,6 +176,8 @@ const BasicEditDialog: React.FC<BasicEditDialogProps> = ({
       condition: vCondition,
       mileage: vMileage,
       mileageMetric: vMileageMetric,
+      viewingLocation: vViewingLocation,
+      vehicleOriginCountry: vVehicleOriginCountry,
       listingPrice: vListingPrice,
       discountedPrice: vDiscountedPrice,
     };
@@ -357,7 +368,7 @@ const BasicEditDialog: React.FC<BasicEditDialogProps> = ({
                 type="text"
                 value={vYearOfManufacture}
                 onChange={(e) => setVYearOfManufacture(e.target.value)}
-                placeholder="e.g. 08/2023"
+                placeholder="e.g. 2023"
                 sx={{ mb: 4 }}
               />
             </Grid>
@@ -370,7 +381,7 @@ const BasicEditDialog: React.FC<BasicEditDialogProps> = ({
                 type="text"
                 value={vYearOfFirstRegistration}
                 onChange={(e) => setVYearOfFirstRegistration(e.target.value)}
-                placeholder="e.g. 09/2023"
+                placeholder="e.g. 2023"
                 sx={{ mb: 4 }}
               />
             </Grid>
@@ -415,6 +426,43 @@ const BasicEditDialog: React.FC<BasicEditDialogProps> = ({
                 }}
                 sx={{ mb: 4 }}
               />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                id="viewing-location"
+                aria-label="viewing-location"
+                label="Viewing Location"
+                type="text"
+                value={vViewingLocation}
+                onChange={(e) => setVViewingLocation(e.target.value)}
+                placeholder="e.g. Galleria Mall, Langata Rd, Nairobi"
+                sx={{ mb: 4 }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel id="origin-country">Country of Origin</InputLabel>
+                <Select
+                  fullWidth
+                  value={vVehicleOriginCountry}
+                  id="origin-country"
+                  label="Country of Origin"
+                  labelId="origin-country"
+                  onChange={(e) => setVVehicleOriginCountry(e.target.value)}
+                  inputProps={{ placeholder: "e.g. Japan" }}
+                >
+                  {countries.map((country, index) => {
+                    const { name } = country;
+
+                    return (
+                      <MenuItem key={index} value={name}>
+                        {name}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField

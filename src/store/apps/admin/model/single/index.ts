@@ -3,7 +3,12 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // ** API
 import apolloClient from "@lib/apollo";
-import { CREATE_MODEL, UPDATE_MODEL, DELETE_MODEL } from "@api/admin/model";
+import {
+  GET_MODEL_BY_ID,
+  CREATE_MODEL,
+  UPDATE_MODEL,
+  DELETE_MODEL,
+} from "@api/admin/model";
 
 // ** Others
 import { Model } from "../types";
@@ -19,6 +24,28 @@ const modelInitialState = {
     name: "",
   },
 };
+
+// ** Fetch Model By ID
+export const fetchModelById = createAsyncThunk<Model, { id: string }, {}>(
+  "appModel/fetchModelById",
+  async (id, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_MODEL_BY_ID,
+        variables: { ...id },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
 // ** Create Model
 export const addModel = createAsyncThunk<Model, Partial<Model>, {}>(
@@ -98,6 +125,14 @@ export const appModelSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(fetchModelById.fulfilled, (state, { payload }) => {
+        // Reset model state.
+        state.model = { ...modelInitialState };
+
+        const { modelById }: any = payload;
+
+        state.model = { ...modelById };
+      })
       .addCase(addModel.fulfilled, (state, { payload }) => {
         // Reset model state.
         state.model = { ...modelInitialState };

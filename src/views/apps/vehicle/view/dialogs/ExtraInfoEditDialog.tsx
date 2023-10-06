@@ -39,7 +39,7 @@ import { editVehicleExtraInfo } from "@src/store/apps/vendor/vehicle/single";
 import CustomChip from "@components/mui/chip";
 
 // ** Others
-import { featuresArray, availablePaymentModes } from "../../config";
+import { availablePaymentModes } from "../../config";
 
 interface ExtraInfoEditDialogProps {
   vehicle: VehicleNode;

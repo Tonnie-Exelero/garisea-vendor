@@ -9,6 +9,7 @@ export const Vehicle = builder.prismaObject("Vehicle", {
     brand: t.relation("brand", { nullable: false }),
     model: t.relation("model", { nullable: false }),
     trim: t.exposeString("trim", { nullable: true }),
+    slug: t.exposeString("slug", { nullable: true }),
     yearOfManufacture: t.exposeString("yearOfManufacture", { nullable: true }),
     yearOfFirstRegistration: t.exposeString("yearOfFirstRegistration", {
       nullable: true,
@@ -24,6 +25,11 @@ export const Vehicle = builder.prismaObject("Vehicle", {
     exteriorColor: t.exposeString("exteriorColor", { nullable: true }),
     upholstery: t.exposeString("upholstery", { nullable: true }),
     images: t.exposeString("images", { nullable: true }),
+    status: t.exposeString("status", { nullable: true }),
+    viewingLocation: t.exposeString("viewingLocation", { nullable: true }),
+    vehicleOriginCountry: t.exposeString("vehicleOriginCountry", {
+      nullable: true,
+    }),
     engineType: t.exposeString("engineType", { nullable: true }),
     driveType: t.exposeString("driveType", { nullable: true }),
     vinNo: t.exposeString("vinNo", { nullable: true }),
@@ -39,10 +45,15 @@ export const Vehicle = builder.prismaObject("Vehicle", {
     }),
     offerType: t.exposeString("offerType", { nullable: true }),
     features: t.exposeString("features", { nullable: true }),
-    views: t.exposeInt("views", { nullable: true }),
     extraInfo: t.exposeString("extraInfo", { nullable: true }),
     reserved: t.exposeString("reserved", { nullable: true }),
     sold: t.exposeString("sold", { nullable: true }),
+    publishedAt: t.exposeString("publishedAt", {
+      nullable: true,
+    }),
+    impressions: t.exposeInt("impressions", { nullable: true }),
+    detailExpands: t.exposeInt("detailExpands", { nullable: true }),
+    interested: t.exposeInt("interested", { nullable: true }),
   }),
 });
 
@@ -89,6 +100,20 @@ builder.queryFields((t) => ({
         },
       }),
   }),
+  vehicleBySlug: t.prismaField({
+    type: Vehicle,
+    nullable: true,
+    args: {
+      slug: t.arg.string({ required: true }),
+    },
+    resolve: (query, _parent, args, _info) =>
+      prisma.vehicle.findUniqueOrThrow({
+        ...query,
+        where: {
+          slug: args.slug,
+        },
+      }),
+  }),
   vehiclesByVendorId: t.prismaConnection({
     type: Vehicle,
     cursor: "id",
@@ -129,6 +154,9 @@ builder.queryFields((t) => ({
       condition: t.arg.string(),
       minMileage: t.arg.int(),
       maxMileage: t.arg.int(),
+      status: t.arg.string(),
+      viewingLocation: t.arg.string(),
+      vehicleOriginCountry: t.arg.string(),
       transmissionType: t.arg.string(),
       fuelType: t.arg.string(),
       minEngineCapacity: t.arg.int(),
@@ -209,6 +237,22 @@ builder.queryFields((t) => ({
         ...(args.maxMileage && {
           mileage: {
             lte: <any>args.maxMileage,
+          },
+        }),
+        ...(args.status && {
+          status: {
+            equals: args.status,
+          },
+        }),
+        ...(args.viewingLocation && {
+          viewingLocation: <any>{
+            search: args.viewingLocation,
+            mode: "insensitive",
+          },
+        }),
+        ...(args.vehicleOriginCountry && {
+          vehicleOriginCountry: {
+            equals: args.vehicleOriginCountry,
           },
         }),
         ...(args.transmissionType && {
@@ -388,6 +432,22 @@ builder.queryFields((t) => ({
             lte: <any>args.maxMileage,
           },
         }),
+        ...(args.status && {
+          status: {
+            equals: args.status,
+          },
+        }),
+        ...(args.viewingLocation && {
+          viewingLocation: <any>{
+            search: args.viewingLocation,
+            mode: "insensitive",
+          },
+        }),
+        ...(args.vehicleOriginCountry && {
+          vehicleOriginCountry: {
+            equals: args.vehicleOriginCountry,
+          },
+        }),
         ...(args.transmissionType && {
           transmissionType: {
             equals: args.transmissionType,
@@ -505,6 +565,7 @@ builder.mutationFields((t) => ({
       brandId: t.arg.string({ required: true }),
       modelId: t.arg.string({ required: true }),
       trim: t.arg.string(),
+      slug: t.arg.string(),
       yearOfManufacture: t.arg.string(),
       yearOfFirstRegistration: t.arg.string(),
       registered: t.arg.string(),
@@ -518,6 +579,9 @@ builder.mutationFields((t) => ({
       exteriorColor: t.arg.string(),
       upholstery: t.arg.string(),
       images: t.arg.string(),
+      status: t.arg.string(),
+      viewingLocation: t.arg.string(),
+      vehicleOriginCountry: t.arg.string(),
       engineType: t.arg.string(),
       driveType: t.arg.string(),
       vinNo: t.arg.string(),
@@ -531,10 +595,13 @@ builder.mutationFields((t) => ({
       allowedPaymentModes: t.arg.string(),
       offerType: t.arg.string(),
       features: t.arg.string(),
-      views: t.arg.int(),
       extraInfo: t.arg.string(),
       reserved: t.arg.string(),
       sold: t.arg.string(),
+      publishedAt: t.arg.string(),
+      impressions: t.arg.int(),
+      detailExpands: t.arg.int(),
+      interested: t.arg.int(),
     },
     resolve: async (query, _parent, args, _ctx) => {
       const {
@@ -543,6 +610,7 @@ builder.mutationFields((t) => ({
         brandId,
         modelId,
         trim,
+        slug,
         yearOfManufacture,
         yearOfFirstRegistration,
         registered,
@@ -556,6 +624,9 @@ builder.mutationFields((t) => ({
         exteriorColor,
         upholstery,
         images,
+        status,
+        viewingLocation,
+        vehicleOriginCountry,
         engineType,
         driveType,
         vinNo,
@@ -569,10 +640,13 @@ builder.mutationFields((t) => ({
         allowedPaymentModes,
         offerType,
         features,
-        views,
         extraInfo,
         reserved,
         sold,
+        publishedAt,
+        impressions,
+        detailExpands,
+        interested,
       } = args;
 
       return await prisma.vehicle.create({
@@ -583,6 +657,7 @@ builder.mutationFields((t) => ({
           brand: { connect: { id: String(brandId) || undefined } },
           model: { connect: { id: String(modelId) || undefined } },
           trim,
+          slug,
           yearOfManufacture,
           yearOfFirstRegistration,
           registered,
@@ -596,6 +671,9 @@ builder.mutationFields((t) => ({
           exteriorColor,
           upholstery,
           images,
+          status,
+          viewingLocation,
+          vehicleOriginCountry,
           engineType,
           driveType,
           vinNo,
@@ -609,10 +687,13 @@ builder.mutationFields((t) => ({
           allowedPaymentModes,
           offerType,
           features,
-          views,
           extraInfo,
           reserved,
           sold,
+          publishedAt,
+          impressions,
+          detailExpands,
+          interested,
         },
       });
     },
@@ -625,6 +706,7 @@ builder.mutationFields((t) => ({
       brandId: t.arg.string(),
       modelId: t.arg.string(),
       trim: t.arg.string(),
+      slug: t.arg.string(),
       yearOfManufacture: t.arg.string(),
       yearOfFirstRegistration: t.arg.string(),
       registered: t.arg.string(),
@@ -638,6 +720,8 @@ builder.mutationFields((t) => ({
       exteriorColor: t.arg.string(),
       upholstery: t.arg.string(),
       images: t.arg.string(),
+      viewingLocation: t.arg.string(),
+      vehicleOriginCountry: t.arg.string(),
       engineType: t.arg.string(),
       driveType: t.arg.string(),
       vinNo: t.arg.string(),
@@ -651,7 +735,6 @@ builder.mutationFields((t) => ({
       allowedPaymentModes: t.arg.string(),
       offerType: t.arg.string(),
       features: t.arg.string(),
-      views: t.arg.int(),
       extraInfo: t.arg.string(),
       reserved: t.arg.string(),
       sold: t.arg.string(),
@@ -662,6 +745,7 @@ builder.mutationFields((t) => ({
         brandId,
         modelId,
         trim,
+        slug,
         yearOfManufacture,
         yearOfFirstRegistration,
         registered,
@@ -675,6 +759,8 @@ builder.mutationFields((t) => ({
         exteriorColor,
         upholstery,
         images,
+        viewingLocation,
+        vehicleOriginCountry,
         engineType,
         driveType,
         vinNo,
@@ -688,7 +774,6 @@ builder.mutationFields((t) => ({
         allowedPaymentModes,
         offerType,
         features,
-        views,
         extraInfo,
         reserved,
         sold,
@@ -710,6 +795,7 @@ builder.mutationFields((t) => ({
             ? { connect: { id: String(modelId) || undefined } }
             : undefined,
           trim: trim ? trim : undefined,
+          slug: slug ? slug : undefined,
           yearOfManufacture: yearOfManufacture ? yearOfManufacture : undefined,
           yearOfFirstRegistration: yearOfFirstRegistration
             ? yearOfFirstRegistration
@@ -725,6 +811,10 @@ builder.mutationFields((t) => ({
           exteriorColor: exteriorColor ? exteriorColor : undefined,
           upholstery: upholstery ? upholstery : undefined,
           images: images ? images : undefined,
+          viewingLocation: viewingLocation ? viewingLocation : undefined,
+          vehicleOriginCountry: vehicleOriginCountry
+            ? vehicleOriginCountry
+            : undefined,
           engineType: engineType ? engineType : undefined,
           driveType: driveType ? driveType : undefined,
           vinNo: vinNo ? vinNo : undefined,
@@ -740,10 +830,49 @@ builder.mutationFields((t) => ({
             : undefined,
           offerType: offerType ? offerType : undefined,
           features: features ? features : undefined,
-          views: views ? views : undefined,
           extraInfo: extraInfo ? extraInfo : undefined,
           reserved: reserved ? reserved : undefined,
           sold: sold ? sold : undefined,
+        },
+      });
+    },
+  }),
+  updateVehicleStatus: t.prismaField({
+    type: Vehicle,
+    args: {
+      id: t.arg.string({ required: true }),
+      status: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { status } = args;
+
+      return await prisma.vehicle.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          status: status ? status : undefined,
+        },
+      });
+    },
+  }),
+  updateVehicleSlug: t.prismaField({
+    type: Vehicle,
+    args: {
+      id: t.arg.string({ required: true }),
+      slug: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { slug } = args;
+
+      return await prisma.vehicle.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          slug: slug ? slug : undefined,
         },
       });
     },
@@ -808,6 +937,86 @@ builder.mutationFields((t) => ({
       });
     },
   }),
+  updateVehiclePublishedAt: t.prismaField({
+    type: Vehicle,
+    args: {
+      id: t.arg.string({ required: true }),
+      publishedAt: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { publishedAt } = args;
+
+      return await prisma.vehicle.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          publishedAt: publishedAt ? publishedAt : undefined,
+        },
+      });
+    },
+  }),
+  updateVehicleImpressions: t.prismaField({
+    type: Vehicle,
+    args: {
+      id: t.arg.string({ required: true }),
+      impressions: t.arg.int(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { impressions } = args;
+
+      return await prisma.vehicle.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          impressions: impressions ? impressions : undefined,
+        },
+      });
+    },
+  }),
+  updateVehicleDetailExpands: t.prismaField({
+    type: Vehicle,
+    args: {
+      id: t.arg.string({ required: true }),
+      detailExpands: t.arg.int(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { detailExpands } = args;
+
+      return await prisma.vehicle.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          detailExpands: detailExpands ? detailExpands : undefined,
+        },
+      });
+    },
+  }),
+  updateVehicleInterested: t.prismaField({
+    type: Vehicle,
+    args: {
+      id: t.arg.string({ required: true }),
+      interested: t.arg.int(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { interested } = args;
+
+      return await prisma.vehicle.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          interested: interested ? interested : undefined,
+        },
+      });
+    },
+  }),
   updateVehicleBasic: t.prismaField({
     type: Vehicle,
     args: {
@@ -816,6 +1025,7 @@ builder.mutationFields((t) => ({
       brandId: t.arg.string(),
       modelId: t.arg.string(),
       trim: t.arg.string(),
+      slug: t.arg.string(),
       yearOfManufacture: t.arg.string(),
       yearOfFirstRegistration: t.arg.string(),
       registered: t.arg.string(),
@@ -832,6 +1042,7 @@ builder.mutationFields((t) => ({
         brandId,
         modelId,
         trim,
+        slug,
         yearOfManufacture,
         yearOfFirstRegistration,
         registered,
@@ -859,6 +1070,7 @@ builder.mutationFields((t) => ({
             ? { connect: { id: String(modelId) || undefined } }
             : undefined,
           trim: trim ? trim : undefined,
+          slug: slug ? slug : undefined,
           yearOfManufacture: yearOfManufacture ? yearOfManufacture : undefined,
           yearOfFirstRegistration: yearOfFirstRegistration
             ? yearOfFirstRegistration
@@ -937,18 +1149,11 @@ builder.mutationFields((t) => ({
       allowedPaymentModes: t.arg.string(),
       offerType: t.arg.string(),
       features: t.arg.string(),
-      views: t.arg.int(),
       extraInfo: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const {
-        vinNo,
-        allowedPaymentModes,
-        offerType,
-        features,
-        views,
-        extraInfo,
-      } = args;
+      const { vinNo, allowedPaymentModes, offerType, features, extraInfo } =
+        args;
 
       return await prisma.vehicle.update({
         ...query,
@@ -962,7 +1167,6 @@ builder.mutationFields((t) => ({
             : undefined,
           offerType: offerType ? offerType : undefined,
           features: features ? features : undefined,
-          views: views ? views : undefined,
           extraInfo: extraInfo ? extraInfo : undefined,
         },
       });

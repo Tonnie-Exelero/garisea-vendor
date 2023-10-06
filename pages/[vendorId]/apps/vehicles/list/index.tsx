@@ -1,18 +1,26 @@
 // ** React Imports
-import { useState, useEffect, useCallback, useContext } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useContext,
+  SyntheticEvent,
+} from "react";
 
 // ** Next Imports
 import Link from "next/link";
 
 // ** MUI Imports
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Alert,
   AlertTitle,
   Box,
   Button,
   Card,
   CardContent,
-  CardHeader,
   CircularProgress,
   Dialog,
   DialogContent,
@@ -21,8 +29,11 @@ import {
   FormGroup,
   Grid,
   IconButton,
+  Tab,
   Typography,
 } from "@mui/material";
+import { TabPanel, TabContext } from "@mui/lab";
+import MuiTabList, { TabListProps } from "@mui/lab/TabList";
 import { styled } from "@mui/material/styles";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 
@@ -33,9 +44,11 @@ import Icon from "src/@core/components/icon";
 import { useDispatch, useSelector } from "react-redux";
 
 // ** Custom Components Imports
+import CustomChip from "src/@core/components/mui/chip";
 import CustomAvatar from "src/@core/components/mui/avatar";
 import CardStatisticsHorizontal from "src/@core/components/card-statistics/card-stats-horizontal";
 import PageHeader from "src/@core/components/page-header";
+import TabsWrapper from "src/@core/styles/mui/TabsWrapper";
 
 // ** Utils Import
 import { getInitials } from "src/@core/utils/get-initials";
@@ -58,6 +71,7 @@ import axios from "axios";
 
 // ** Types Imports
 import { RootState, AppDispatch } from "src/store";
+import { ThemeColor } from "src/@core/layouts/types";
 import { CardStatsType } from "src/@fake-db/types";
 import { VehicleRowType } from "src/types/apps/vehicleTypes";
 import { CardStatsHorizontalProps } from "src/@core/components/card-statistics/types";
@@ -74,9 +88,50 @@ import { removeFile } from "@core/utils/file-manager";
 
 const PAGE_SIZE = 20;
 
+interface VehicleStatusType {
+  [key: string]: ThemeColor;
+}
+
+const vehicleStatusObj: VehicleStatusType = {
+  active: "success",
+  pending: "warning",
+  declined: "error",
+};
+
 interface CellType {
   row: VehicleRowType;
 }
+
+// Styled TabList component
+const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
+  minHeight: 40,
+  marginBlock: theme.spacing(4),
+  "& .MuiTabs-indicator": {
+    display: "none",
+  },
+  "& .MuiTab-root": {
+    minHeight: 40,
+    marginInline: theme.spacing(4),
+    paddingTop: theme.spacing(2.5),
+    paddingBottom: theme.spacing(2.5),
+    borderRadius: theme.shape.borderRadius,
+    "&.active": {
+      color: theme.palette.common.white,
+      backgroundColor: theme.palette.primary.main,
+    },
+    "&.pending": {
+      color: theme.palette.common.white,
+      backgroundColor: theme.palette.warning.main,
+    },
+    "&.declined": {
+      color: theme.palette.common.white,
+      backgroundColor: theme.palette.error.main,
+    },
+    "&.Mui-selected": {
+      borderBlockEnd: `5px solid ${theme.palette.info.main}`,
+    },
+  },
+}));
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   fontWeight: 600,
@@ -185,8 +240,8 @@ const defaultColumns: GridColDef[] = [
     },
   },
   {
-    flex: 0.35,
-    minWidth: 320,
+    flex: 0.3,
+    minWidth: 300,
     headerName: "Specs",
     field: "specs",
     renderCell: ({ row }: CellType) => {
@@ -236,7 +291,7 @@ const defaultColumns: GridColDef[] = [
     },
   },
   {
-    flex: 0.2,
+    flex: 0.15,
     headerName: `Price (${currency})`,
     field: "price",
     minWidth: 160,
@@ -288,6 +343,44 @@ const defaultColumns: GridColDef[] = [
       );
     },
   },
+  {
+    flex: 0.1,
+    minWidth: 100,
+    headerName: "Status",
+    field: "status",
+    renderCell: ({ row }: CellType) => {
+      return (
+        <CustomChip
+          rounded
+          skin="light"
+          size="small"
+          label={row.node.status}
+          color={vehicleStatusObj[row.node.status]}
+        />
+      );
+    },
+  },
+];
+
+const vehiclesTabs = [
+  {
+    id: 1,
+    title: "Active",
+    status: "active",
+    color: "success",
+  },
+  {
+    id: 2,
+    title: "In Review",
+    status: "pending",
+    color: "warning",
+  },
+  {
+    id: 3,
+    title: "Declined",
+    status: "declined",
+    color: "error",
+  },
 ];
 
 interface Props {
@@ -314,7 +407,8 @@ const VehiclesList = (props: Partial<Props>) => {
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [vehiclesSearchParams, setVehiclesSearchParams] = useState<any>();
-  const [type, setType] = useState<string>("");
+  const [expanded, setExpanded] = useState<string | false>(false);
+  const [tabValue, setTabValue] = useState<string>("active");
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
@@ -325,14 +419,49 @@ const VehiclesList = (props: Partial<Props>) => {
     dispatch(fetchVendors({ first: 100 }));
   }, [dispatch, vendors]);
 
+  const handleAccordionChange =
+    (panel: string) => (event: SyntheticEvent, isExpanded: boolean) => {
+      setExpanded(isExpanded ? panel : false);
+    };
+
+  const handleTabChange = useCallback(
+    async (event: SyntheticEvent, newValue: string) => {
+      setIsLoading(true);
+      setTabValue(newValue);
+
+      const { data } = await apolloClient.query({
+        query: GET_FILTERED_VEHICLES,
+        variables: {
+          vendorId,
+          status: newValue,
+          ...(expanded !== false && { ...vehiclesSearchParams }),
+          first: 20,
+        },
+        fetchPolicy: "no-cache",
+      });
+
+      setPaginationModel({
+        page: 0,
+        pageSize: PAGE_SIZE,
+      });
+
+      const { vehiclesFiltered }: any = data;
+
+      setVVehicles(vehiclesFiltered);
+
+      setIsLoading(false);
+    },
+    [paginationModel, vVehicles, isLoading]
+  );
+
   const handleRefresh = useCallback(async () => {
     setIsLoading(true);
     const { data } = await apolloClient.query({
-      query:
-        type === "filter" ? GET_FILTERED_VEHICLES : GET_VEHICLES_BY_VENDOR_ID,
+      query: GET_FILTERED_VEHICLES,
       variables: {
         vendorId,
-        ...(type === "filter" ? { ...vehiclesSearchParams } : {}),
+        status: tabValue,
+        ...(expanded !== false && { ...vehiclesSearchParams }),
         first: PAGE_SIZE,
       },
       fetchPolicy: "no-cache",
@@ -343,30 +472,21 @@ const VehiclesList = (props: Partial<Props>) => {
       pageSize: PAGE_SIZE,
     });
 
-    setVVehicles(
-      type === "filter"
-        ? () => {
-            const { vehiclesFiltered }: any = data;
+    const { vehiclesFiltered }: any = data;
 
-            return vehiclesFiltered;
-          }
-        : () => {
-            const { vehiclesByVendorId }: any = data;
-
-            return vehiclesByVendorId;
-          }
-    );
+    setVVehicles(vehiclesFiltered);
 
     setIsLoading(false);
   }, [paginationModel, vVehicles, isLoading]);
 
   const handleVehiclesFilter = async (params: any) => {
-    setType("filter");
+    setIsLoading(true);
     setVehiclesSearchParams(params);
 
     const filteredVehicles = await dispatch(
       fetchFilteredVehicles({
         vendorId,
+        status: tabValue,
         ...params,
         first: paginationModel.pageSize,
       })
@@ -380,6 +500,8 @@ const VehiclesList = (props: Partial<Props>) => {
     const { vehiclesFiltered }: any = filteredVehicles.payload;
 
     setVVehicles(vehiclesFiltered);
+
+    setIsLoading(false);
   };
 
   const handlePaginationModelChange = useCallback(
@@ -391,66 +513,36 @@ const VehiclesList = (props: Partial<Props>) => {
       if (vVehicles.pageInfo.hasNextPage && page > paginationModel.page) {
         setPaginationModel(newPaginationModel);
         const newVehicles = await dispatch(
-          type === "filter"
-            ? fetchFilteredVehicles({
-                vendorId,
-                ...vehiclesSearchParams,
-                first: paginationModel.pageSize,
-                after: vVehicles.pageInfo.endCursor,
-              })
-            : fetchVehiclesByVendor({
-                vendorId,
-                first: paginationModel.pageSize,
-                after: vVehicles.pageInfo.endCursor,
-              })
+          fetchFilteredVehicles({
+            vendorId,
+            status: tabValue,
+            ...(expanded !== false && { ...vehiclesSearchParams }),
+            first: paginationModel.pageSize,
+            after: vVehicles.pageInfo.endCursor,
+          })
         );
 
-        setVVehicles(
-          type === "filter"
-            ? () => {
-                const { vehiclesFiltered }: any = newVehicles.payload;
+        const { vehiclesFiltered }: any = newVehicles.payload;
 
-                return vehiclesFiltered;
-              }
-            : () => {
-                const { vehiclesByVendorId }: any = newVehicles.payload;
-
-                return vehiclesByVendorId;
-              }
-        );
+        setVVehicles(vehiclesFiltered);
       }
 
       if (vVehicles.pageInfo.hasPreviousPage && page < paginationModel.page) {
         setPaginationModel(newPaginationModel);
 
         const newVehicles = await dispatch(
-          type === "filter"
-            ? fetchFilteredVehicles({
-                vendorId,
-                ...vehiclesSearchParams,
-                last: paginationModel.pageSize,
-                before: vVehicles.pageInfo.startCursor,
-              })
-            : fetchVehiclesByVendor({
-                vendorId,
-                last: paginationModel.pageSize,
-                before: vVehicles.pageInfo.startCursor,
-              })
+          fetchFilteredVehicles({
+            vendorId,
+            status: tabValue,
+            ...(expanded !== false && { ...vehiclesSearchParams }),
+            last: paginationModel.pageSize,
+            before: vVehicles.pageInfo.startCursor,
+          })
         );
 
-        setVVehicles(
-          type === "filter"
-            ? () => {
-                const { vehiclesFiltered }: any = newVehicles.payload;
+        const { vehiclesFiltered }: any = newVehicles.payload;
 
-                return vehiclesFiltered;
-              }
-            : () => {
-                const { vehiclesByVendorId }: any = newVehicles.payload;
-
-                return vehiclesByVendorId;
-              }
-        );
+        setVVehicles(vehiclesFiltered);
       }
 
       setIsLoading(false);
@@ -542,51 +634,93 @@ const VehiclesList = (props: Partial<Props>) => {
         </Grid>
         <Grid item xs={12}>
           <Card>
-            <CardHeader title="Search Filters" />
             <CardContent>
-              <VehicleSearch handleVehiclesFilter={handleVehiclesFilter} />
+              <Accordion
+                expanded={expanded === "panel1"}
+                onChange={handleAccordionChange("panel1")}
+              >
+                <AccordionSummary
+                  id="panel-header-1"
+                  aria-controls="panel-content-1"
+                  expandIcon={<Icon icon="bx:chevron-down" />}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Icon
+                    icon="bx:search"
+                    fontSize={30}
+                    style={{ display: "flex", alignItems: "center" }}
+                  />
+                  <Typography sx={{ ml: 2, fontSize: 20 }}>
+                    Search Filters
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <VehicleSearch handleVehiclesFilter={handleVehiclesFilter} />
+                </AccordionDetails>
+              </Accordion>
             </CardContent>
             <Divider sx={{ m: "0 !important" }} />
-            <TableHeader handleRefresh={handleRefresh} />
-
-            {vVehicles &&
-            vVehicles.edges &&
-            vVehicles.edges.length &&
-            vVehicles.edges[0]?.cursor === "" ? (
-              <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <CircularProgress sx={{ mt: 6, mb: 6 }} />
-              </Box>
-            ) : (
-              <>
-                {vVehicles && vVehicles.edges && vVehicles.edges.length > 0 ? (
-                  <DataGrid
-                    autoHeight
-                    rows={vVehicles.edges}
-                    columns={columns}
-                    getRowId={(vehicle) => vehicle.cursor}
-                    rowCount={rowCountState}
-                    paginationMode="server"
-                    disableRowSelectionOnClick
-                    pageSizeOptions={[PAGE_SIZE]}
-                    paginationModel={paginationModel}
-                    onPaginationModelChange={handlePaginationModelChange}
-                    loading={isLoading}
-                  />
-                ) : (
-                  <Box sx={{ margin: "2rem" }}>
-                    <Typography
-                      sx={{
-                        color: "text.secondary",
-                        fontStyle: "italic",
-                        textAlign: "center",
-                      }}
-                    >
-                      There are no vehicles matching criteria.
-                    </Typography>
-                  </Box>
-                )}
-              </>
-            )}
+            <TabsWrapper panelTopRound="both">
+              <TabContext value={tabValue}>
+                <TabList onChange={handleTabChange} aria-label="vehicles-tabs">
+                  {vehiclesTabs.map((tab, index) => (
+                    <Tab
+                      value={tab.status}
+                      label={tab.title}
+                      className={tab.status}
+                      key={index}
+                    />
+                  ))}
+                </TabList>
+                {vehiclesTabs.map((tab, index) => (
+                  <TabPanel value={tab.status} key={index} sx={{ padding: 0 }}>
+                    <TableHeader handleRefresh={handleRefresh} />
+                    {vVehicles &&
+                    vVehicles.edges &&
+                    vVehicles.edges.length &&
+                    vVehicles.edges[0]?.cursor === "" ? (
+                      <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        <CircularProgress sx={{ mt: 6, mb: 6 }} />
+                      </Box>
+                    ) : (
+                      <>
+                        {vVehicles &&
+                        vVehicles.edges &&
+                        vVehicles.edges.length > 0 ? (
+                          <DataGrid
+                            autoHeight
+                            rows={vVehicles.edges}
+                            columns={columns}
+                            getRowId={(vehicle) => vehicle.cursor}
+                            rowCount={rowCountState}
+                            paginationMode="server"
+                            disableRowSelectionOnClick
+                            pageSizeOptions={[PAGE_SIZE]}
+                            paginationModel={paginationModel}
+                            onPaginationModelChange={
+                              handlePaginationModelChange
+                            }
+                            loading={isLoading}
+                          />
+                        ) : (
+                          <Box sx={{ margin: "2rem" }}>
+                            <Typography
+                              sx={{
+                                color: "text.secondary",
+                                fontStyle: "italic",
+                                textAlign: "center",
+                              }}
+                            >
+                              There are no vehicles matching criteria.
+                            </Typography>
+                          </Box>
+                        )}
+                      </>
+                    )}
+                  </TabPanel>
+                ))}
+              </TabContext>
+            </TabsWrapper>
           </Card>
         </Grid>
       </Grid>
@@ -665,11 +799,13 @@ export const getServerSideProps: any = async ({ params }: any) => {
   const { vendorId } = params;
 
   const { data, loading, error } = await apolloClient.query({
-    query: GET_VEHICLES_BY_VENDOR_ID,
+    query: GET_FILTERED_VEHICLES,
     variables: {
       vendorId,
+      status: "active",
       first: PAGE_SIZE,
     },
+    fetchPolicy: "no-cache",
   });
 
   if (loading) {

@@ -27,6 +27,9 @@ import {
   Typography,
 } from "@mui/material";
 
+// ** Icon Imports
+import Icon from "src/@core/components/icon";
+
 // ** Type Imports
 import {
   CustomRadioIconsData,
@@ -36,9 +39,6 @@ import {
 // ** Custom Components Imports
 import CustomRadioIcons from "@components/custom-radio/icons";
 import CustomChip from "@components/mui/chip";
-
-// ** Icon Imports
-import Icon from "src/@core/components/icon";
 
 // ** API
 import apolloClient from "@src/lib/apollo";
@@ -52,6 +52,7 @@ import { addModel } from "@src/store/apps/admin/model/single";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@src/store";
 import { country, metrics } from "../../config";
+import { countries } from "@src/configs/countries";
 import toast from "react-hot-toast";
 
 interface IconType {
@@ -114,6 +115,8 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
   const [registrationNo, setRegistrationNo] = useState<string>("");
   const [mileage, setMileage] = useState<number>();
   const [mileageMetric, setMileageMetric] = useState<string>("");
+  const [viewingLocation, setViewingLocation] = useState<string>("");
+  const [vehicleOriginCountry, setVehicleOriginCountry] = useState<string>("");
   const [newItem, setNewItem] = useState<string>("");
   const [itemType, setItemType] = useState<string>("");
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -177,6 +180,8 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
     registrationNo,
     mileage,
     mileageMetric,
+    viewingLocation,
+    vehicleOriginCountry,
   };
 
   const handleRefreshBrands = useCallback(async () => {
@@ -232,6 +237,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
       } = event;
       setBrandId(value);
 
+      // Fetch Models by Brand ID
       const { data } = await apolloClient.query({
         query: GET_MODELS_BY_BRAND_ID,
         variables: { brandId: value, first: 100 },
@@ -389,7 +395,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
           </FormControl>
         </Grid>
         <Grid item xs={12} md={6}>
-          <FormControl fullWidth sx={{ mb: 4 }}>
+          <FormControl fullWidth sx={{ mb: 0 }}>
             <InputLabel htmlFor="model-select">Model</InputLabel>
             <Select
               fullWidth
@@ -526,6 +532,43 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
             }}
             sx={{ mb: 4 }}
           />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <TextField
+            fullWidth
+            id="viewing-location"
+            aria-label="viewing-location"
+            label="Viewing Location"
+            type="text"
+            value={viewingLocation}
+            onChange={(e) => setViewingLocation(e.target.value)}
+            placeholder="e.g. Galleria Mall, Langata Rd, Nairobi"
+            sx={{ mb: 4 }}
+          />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <InputLabel id="origin-country">Country of Origin</InputLabel>
+            <Select
+              fullWidth
+              value={vehicleOriginCountry}
+              id="origin-country"
+              label="Country of Origin"
+              labelId="origin-country"
+              onChange={(e) => setVehicleOriginCountry(e.target.value)}
+              inputProps={{ placeholder: "e.g. Japan" }}
+            >
+              {countries.map((country, index) => {
+                const { name } = country;
+
+                return (
+                  <MenuItem key={index} value={name}>
+                    {name}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
         </Grid>
         <Grid item xs={12} md={6}>
           <FormControl sx={{ mb: 4 }}>

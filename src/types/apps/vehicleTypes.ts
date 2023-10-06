@@ -9,6 +9,7 @@ export type VehicleNode = {
   brand: Partial<BrandNode>;
   model: Partial<ModelNode>;
   trim: string;
+  slug: string;
   yearOfManufacture: string;
   yearOfFirstRegistration: string;
   registered: string;
@@ -22,6 +23,9 @@ export type VehicleNode = {
   exteriorColor: string;
   upholstery: string;
   images: string;
+  status: string;
+  viewingLocation: string;
+  vehicleOriginCountry: string;
   engineType: string;
   driveType: string;
   vinNo: string;
@@ -39,6 +43,10 @@ export type VehicleNode = {
   extraInfo: string;
   reserved: string;
   sold: string;
+  publishedAt: string;
+  impressions: number;
+  detailExpands: number;
+  interested: number;
 };
 
 export type VehicleRowType = {
