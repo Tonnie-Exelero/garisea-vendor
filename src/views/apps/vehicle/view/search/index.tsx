@@ -29,6 +29,7 @@ import { fetchModelsByBrand } from "@src/store/apps/admin/model";
 
 // ** Others
 import { currency, vehicleBodyTypes } from "../../config";
+import { countries } from "@src/configs/countries";
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: "none",
@@ -54,6 +55,8 @@ const VehicleSearch = (props: Props) => {
   ]);
   const [mileage, setMileage] = useState<number[]>([0, 1000000]);
   const [engineType, setEngineType] = useState<string>("");
+  const [viewingLocation, setViewingLocation] = useState<string>("");
+  const [vehicleOriginCountry, setVehicleOriginCountry] = useState<string>("");
   const [engineCapacity, setEngineCapacity] = useState<number[]>([50, 20000]);
   const [fuelType, setFuelType] = useState<string>("");
   const [transmissionType, setTransmissionType] = useState<string>("");
@@ -80,6 +83,8 @@ const VehicleSearch = (props: Props) => {
     setYearRange([1950, new Date().getFullYear() + 2]);
     setMileage([0, 1000000]);
     setEngineType("");
+    setViewingLocation("");
+    setVehicleOriginCountry("");
     setEngineCapacity([50, 20000]);
     setFuelType("");
     setTransmissionType("");
@@ -115,6 +120,8 @@ const VehicleSearch = (props: Props) => {
       ...(exteriorColor && { exteriorColor }),
       ...(upholstery && { upholstery }),
       ...(engineType && { engineType }),
+      ...(viewingLocation && { viewingLocation }),
+      ...(vehicleOriginCountry && { vehicleOriginCountry }),
       ...(driveType && { driveType }),
       ...(bodyType && { bodyType }),
       ...(interiorColor && { interiorColor }),
@@ -382,6 +389,44 @@ const VehicleSearch = (props: Props) => {
             <MenuItem value="LHD">LHD</MenuItem>
           </Select>
         </FormControl>
+      </Grid>
+      <Grid item md={2} sm={3} xs={12}>
+        <FormControl fullWidth sx={{ mb: 4 }} size="small">
+          <InputLabel id="origin-country">Country of Origin</InputLabel>
+          <Select
+            fullWidth
+            value={vehicleOriginCountry}
+            id="origin-country"
+            label="Country of Origin"
+            labelId="origin-country"
+            onChange={(e) => setVehicleOriginCountry(e.target.value)}
+            inputProps={{ placeholder: "e.g. Japan" }}
+          >
+            {countries.map((country, index) => {
+              const { name } = country;
+
+              return (
+                <MenuItem key={index} value={name}>
+                  {name}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid item md={2} sm={3} xs={12}>
+        <TextField
+          fullWidth
+          id="viewing-location"
+          aria-label="viewing-location"
+          label="Viewing Location"
+          type="text"
+          size="small"
+          value={viewingLocation}
+          onChange={(e) => setViewingLocation(e.target.value)}
+          placeholder="e.g. Galleria Mall, Langata Rd, Nairobi"
+          sx={{ mb: 4 }}
+        />
       </Grid>
       <Grid item md={2} sm={3} xs={12}>
         <TextField
