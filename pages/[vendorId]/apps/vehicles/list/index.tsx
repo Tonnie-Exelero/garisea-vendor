@@ -407,7 +407,6 @@ const VehiclesList = (props: Partial<Props>) => {
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [vehiclesSearchParams, setVehiclesSearchParams] = useState<any>();
-  const [type, setType] = useState<string>("");
   const [expanded, setExpanded] = useState<string | false>(false);
   const [tabValue, setTabValue] = useState<string>("active");
 
@@ -806,6 +805,7 @@ export const getServerSideProps: any = async ({ params }: any) => {
       status: "active",
       first: PAGE_SIZE,
     },
+    fetchPolicy: "no-cache",
   });
 
   if (loading) {
