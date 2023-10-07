@@ -26,12 +26,12 @@ const events = [
 
 export const idleTimer = () => {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { softLogout } = useAuth();
 
   let timeout: NodeJS.Timeout | null = null;
 
   const goBackToLogin = () => {
-    logout();
+    softLogout();
   };
 
   const restartAutoReset = () => {

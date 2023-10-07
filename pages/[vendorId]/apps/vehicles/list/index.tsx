@@ -394,8 +394,6 @@ const VehiclesList = (props: Partial<Props>) => {
 
   const { vendorId, vehicles } = props;
 
-  console.log(props);
-
   // ** State
   const [vVehicles, setVVehicles] = useState<any>(vehicles);
   const [id, setId] = useState<string>("");
@@ -818,12 +816,12 @@ export const getServerSideProps: any = async ({ params }: any) => {
     return undefined;
   }
 
-  const { vehiclesByVendorId }: any = data;
+  const { vehiclesFiltered }: any = data;
 
   return {
     props: {
       vendorId,
-      vehicles: { ...vehiclesByVendorId },
+      vehicles: { ...vehiclesFiltered },
     },
   };
 };
