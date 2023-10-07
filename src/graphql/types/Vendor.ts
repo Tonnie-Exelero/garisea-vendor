@@ -149,13 +149,26 @@ builder.queryFields((t) => ({
     args: {
       storeLink: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _info) =>
-      prisma.vendor.findUniqueOrThrow({
+    resolve: async (query, _parent, args, _info): Promise<any | undefined> => {
+      const vendor = await prisma.vendor.findUnique({
         ...query,
         where: {
           storeLink: args.storeLink,
         },
-      }),
+      });
+
+      if (!vendor) {
+        return {
+          storeLink: null,
+        };
+      }
+
+      if (vendor) {
+        return {
+          storeLink: vendor.storeLink,
+        };
+      }
+    },
   }),
 }));
 

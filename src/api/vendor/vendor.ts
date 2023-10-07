@@ -218,6 +218,14 @@ export const GET_VENDOR_BY_EMAIL = gql`
   }
 `;
 
+export const GET_VENDOR_STORE_LINK = gql`
+  query GetVendorStoreLink($storeLink: String!) {
+    vendorStoreLink(storeLink: $storeLink) {
+      storeLink
+    }
+  }
+`;
+
 export const CREATE_VENDOR = gql`
   mutation CreateVendor(
     $firstName: String

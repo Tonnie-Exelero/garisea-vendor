@@ -9,10 +9,14 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
 import InputAdornment from "@mui/material/InputAdornment";
-import { Tooltip } from "@mui/material";
+import { CircularProgress, Tooltip } from "@mui/material";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
+
+// ** API
+import apolloClient from "@src/lib/apollo";
+import { GET_VENDOR_STORE_LINK } from "@src/api/vendor/vendor";
 
 interface Props {
   handleNext: () => void;
@@ -31,17 +35,46 @@ const StepAccountDetails = (props: Props) => {
   const [storeLink, setStoreLink] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [city, setCity] = useState<string>("");
+  const [verifying, setVerifying] = useState<string>("");
+  const [allowedStoreLink, setAllowedStoreLink] = useState<string>("");
 
   const personalInfo = {
     firstName,
     lastName,
     username,
     email,
-    phone: "+254" + phone,
-    storeLink,
+    phone: `+254${phone}`,
+    storeLink: storeLink.toLowerCase(),
     address,
     city,
     country: "Kenya",
+  };
+
+  // Handle verify store link
+  const handleStoreLink = async (value: string) => {
+    setVerifying("ongoing");
+
+    const { data } = await apolloClient.query({
+      query: GET_VENDOR_STORE_LINK,
+      variables: {
+        storeLink: value.toLowerCase(),
+      },
+      fetchPolicy: "no-cache",
+    });
+
+    const {
+      vendorStoreLink: { storeLink },
+    }: any = data;
+
+    if (storeLink === null) {
+      setAllowedStoreLink("yes");
+    }
+
+    if (storeLink === value) {
+      setAllowedStoreLink("no");
+    }
+
+    setVerifying("complete");
   };
 
   return (
@@ -153,6 +186,7 @@ const StepAccountDetails = (props: Props) => {
               aria-label="storeLink"
               value={storeLink}
               onChange={(e) => setStoreLink(e.target.value)}
+              onBlur={(e) => handleStoreLink(e.target.value)}
               type="text"
               sx={{ mb: 4 }}
               label="Unique Garisea Link"
@@ -169,11 +203,33 @@ const StepAccountDetails = (props: Props) => {
                     placement="top"
                     sx={{ cursor: "pointer" }}
                   >
-                    <InputAdornment position="end">
-                      <Icon
-                        icon="material-symbols:error"
-                        fontSize={20}
-                      />
+                    <InputAdornment
+                      position="end"
+                      sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+                    >
+                      {verifying === "ongoing" && (
+                        <CircularProgress size={15} />
+                      )}
+                      {verifying === "complete" && (
+                        <>
+                          {allowedStoreLink === "yes" ? (
+                            <Icon
+                              icon="material-symbols:done"
+                              fontSize={25}
+                              style={{ color: "#67C932" }}
+                            />
+                          ) : (
+                            allowedStoreLink === "no" && (
+                              <Icon
+                                icon="material-symbols:close"
+                                fontSize={25}
+                                style={{ color: "red" }}
+                              />
+                            )
+                          )}
+                        </>
+                      )}
+                      <Icon icon="material-symbols:error" fontSize={20} />
                     </InputAdornment>
                   </Tooltip>
                 ),
@@ -236,6 +292,7 @@ const StepAccountDetails = (props: Props) => {
                 username === "" ||
                 email === "" ||
                 phone === "" ||
+                allowedStoreLink === "no" ||
                 storeLink === "" ||
                 address === "" ||
                 city === ""
