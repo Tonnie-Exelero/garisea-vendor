@@ -24,6 +24,7 @@ export const Vendor = builder.prismaObject("Vendor", {
     country: t.exposeString("country", { nullable: true }),
     emailVerified: t.exposeString("emailVerified", { nullable: true }),
     addedOrganization: t.exposeString("addedOrganization", { nullable: true }),
+    identification: t.exposeString("identification", { nullable: true }),
     organization: t.relation("organization", { nullable: true }),
   }),
 });
@@ -212,7 +213,6 @@ builder.mutationFields((t) => ({
           new URL(process.env.NEXT_PUBLIC_BASE_URL);
 
         // Set the auth cookie on the response
-
         await ctx.request.cookieStore.set({
           name: "auth",
           sameSite: "strict",
@@ -439,6 +439,26 @@ builder.mutationFields((t) => ({
         },
         data: {
           status: status ? status : undefined,
+        },
+      });
+    },
+  }),
+  updateVendorIdentification: t.prismaField({
+    type: "Vendor",
+    args: {
+      id: t.arg.string({ required: true }),
+      identification: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { identification } = args;
+
+      return await prisma.vendor.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          identification: identification ? identification : undefined,
         },
       });
     },

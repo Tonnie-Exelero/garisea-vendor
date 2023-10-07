@@ -10,6 +10,7 @@ import {
   UPDATE_ORGANIZATION,
   UPDATE_LOGO,
   UPDATE_CERTIFICATE,
+  UPDATE_KRA_PIN,
   DELETE_ORGANIZATION,
 } from "@api/vendor/organization";
 
@@ -20,6 +21,7 @@ import { Organization } from "../types";
 const organizationInitialState = {
   id: "",
   name: "",
+  nicename: "",
   email: "",
   phone: "",
   address: "",
@@ -28,6 +30,7 @@ const organizationInitialState = {
   country: "",
   logo: "",
   certificate: "",
+  kraPin: "",
 };
 
 // ** Fetch Organization By ID
@@ -163,6 +166,28 @@ export const editCertificate = createAsyncThunk<Organization, any, {}>(
   }
 );
 
+// ** Update KRA Pin
+export const editKRAPin = createAsyncThunk<Organization, any, {}>(
+  "appOrganization/editKRAPin",
+  async (organizationData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_KRA_PIN,
+        variables: { ...organizationData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // ** Delete Organization
 export const removeOrganization = createAsyncThunk<Organization, any, {}>(
   "appOrganization/removeOrganization",
@@ -245,20 +270,20 @@ export const appOrganizationSlice = createSlice({
         state.organization = { ...updateOrganization };
       })
       .addCase(editLogo.fulfilled, (state, { payload }) => {
-        // Reset organization state.
-        state.organization = { ...organizationInitialState };
-
         const { updateOrganizationLogo }: any = payload;
 
-        state.organization = { ...updateOrganizationLogo };
+        state.organization.logo = updateOrganizationLogo.logo;
       })
       .addCase(editCertificate.fulfilled, (state, { payload }) => {
-        // Reset organization state.
-        state.organization = { ...organizationInitialState };
-
         const { updateOrganizationCertificate }: any = payload;
 
-        state.organization = { ...updateOrganizationCertificate };
+        state.organization.certificate =
+          updateOrganizationCertificate.certificate;
+      })
+      .addCase(editKRAPin.fulfilled, (state, { payload }) => {
+        const { updateOrganizationKRAPin }: any = payload;
+
+        state.organization.kraPin = updateOrganizationKRAPin.kraPin;
       })
       .addCase(removeOrganization.fulfilled, (state, { payload }) => {
         const { deleteOrganization }: any = payload;

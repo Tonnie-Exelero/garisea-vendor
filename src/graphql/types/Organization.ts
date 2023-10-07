@@ -5,10 +5,12 @@ export const Organization = builder.prismaObject("Organization", {
   fields: (t) => ({
     id: t.exposeID("id"),
     name: t.exposeString("name", { nullable: false }),
+    nicename: t.exposeString("nicename", { nullable: true }),
     email: t.exposeString("email", { nullable: true }),
     phone: t.exposeString("phone", { nullable: true }),
     logo: t.exposeString("logo", { nullable: true }),
     certificate: t.exposeString("certificate", { nullable: true }),
+    kraPin: t.exposeString("kraPin", { nullable: true }),
     address: t.exposeString("address", { nullable: true }),
     address2: t.exposeString("address2", { nullable: true }),
     city: t.exposeString("city", { nullable: true }),
@@ -42,6 +44,7 @@ builder.queryFields((t) => ({
         OR: [
           { id: { contains: args.filter } },
           { name: { contains: args.filter } },
+          { nicename: { contains: args.filter } },
           { email: { contains: args.filter } },
           { phone: { contains: args.filter } },
           { city: { contains: args.filter } },
@@ -62,6 +65,7 @@ builder.queryFields((t) => ({
         OR: [
           { id: { contains: args.filter } },
           { name: { contains: args.filter } },
+          { nicename: { contains: args.filter } },
           { email: { contains: args.filter } },
           { phone: { contains: args.filter } },
           { city: { contains: args.filter } },
@@ -113,21 +117,9 @@ builder.mutationFields((t) => ({
       address2: t.arg.string(),
       city: t.arg.string(),
       country: t.arg.string(),
-      logo: t.arg.string(),
-      certificate: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const {
-        name,
-        email,
-        phone,
-        address,
-        address2,
-        city,
-        country,
-        logo,
-        certificate,
-      } = args;
+      const { name, email, phone, address, address2, city, country } = args;
 
       return await prisma.organization.create({
         ...query,
@@ -139,8 +131,6 @@ builder.mutationFields((t) => ({
           address2,
           city,
           country,
-          logo,
-          certificate,
         },
       });
     },
@@ -150,27 +140,17 @@ builder.mutationFields((t) => ({
     args: {
       id: t.arg.string({ required: true }),
       name: t.arg.string(),
+      nicename: t.arg.string(),
       email: t.arg.string(),
       phone: t.arg.string(),
       address: t.arg.string(),
       address2: t.arg.string(),
       city: t.arg.string(),
       country: t.arg.string(),
-      logo: t.arg.string(),
-      certificate: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const {
-        name,
-        email,
-        phone,
-        address,
-        address2,
-        city,
-        country,
-        logo,
-        certificate,
-      } = args;
+      const { name, nicename, email, phone, address, address2, city, country } =
+        args;
 
       return await prisma.organization.update({
         ...query,
@@ -179,14 +159,13 @@ builder.mutationFields((t) => ({
         },
         data: {
           name: name ? name : undefined,
+          nicename: nicename ? nicename : undefined,
           email: email ? email : undefined,
           phone: phone ? phone : undefined,
           address: address ? address : undefined,
           address2: address2 ? address2 : undefined,
           city: city ? city : undefined,
           country: country ? country : undefined,
-          logo: logo ? logo : undefined,
-          certificate: certificate ? certificate : undefined,
         },
       });
     },
@@ -227,6 +206,26 @@ builder.mutationFields((t) => ({
         },
         data: {
           certificate: certificate ? certificate : undefined,
+        },
+      });
+    },
+  }),
+  updateOrganizationKRAPin: t.prismaField({
+    type: "Organization",
+    args: {
+      id: t.arg.string({ required: true }),
+      kraPin: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { kraPin } = args;
+
+      return await prisma.organization.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          kraPin: kraPin ? kraPin : undefined,
         },
       });
     },
