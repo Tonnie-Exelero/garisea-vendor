@@ -1,5 +1,11 @@
 // ** React Imports
-import { ChangeEvent, ElementType, useContext, useState } from "react";
+import {
+  ChangeEvent,
+  ElementType,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
@@ -113,6 +119,8 @@ const OrganizationInfo = ({ vendor }: Props) => {
     city: oCity,
     country: oCountry,
   };
+
+  useEffect(() => {}, [vendor.organization]);
 
   // Handle Edit dialog
   const handleEditDialogToggle = () => setOpenEdit(!openEdit);
