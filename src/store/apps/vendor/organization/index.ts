@@ -19,6 +19,7 @@ const organizationsInitialState = {
       node: {
         id: "",
         name: "",
+        nicename: "",
         email: "",
         phone: "",
         address: "",
@@ -27,6 +28,7 @@ const organizationsInitialState = {
         country: "",
         logo: "",
         certificate: "",
+        kraPin: "",
       },
     },
   ],
