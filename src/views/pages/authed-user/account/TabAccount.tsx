@@ -39,9 +39,10 @@ import CustomAvatar from "@components/mui/avatar";
 
 // ** Others
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@src/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@src/store";
 import { editVendor, editImage, removeVendor } from "@src/store/apps/auth";
+import { fetchVehiclesByVendor } from "@src/store/apps/vendor/vehicle";
 import { ThemeColor } from "@core/layouts/types";
 import { getInitials } from "@utils/get-initials";
 import { removeFile, uploadFile } from "@core/utils/file-manager";
@@ -98,6 +99,7 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
     formState: { errors },
   } = useForm({ defaultValues: { checkbox: false } });
   const dispatch = useDispatch<AppDispatch>();
+  const { vehicles } = useSelector((state: RootState) => state.vehicles);
   const { logout } = useAuth();
 
   const setUpdateUserData = () => {
@@ -119,7 +121,13 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
 
   useEffect(() => {
     setUpdateUserData();
-  }, [user]);
+    dispatch(
+      fetchVehiclesByVendor({
+        vendorId: user.id,
+        first: 2,
+      })
+    );
+  }, [dispatch, vehicles, user]);
 
   const handleClose = () => setOpen(false);
 
@@ -460,8 +468,54 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
         <Card>
           <CardHeader title="Delete Account" />
           <CardContent>
+            <Typography sx={{ mb: 2 }}>
+              Before deleting account, you will need to remove all your vehicle
+              listings.
+            </Typography>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <Box sx={{ mb: 2 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", mb: 2 }}>
+                <FormControl>
+                  <Controller
+                    name="checkbox"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        label="I have removed all my vehicle listings"
+                        sx={{
+                          "& .MuiTypography-root": {
+                            color: errors.checkbox
+                              ? "error.main"
+                              : "text.secondary",
+                          },
+                        }}
+                        control={
+                          <Checkbox
+                            {...field}
+                            size="small"
+                            name="validation-listings-checkbox"
+                            sx={
+                              errors.checkbox ? { color: "error.main" } : null
+                            }
+                          />
+                        }
+                      />
+                    )}
+                  />
+                  {errors.checkbox && (
+                    <FormHelperText
+                      sx={{ color: "error.main" }}
+                      id="validation-listings-checkbox"
+                    >
+                      Please confirm you have removed all vehicle listings
+                    </FormHelperText>
+                  )}
+                  {vehicles.totalCount !== 0 && (
+                    <FormHelperText sx={{ color: "error.main" }}>
+                      Please remove all vehicle listings to proceed
+                    </FormHelperText>
+                  )}
+                </FormControl>
                 <FormControl>
                   <Controller
                     name="checkbox"
@@ -504,7 +558,9 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
                 variant="contained"
                 color="error"
                 type="submit"
-                disabled={errors.checkbox !== undefined}
+                disabled={
+                  errors.checkbox !== undefined || vehicles.totalCount !== 0
+                }
               >
                 Deactivate Account
               </Button>
