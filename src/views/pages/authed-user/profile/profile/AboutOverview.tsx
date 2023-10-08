@@ -61,7 +61,16 @@ interface AboutOverviewProps {
   user: any;
 }
 const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
-  const { id, username, email, phone, language, status, identification } = user;
+  const {
+    id,
+    username,
+    email,
+    phone,
+    language,
+    status,
+    storeLink,
+    identification,
+  } = user;
 
   // ** State
   const [vIdentification, setVIdentification] =
@@ -130,6 +139,16 @@ const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
                 </Typography>
                 <Typography sx={{ color: "text.secondary" }}>
                   {email}
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", mb: 4 }}>
+                <Typography
+                  sx={{ mr: 2, fontWeight: 700, color: "text.secondary" }}
+                >
+                  Store Link:
+                </Typography>
+                <Typography sx={{ color: "text.secondary" }}>
+                  {storeLink}
                 </Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
