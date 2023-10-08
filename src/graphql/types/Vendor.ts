@@ -144,6 +144,33 @@ builder.queryFields((t) => ({
         },
       }),
   }),
+  vendorCheckEmail: t.prismaField({
+    type: Vendor,
+    nullable: true,
+    args: {
+      email: t.arg.string({ required: true }),
+    },
+    resolve: async (query, _parent, args, _info): Promise<any | undefined> => {
+      const vendor = await prisma.vendor.findUnique({
+        ...query,
+        where: {
+          email: args.email,
+        },
+      });
+
+      if (!vendor) {
+        return {
+          email: 'no-email',
+        };
+      }
+
+      if (vendor) {
+        return {
+          email: vendor.email,
+        };
+      }
+    },
+  }),
   vendorStoreLink: t.prismaField({
     type: Vendor,
     nullable: true,

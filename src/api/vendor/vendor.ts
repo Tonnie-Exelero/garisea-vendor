@@ -233,6 +233,14 @@ export const GET_VENDOR_BY_EMAIL = gql`
   }
 `;
 
+export const GET_VENDOR_EMAIL = gql`
+  query GetVendorEmail($email: String!) {
+    vendorCheckEmail(email: $email) {
+      email
+    }
+  }
+`;
+
 export const GET_VENDOR_STORE_LINK = gql`
   query GetVendorStoreLink($storeLink: String!) {
     vendorStoreLink(storeLink: $storeLink) {
