@@ -12,10 +12,19 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import InputAdornment from "@mui/material/InputAdornment";
 import { styled } from "@mui/material/styles";
-import { Checkbox, FormControlLabel } from "@mui/material";
+import {
+  Checkbox,
+  CircularProgress,
+  FormControlLabel,
+  FormHelperText,
+} from "@mui/material";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
+
+// ** API
+import apolloClient from "@src/lib/apollo";
+import { GET_ORGANIZATION_NAME } from "@src/api/vendor/organization";
 
 // ** Styled Components
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -40,6 +49,8 @@ const StepOrganizationInfo = (props: Props) => {
   const [address2, setAddress2] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const [termsChecked, setTermsChecked] = useState<boolean>(false);
+  const [nameVerifying, setNameVerifying] = useState<string>("");
+  const [allowedName, setAllowedName] = useState<string>("");
 
   const organizationData = {
     name,
@@ -49,6 +60,38 @@ const StepOrganizationInfo = (props: Props) => {
     address2,
     city,
     country: "Kenya",
+  };
+
+  // Handle verify name
+  const handleNameVerify = async (value: string) => {
+    if (value.length > 5) {
+      setNameVerifying("ongoing");
+
+      const { data } = await apolloClient.query({
+        query: GET_ORGANIZATION_NAME,
+        variables: {
+          name: value,
+        },
+        fetchPolicy: "no-cache",
+      });
+
+      const {
+        organizationCheckName: { name },
+      }: any = data;
+
+      if (name === "no-name") {
+        setAllowedName("yes");
+      }
+
+      if (name === value) {
+        setAllowedName("no");
+      }
+
+      setNameVerifying("complete");
+    } else {
+      setAllowedName("");
+      setNameVerifying("");
+    }
   };
 
   return (
@@ -69,12 +112,50 @@ const StepOrganizationInfo = (props: Props) => {
             aria-label="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onBlur={(e) => handleNameVerify(e.target.value)}
             type="text"
-            sx={{ mb: 4 }}
+            sx={{ mb: allowedName === "no" ? 0 : 4 }}
             label="Organization Name"
             placeholder="Garisea Cars Ltd"
+            inputProps={{ minLength: 5 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment
+                  position="end"
+                  sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+                >
+                  {nameVerifying === "ongoing" && (
+                    <CircularProgress size={15} />
+                  )}
+                  {nameVerifying === "complete" && (
+                    <>
+                      {allowedName === "yes" ? (
+                        <Icon
+                          icon="material-symbols:done"
+                          fontSize={25}
+                          style={{ color: "#67C932" }}
+                        />
+                      ) : (
+                        allowedName === "no" && (
+                          <Icon
+                            icon="material-symbols:close"
+                            fontSize={25}
+                            style={{ color: "red" }}
+                          />
+                        )
+                      )}
+                    </>
+                  )}
+                </InputAdornment>
+              ),
+            }}
             required
           />
+          {allowedName === "no" && (
+            <FormHelperText sx={{ color: "error.main" }}>
+              Name already exists
+            </FormHelperText>
+          )}
         </Grid>
 
         <Grid item xs={12} sm={6}>
@@ -196,6 +277,7 @@ const StepOrganizationInfo = (props: Props) => {
               disabled={
                 !termsChecked ||
                 name === "" ||
+                allowedName === "no" ||
                 email === "" ||
                 phone === "" ||
                 address === "" ||

@@ -104,6 +104,33 @@ builder.queryFields((t) => ({
         },
       }),
   }),
+  organizationCheckName: t.prismaField({
+    type: Organization,
+    nullable: true,
+    args: {
+      name: t.arg.string({ required: true }),
+    },
+    resolve: async (query, _parent, args, _info): Promise<any | undefined> => {
+      const organization = await prisma.organization.findUnique({
+        ...query,
+        where: {
+          name: args.name,
+        },
+      });
+
+      if (!organization) {
+        return {
+          name: "no-name",
+        };
+      }
+
+      if (organization) {
+        return {
+          name: organization.name,
+        };
+      }
+    },
+  }),
 }));
 
 builder.mutationFields((t) => ({

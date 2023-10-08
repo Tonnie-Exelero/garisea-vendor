@@ -100,6 +100,14 @@ export const GET_ORGANIZATION_BY_NAME = gql`
   }
 `;
 
+export const GET_ORGANIZATION_NAME = gql`
+  query GetOrganizationName($name: String!) {
+    organizationCheckName(name: $name) {
+      name
+    }
+  }
+`;
+
 export const CREATE_ORGANIZATION = gql`
   mutation CreateOrganization(
     $name: String!

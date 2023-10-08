@@ -55,7 +55,7 @@ const StepAccountDetails = (props: Props) => {
     country: "Kenya",
   };
 
-  // Handle verify store link
+  // Handle verify email
   const handleEmailVerify = async (value: string) => {
     if (value.length > 5) {
       setEmailVerifying("ongoing");
@@ -196,6 +196,7 @@ const StepAccountDetails = (props: Props) => {
               sx={{ mb: allowedEmail === "no" ? 0 : 4 }}
               label="Email"
               placeholder="e.g. johndoe@email.com"
+              inputProps={{ minLength: 5 }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment
