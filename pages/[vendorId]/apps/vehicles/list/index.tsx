@@ -56,9 +56,15 @@ import { getInitials } from "src/@core/utils/get-initials";
 // ** Actions Imports
 import apolloClient from "@lib/apollo";
 import { fetchVendors } from "@src/store/apps/vendor/vendor";
-import { fetchFilteredVehicles } from "@src/store/apps/vendor/vehicle";
+import {
+  fetchFilteredVehicles,
+  fetchVehiclesByVendor,
+} from "@src/store/apps/vendor/vehicle";
 import { removeVehicle } from "@src/store/apps/vendor/vehicle/single";
-import { GET_FILTERED_VEHICLES } from "@src/api/vendor/vehicle";
+import {
+  GET_FILTERED_VEHICLES,
+  GET_VEHICLES_BY_VENDOR_ID,
+} from "@src/api/vendor/vehicle";
 
 // ** Third Party Components
 import axios from "axios";
@@ -387,6 +393,8 @@ const VehiclesList = (props: Partial<Props>) => {
   idleTimer();
 
   const { vendorId, vehicles } = props;
+
+  console.log(props);
 
   // ** State
   const [vVehicles, setVVehicles] = useState<any>(vehicles);
@@ -810,12 +818,12 @@ export const getServerSideProps: any = async ({ params }: any) => {
     return undefined;
   }
 
-  const { vehiclesFiltered }: any = data;
+  const { vehiclesByVendorId }: any = data;
 
   return {
     props: {
       vendorId,
-      vehicles: { ...vehiclesFiltered },
+      vehicles: { ...vehiclesByVendorId },
     },
   };
 };

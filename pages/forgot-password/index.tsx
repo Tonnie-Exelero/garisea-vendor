@@ -41,7 +41,6 @@ import { APP_SECRET } from "@graphql/utils/auth";
 import { createToken } from "@src/configs/jwt";
 import { sendEmail } from "@src/configs/email";
 import { baseUrl } from "@src/configs/baseUrl";
-import { idleTimer } from "@src/configs/idleOrReload";
 
 // ** Styled Components
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -53,9 +52,6 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 }));
 
 const ForgotPassword = () => {
-  // ** Watch for idle time or reload
-  idleTimer();
-
   // ** States
   const [vEmail, setVEmail] = useState<string>("");
   const [isSending, setIsSending] = useState<string>("");

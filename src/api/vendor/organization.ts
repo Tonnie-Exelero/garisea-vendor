@@ -8,7 +8,6 @@ export const GET_ORGANIZATIONS = gql`
         node {
           id
           name
-          nicename
           email
           phone
           address
@@ -17,7 +16,6 @@ export const GET_ORGANIZATIONS = gql`
           country
           logo
           certificate
-          kraPin
         }
       }
       pageInfo {
@@ -39,7 +37,6 @@ export const GET_FILTERED_ORGANIZATIONS = gql`
         node {
           id
           name
-          nicename
           email
           phone
           address
@@ -48,7 +45,6 @@ export const GET_FILTERED_ORGANIZATIONS = gql`
           country
           logo
           certificate
-          kraPin
         }
       }
       pageInfo {
@@ -67,7 +63,6 @@ export const GET_ORGANIZATION_BY_ID = gql`
     organizationById(id: $id) {
       id
       name
-      nicename
       email
       phone
       address
@@ -76,7 +71,6 @@ export const GET_ORGANIZATION_BY_ID = gql`
       country
       logo
       certificate
-      kraPin
     }
   }
 `;
@@ -86,7 +80,6 @@ export const GET_ORGANIZATION_BY_NAME = gql`
     organizationByName(name: $name) {
       id
       name
-      nicename
       email
       phone
       address
@@ -95,15 +88,6 @@ export const GET_ORGANIZATION_BY_NAME = gql`
       country
       logo
       certificate
-      kraPin
-    }
-  }
-`;
-
-export const GET_ORGANIZATION_NAME = gql`
-  query GetOrganizationName($name: String!) {
-    organizationCheckName(name: $name) {
-      name
     }
   }
 `;
@@ -117,6 +101,8 @@ export const CREATE_ORGANIZATION = gql`
     $address2: String
     $city: String
     $country: String
+    $logo: String
+    $certificate: String
   ) {
     createOrganization(
       name: $name
@@ -126,10 +112,11 @@ export const CREATE_ORGANIZATION = gql`
       address2: $address2
       city: $city
       country: $country
+      logo: $logo
+      certificate: $certificate
     ) {
       id
       name
-      nicename
       email
       phone
       address
@@ -138,7 +125,6 @@ export const CREATE_ORGANIZATION = gql`
       country
       logo
       certificate
-      kraPin
     }
   }
 `;
@@ -147,28 +133,29 @@ export const UPDATE_ORGANIZATION = gql`
   mutation UpdateOrganization(
     $id: String!
     $name: String
-    $nicename: String
     $email: String
     $phone: String
     $address: String
     $address2: String
     $city: String
     $country: String
+    $logo: String
+    $certificate: String
   ) {
     updateOrganization(
       id: $id
       name: $name
-      nicename: $nicename
       email: $email
       phone: $phone
       address: $address
       address2: $address2
       city: $city
       country: $country
+      logo: $logo
+      certificate: $certificate
     ) {
       id
       name
-      nicename
       email
       phone
       address
@@ -177,7 +164,6 @@ export const UPDATE_ORGANIZATION = gql`
       country
       logo
       certificate
-      kraPin
     }
   }
 `;
@@ -186,7 +172,15 @@ export const UPDATE_LOGO = gql`
   mutation UpdateLogo($id: String!, $logo: String!) {
     updateOrganizationLogo(id: $id, logo: $logo) {
       id
+      name
+      email
+      phone
+      address
+      address2
+      city
+      country
       logo
+      certificate
     }
   }
 `;
@@ -195,16 +189,15 @@ export const UPDATE_CERTIFICATE = gql`
   mutation UpdateCertificate($id: String!, $certificate: String!) {
     updateOrganizationCertificate(id: $id, certificate: $certificate) {
       id
+      name
+      email
+      phone
+      address
+      address2
+      city
+      country
+      logo
       certificate
-    }
-  }
-`;
-
-export const UPDATE_KRA_PIN = gql`
-  mutation UpdateKRAPin($id: String!, $kraPin: String!) {
-    updateOrganizationKRAPin(id: $id, kraPin: $kraPin) {
-      id
-      kraPin
     }
   }
 `;

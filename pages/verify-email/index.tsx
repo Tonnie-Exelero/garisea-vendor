@@ -42,7 +42,6 @@ import { APP_SECRET } from "@graphql/utils/auth";
 import { createToken, decodeToken } from "@src/configs/jwt";
 import { sendEmail } from "@src/configs/email";
 import { baseUrl } from "@src/configs/baseUrl";
-import { idleTimer } from "@src/configs/idleOrReload";
 
 // ** Styled Components
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -58,9 +57,6 @@ interface Props {
 }
 
 const VerifyEmail = (props: Props) => {
-  // ** Watch for idle time or reload
-  idleTimer();
-
   const {
     data: { id, email, firstName },
     isTokenExpired,

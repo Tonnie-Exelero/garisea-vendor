@@ -33,7 +33,6 @@ const vendorsInitialState = {
         country: "",
         emailVerified: "",
         addedOrganization: "",
-        identification: "",
         organization: {
           id: "",
           name: "",

@@ -24,7 +24,6 @@ export const Vendor = builder.prismaObject("Vendor", {
     country: t.exposeString("country", { nullable: true }),
     emailVerified: t.exposeString("emailVerified", { nullable: true }),
     addedOrganization: t.exposeString("addedOrganization", { nullable: true }),
-    identification: t.exposeString("identification", { nullable: true }),
     organization: t.relation("organization", { nullable: true }),
   }),
 });
@@ -144,59 +143,19 @@ builder.queryFields((t) => ({
         },
       }),
   }),
-  vendorCheckEmail: t.prismaField({
-    type: Vendor,
-    nullable: true,
-    args: {
-      email: t.arg.string({ required: true }),
-    },
-    resolve: async (query, _parent, args, _info): Promise<any | undefined> => {
-      const vendor = await prisma.vendor.findUnique({
-        ...query,
-        where: {
-          email: args.email,
-        },
-      });
-
-      if (!vendor) {
-        return {
-          email: 'no-email',
-        };
-      }
-
-      if (vendor) {
-        return {
-          email: vendor.email,
-        };
-      }
-    },
-  }),
   vendorStoreLink: t.prismaField({
     type: Vendor,
     nullable: true,
     args: {
       storeLink: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info): Promise<any | undefined> => {
-      const vendor = await prisma.vendor.findUnique({
+    resolve: (query, _parent, args, _info) =>
+      prisma.vendor.findUniqueOrThrow({
         ...query,
         where: {
           storeLink: args.storeLink,
         },
-      });
-
-      if (!vendor) {
-        return {
-          storeLink: null,
-        };
-      }
-
-      if (vendor) {
-        return {
-          storeLink: vendor.storeLink,
-        };
-      }
-    },
+      }),
   }),
 }));
 
@@ -240,6 +199,7 @@ builder.mutationFields((t) => ({
           new URL(process.env.NEXT_PUBLIC_BASE_URL);
 
         // Set the auth cookie on the response
+
         await ctx.request.cookieStore.set({
           name: "auth",
           sameSite: "strict",
@@ -466,26 +426,6 @@ builder.mutationFields((t) => ({
         },
         data: {
           status: status ? status : undefined,
-        },
-      });
-    },
-  }),
-  updateVendorIdentification: t.prismaField({
-    type: "Vendor",
-    args: {
-      id: t.arg.string({ required: true }),
-      identification: t.arg.string(),
-    },
-    resolve: async (query, _parent, args, _ctx) => {
-      const { identification } = args;
-
-      return await prisma.vendor.update({
-        ...query,
-        where: {
-          id: args.id,
-        },
-        data: {
-          identification: identification ? identification : undefined,
         },
       });
     },

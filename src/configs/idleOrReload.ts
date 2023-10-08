@@ -26,12 +26,12 @@ const events = [
 
 export const idleTimer = () => {
   const router = useRouter();
-  const { softLogout } = useAuth();
+  const { logout } = useAuth();
 
   let timeout: NodeJS.Timeout | null = null;
 
   const goBackToLogin = () => {
-    softLogout();
+    logout();
   };
 
   const restartAutoReset = () => {
@@ -60,8 +60,6 @@ export const idleTimer = () => {
       }
     }
     if (preventReset) {
-      window.localStorage.removeItem("iT");
-
       return;
     }
 
