@@ -100,7 +100,6 @@ const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
           <Grid container spacing={5}>
             <Grid item xs={12} sm={6}>
               <TextField
-                autoFocus
                 fullWidth
                 id="name"
                 aria-label="name"
@@ -110,10 +109,12 @@ const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
                 sx={{ mb: 4 }}
                 label="Name"
                 placeholder="e.g. Garisea Limited"
+                disabled
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
+                autoFocus
                 fullWidth
                 id="nicename"
                 aria-label="nicename"
