@@ -60,6 +60,8 @@ export const idleTimer = () => {
       }
     }
     if (preventReset) {
+      window.localStorage.removeItem("iT");
+
       return;
     }
 
