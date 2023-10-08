@@ -40,6 +40,9 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 import AuthIllustrationWrapper from "src/views/pages/auth/AuthIllustrationWrapper";
 import CustomAvatar from "@components/mui/avatar";
 
+// ** Others
+import { idleTimer } from "@src/configs/idleOrReload";
+
 // ** Styled Components
 const LinkStyled = styled(Link)(({ theme }) => ({
   fontSize: "0.875rem",
@@ -58,6 +61,9 @@ interface FormData {
 }
 
 const Login = () => {
+  // ** Watch for idle time or reload
+  idleTimer();
+
   // ** States
   const [showPassword, setShowPassword] = useState<boolean>(false);
 

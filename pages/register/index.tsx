@@ -38,6 +38,7 @@ import { baseUrl } from "@src/configs/baseUrl";
 import { createToken } from "@src/configs/jwt";
 import { sendEmail } from "@src/configs/email";
 import { APP_SECRET } from "@graphql/utils/auth";
+import { idleTimer } from "@src/configs/idleOrReload";
 
 // ** Styled Components
 const RegisterMultiStepsIllustration = styled("img")({
@@ -91,6 +92,9 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 }));
 
 const Register = () => {
+  // ** Watch for idle time or reload
+  idleTimer();
+
   // ** States
   const [personal, setPersonal] = useState<any>();
   const [accountCreated, setAccountCreated] = useState<boolean>(false);

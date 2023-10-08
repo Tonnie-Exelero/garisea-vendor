@@ -44,6 +44,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@src/store";
 import { editPassword } from "@src/store/apps/vendor/vendor/single";
 import { decodeToken } from "@src/configs/jwt";
+import { idleTimer } from "@src/configs/idleOrReload";
 
 interface State {
   showNewPassword: boolean;
@@ -80,6 +81,9 @@ interface Props {
 }
 
 const ResetPassword = (props: Props) => {
+  // ** Watch for idle time or reload
+  idleTimer();
+
   const { uid } = props;
 
   // ** States
