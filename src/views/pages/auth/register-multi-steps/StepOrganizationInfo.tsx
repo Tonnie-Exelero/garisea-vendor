@@ -54,7 +54,7 @@ const StepOrganizationInfo = (props: Props) => {
 
   const organizationData = {
     name,
-    email,
+    email: email.trim().toLowerCase(),
     phone: `+254${phone}`,
     address,
     address2,
