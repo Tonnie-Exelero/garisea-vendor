@@ -325,7 +325,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                               color: "text.secondary",
                             }}
                           >
-                            Nicename:
+                            Trading Name:
                           </Typography>
                         </TableCell>
                         <TableCell>

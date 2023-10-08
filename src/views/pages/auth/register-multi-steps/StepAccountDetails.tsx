@@ -47,7 +47,7 @@ const StepAccountDetails = (props: Props) => {
     firstName,
     lastName,
     username,
-    email: email.trim(),
+    email: email.trim().toLowerCase(),
     phone: `+254${phone}`,
     storeLink: storeLink.toLowerCase(),
     address,
@@ -63,7 +63,7 @@ const StepAccountDetails = (props: Props) => {
       const { data } = await apolloClient.query({
         query: GET_VENDOR_EMAIL,
         variables: {
-          email: value.trim(),
+          email: value.trim().toLowerCase(),
         },
         fetchPolicy: "no-cache",
       });
