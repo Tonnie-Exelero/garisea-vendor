@@ -1,9 +1,6 @@
 // ** React Imports
 import { useState, ElementType, ChangeEvent, useEffect } from "react";
 
-// ** Next Import
-import { useRouter } from "next/router";
-
 // ** MUI Imports
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
@@ -42,14 +39,12 @@ import CustomAvatar from "@components/mui/avatar";
 
 // ** Others
 import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@src/store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@src/store";
 import { editVendor, editImage, removeVendor } from "@src/store/apps/auth";
-import { fetchVehiclesByVendor } from "@src/store/apps/vendor/vehicle";
 import { ThemeColor } from "@core/layouts/types";
 import { getInitials } from "@utils/get-initials";
 import { removeFile, uploadFile } from "@core/utils/file-manager";
-import authConfig from "@src/configs/auth";
 
 const ButtonStyled = styled(Button)<
   ButtonProps & { component?: ElementType; htmlFor?: string }
@@ -95,18 +90,15 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
   const [userInput, setUserInput] = useState<string>("yes");
   const [secondDialogOpen, setSecondDialogOpen] = useState<boolean>(false);
   const [uploadingImage, setUploadingImage] = useState<boolean>(false);
-  const [deactivateChecked, setDeactivateChecked] = useState<boolean>(false);
-  const [noListingsChecked, setNoListingsChecked] = useState<boolean>(false);
 
   // ** Hooks
-  const router = useRouter();
-  const dispatch = useDispatch<AppDispatch>();
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm({ defaultValues: { checkbox: false } });
-  const { vehicles } = useSelector((state: RootState) => state.vehicles);
+  const dispatch = useDispatch<AppDispatch>();
+  const { logout } = useAuth();
 
   const setUpdateUserData = () => {
     setId(user.id);
@@ -127,13 +119,7 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
 
   useEffect(() => {
     setUpdateUserData();
-    dispatch(
-      fetchVehiclesByVendor({
-        vendorId: user.id,
-        first: 2,
-      })
-    );
-  }, [dispatch, vehicles, user]);
+  }, [user]);
 
   const handleClose = () => setOpen(false);
 
@@ -211,22 +197,9 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
   const handleDeleteAccount = async (e: any) => {
     e.preventDefault();
 
-    const filesToDelete = [
-      user.image,
-      user.identification,
-      user.organization.logo,
-      user.organization.certificate,
-      user.organization.kraPin,
-    ];
-
     const resultAction = await dispatch(removeVendor({ id }));
 
     if (removeVendor.fulfilled.match(resultAction)) {
-      // Remove files from server
-      filesToDelete.forEach((file) => {
-        file && removeFile(file);
-      });
-
       toast.success(`Account deleted successfully!`);
     } else {
       toast.error(`Error deleting account: ${resultAction.error}`);
@@ -487,37 +460,8 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
         <Card>
           <CardHeader title="Delete Account" />
           <CardContent>
-            <Typography sx={{ mb: 2 }}>
-              Before deleting account, you will need to remove all your vehicle
-              listings.
-            </Typography>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <Box sx={{ display: "flex", flexDirection: "column", mb: 2 }}>
-                <FormControl>
-                  <FormControlLabel
-                    label="I have removed all my vehicle listings"
-                    sx={{
-                      "& .MuiTypography-root": {
-                        color: "text.secondary",
-                      },
-                    }}
-                    control={
-                      <Checkbox
-                        checked={noListingsChecked}
-                        onChange={() =>
-                          setNoListingsChecked(!noListingsChecked)
-                        }
-                        size="small"
-                        name="validation-listings-checkbox"
-                      />
-                    }
-                  />
-                  {vehicles.totalCount !== 0 && (
-                    <FormHelperText sx={{ color: "error.main" }}>
-                      Please remove all vehicle listings to proceed
-                    </FormHelperText>
-                  )}
-                </FormControl>
+              <Box sx={{ mb: 2 }}>
                 <FormControl>
                   <Controller
                     name="checkbox"
@@ -560,11 +504,7 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
                 variant="contained"
                 color="error"
                 type="submit"
-                disabled={
-                  errors.checkbox !== undefined ||
-                  vehicles.totalCount !== 0 ||
-                  !noListingsChecked
-                }
+                disabled={errors.checkbox !== undefined}
               >
                 Deactivate Account
               </Button>
@@ -699,11 +639,7 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
             variant="contained"
             color="success"
             onClick={() => {
-              if (userInput === "yes") {
-                window.localStorage.removeItem("uD");
-                window.localStorage.removeItem(authConfig.storageTokenKeyName);
-                router.push("/login");
-              }
+              userInput === "yes" && logout();
               handleSecondDialogClose();
             }}
           >

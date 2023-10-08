@@ -32,7 +32,6 @@ export type VendorDataType = {
 export type AuthValuesType = {
   loading: boolean;
   logout: () => void;
-  softLogout: () => void;
   vendor: VendorDataType | null;
   setLoading: (value: boolean) => void;
   setVendor: (value: VendorDataType | null) => void;

@@ -1,11 +1,5 @@
 // ** React Imports
-import {
-  ChangeEvent,
-  ElementType,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { ChangeEvent, ElementType, useContext, useState } from "react";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
@@ -43,7 +37,6 @@ import {
   editOrganization,
   editLogo,
   editCertificate,
-  editKRAPin,
 } from "@src/store/apps/vendor/organization/single";
 
 // ** Others
@@ -70,7 +63,6 @@ const OrganizationInfo = ({ vendor }: Props) => {
   const {
     id,
     name,
-    nicename,
     email,
     phone,
     address,
@@ -79,12 +71,10 @@ const OrganizationInfo = ({ vendor }: Props) => {
     country,
     logo,
     certificate,
-    kraPin,
   } = vendor.organization;
 
   // ** States
   const [oName, setOName] = useState<string>(name);
-  const [oNicename, setONicename] = useState<string>(nicename);
   const [oEmail, setOEmail] = useState<string>(email);
   const [oPhone, setOPhone] = useState<string>(phone);
   const [oAddress, setOAddress] = useState<string>(address);
@@ -93,16 +83,12 @@ const OrganizationInfo = ({ vendor }: Props) => {
   const [oCountry, setOCountry] = useState<string>(country);
   const [oLogo, setOLogo] = useState<string>(logo);
   const [oCertificate, setOCertificate] = useState<string>(certificate);
-  const [oKraPin, setOKraPin] = useState<string>(kraPin);
   const [inputValue, setInputValue] = useState<string>("");
   const [certInputValue, setCertInputValue] = useState<string>("");
-  const [pinInputValue, setPinInputValue] = useState<string>("");
-  const [fileToView, setFileToView] = useState<string>("");
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [openFileView, setOpenFileView] = useState<boolean>(false);
   const [uploadingLogo, setUploadingLogo] = useState<boolean>(false);
   const [uploadingFile, setUploadingFile] = useState<boolean>(false);
-  const [uploadingPinFile, setUploadingPinFile] = useState<boolean>(false);
 
   // ** Hooks
   const ability = useContext(AbilityContext);
@@ -111,7 +97,6 @@ const OrganizationInfo = ({ vendor }: Props) => {
   const orgData = {
     id,
     name: oName,
-    nicename: oNicename,
     email: oEmail,
     phone: oPhone,
     address: oAddress,
@@ -120,14 +105,9 @@ const OrganizationInfo = ({ vendor }: Props) => {
     country: oCountry,
   };
 
-  useEffect(() => {}, [vendor.organization]);
-
   // Handle Edit dialog
   const handleEditDialogToggle = () => setOpenEdit(!openEdit);
-  const handleOpenFileView = (val: string) => {
-    setFileToView(val);
-    setOpenFileView(!openFileView);
-  };
+  const handleOpenFileView = () => setOpenFileView(!openFileView);
 
   const handleInputLogoChange = async (file: ChangeEvent) => {
     setUploadingLogo(true);
@@ -189,41 +169,9 @@ const OrganizationInfo = ({ vendor }: Props) => {
     }
   };
 
-  const handleInputKRAPinChange = async (file: ChangeEvent) => {
-    setUploadingPinFile(true);
-
-    const newFile = await uploadFile(file);
-
-    newFile && handleUpdateKRAPin(newFile.url);
-    newFile && setOKraPin(newFile.url);
-
-    // Then remove the previous image from server.
-    certificate && removeFile(certificate);
-
-    setUploadingPinFile(false);
-  };
-
-  const handleUpdateKRAPin = async (pinUrl: string) => {
-    const organizationData = {
-      id,
-      kraPin: pinUrl,
-    };
-
-    const resultAction: any = await dispatch(
-      editKRAPin({ ...organizationData })
-    );
-
-    if (editKRAPin.fulfilled.match(resultAction)) {
-      toast.success(`KRA Pin updated successfully!`);
-    } else {
-      toast.error(`Error updating KRA Pin: ${resultAction.error}`);
-    }
-  };
-
   const handleUpdateOrganization = async (val: any) => {
     // Update local state
     setOName(val.name);
-    setONicename(val.nicename);
     setOEmail(val.email);
     setOPhone(val.phone);
     setOAddress(val.address);
@@ -234,7 +182,6 @@ const OrganizationInfo = ({ vendor }: Props) => {
     const organizationData = {
       id: val.id,
       name: val.name,
-      nicename: val.nicename,
       email: val.email,
       phone: val.phone,
       address: val.address,
@@ -267,7 +214,6 @@ const OrganizationInfo = ({ vendor }: Props) => {
                 <Button
                   size="small"
                   variant="contained"
-                  color="info"
                   onClick={handleEditDialogToggle}
                 >
                   Edit
@@ -311,27 +257,6 @@ const OrganizationInfo = ({ vendor }: Props) => {
                           {oName && (
                             <Typography sx={{ color: "text.secondary" }}>
                               {oName}
-                            </Typography>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <Typography
-                            sx={{
-                              fontWeight: 600,
-                              lineHeight: 1.53,
-                              whiteSpace: "nowrap",
-                              color: "text.secondary",
-                            }}
-                          >
-                            Nicename:
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          {oNicename && (
-                            <Typography sx={{ color: "text.secondary" }}>
-                              {oNicename}
                             </Typography>
                           )}
                         </TableCell>
@@ -392,9 +317,12 @@ const OrganizationInfo = ({ vendor }: Props) => {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography sx={{ color: "text.secondary" }}>
-                            {oAddress}, {oAddress2}
-                          </Typography>
+                          {oAddress ||
+                            (oAddress2 && (
+                              <Typography sx={{ color: "text.secondary" }}>
+                                {oAddress}, {oAddress2}
+                              </Typography>
+                            ))}
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -483,7 +411,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                               variant="rounded"
                               alt={"Logo"}
                               sx={{
-                                width: 75,
+                                width: 60,
                                 height: 60,
                                 marginInlineEnd: (theme) => theme.spacing(6.25),
                               }}
@@ -492,10 +420,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                           {ability?.can("update", "organizations") && (
                             <div>
                               <Box sx={{ display: "flex" }}>
-                                <Tooltip
-                                  title="Allowed PNG/JPEG/SVG. Max size of 2MB."
-                                  placement="top"
-                                >
+                                <Tooltip title="Allowed PNG/JPEG/SVG. Max size of 2MB.">
                                   <ButtonStyled
                                     // @ts-ignore
                                     component={"label"}
@@ -554,7 +479,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                             <Button
                               variant="contained"
                               color="info"
-                              onClick={() => handleOpenFileView(oCertificate)}
+                              onClick={handleOpenFileView}
                               sx={{
                                 mr: (theme) => theme.spacing(6.25),
                               }}
@@ -562,124 +487,46 @@ const OrganizationInfo = ({ vendor }: Props) => {
                               View
                             </Button>
                           )}
-                          {vendor.status !== "active" &&
-                            ability?.can("update", "organizations") && (
-                              <div>
-                                <Box sx={{ display: "flex" }}>
-                                  <Tooltip
-                                    title="Your Business/Company Registration Certificate. Max size of 2MB."
-                                    placement="top"
+                          {ability?.can("update", "organizations") && (
+                            <div>
+                              <Box sx={{ display: "flex" }}>
+                                <Tooltip title="Allowed PDF only. Max size of 2MB.">
+                                  <ButtonStyled
+                                    // @ts-ignore
+                                    component={"label"}
+                                    variant="contained"
+                                    htmlFor="upload-certificate"
                                   >
-                                    <ButtonStyled
-                                      // @ts-ignore
-                                      component={"label"}
-                                      variant="contained"
-                                      htmlFor="upload-certificate"
-                                    >
-                                      Upload
-                                      <input
-                                        hidden
-                                        type="file"
-                                        value={certInputValue}
-                                        accept="application/pdf"
-                                        onChange={handleInputCertificateChange}
-                                        id="upload-certificate"
-                                      />
-                                    </ButtonStyled>
-                                  </Tooltip>
+                                    Upload
+                                    <input
+                                      hidden
+                                      type="file"
+                                      value={certInputValue}
+                                      accept="application/pdf"
+                                      onChange={handleInputCertificateChange}
+                                      id="upload-certificate"
+                                    />
+                                  </ButtonStyled>
+                                </Tooltip>
 
-                                  {uploadingFile && (
-                                    <Box
-                                      sx={{
-                                        ml: 4,
-                                        display: "flex",
-                                        justifyContent: "flex-start",
-                                        alignItems: "center",
-                                      }}
-                                    >
-                                      <CircularProgress
-                                        size="1.2rem"
-                                        sx={{ mr: 2 }}
-                                      />
-                                    </Box>
-                                  )}
-                                </Box>
-                              </div>
-                            )}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <Typography
-                            sx={{
-                              fontWeight: 600,
-                              lineHeight: 1.53,
-                              whiteSpace: "nowrap",
-                              color: "text.secondary",
-                            }}
-                          >
-                            KRA Pin:
-                          </Typography>
-                        </TableCell>
-                        <TableCell
-                          sx={{ display: "flex", alignItems: "center" }}
-                        >
-                          {oKraPin && (
-                            <Button
-                              variant="contained"
-                              color="info"
-                              onClick={() => handleOpenFileView(oKraPin)}
-                              sx={{
-                                mr: (theme) => theme.spacing(6.25),
-                              }}
-                            >
-                              View
-                            </Button>
+                                {uploadingFile && (
+                                  <Box
+                                    sx={{
+                                      ml: 4,
+                                      display: "flex",
+                                      justifyContent: "flex-start",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    <CircularProgress
+                                      size="1.2rem"
+                                      sx={{ mr: 2 }}
+                                    />
+                                  </Box>
+                                )}
+                              </Box>
+                            </div>
                           )}
-                          {vendor.status !== "active" &&
-                            ability?.can("update", "organizations") && (
-                              <div>
-                                <Box sx={{ display: "flex" }}>
-                                  <Tooltip
-                                    title="Your Business/Company KRA Pin. Max size of 2MB."
-                                    placement="top"
-                                  >
-                                    <ButtonStyled
-                                      // @ts-ignore
-                                      component={"label"}
-                                      variant="contained"
-                                      htmlFor="upload-kra-pin"
-                                    >
-                                      Upload
-                                      <input
-                                        hidden
-                                        type="file"
-                                        value={pinInputValue}
-                                        accept="application/pdf"
-                                        onChange={handleInputKRAPinChange}
-                                        id="upload-kra-pin"
-                                      />
-                                    </ButtonStyled>
-                                  </Tooltip>
-
-                                  {uploadingPinFile && (
-                                    <Box
-                                      sx={{
-                                        ml: 4,
-                                        display: "flex",
-                                        justifyContent: "flex-start",
-                                        alignItems: "center",
-                                      }}
-                                    >
-                                      <CircularProgress
-                                        size="1.2rem"
-                                        sx={{ mr: 2 }}
-                                      />
-                                    </Box>
-                                  )}
-                                </Box>
-                              </div>
-                            )}
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -742,7 +589,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
           >
             <Tooltip title="Close">
               <IconButton
-                onClick={() => handleOpenFileView("")}
+                onClick={handleOpenFileView}
                 color="inherit"
                 sx={{
                   position: "absolute",
@@ -753,7 +600,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                 <Icon fontSize={30} icon="bx:x" />
               </IconButton>
             </Tooltip>
-            <PDFViewer url={fileToView} />
+            <PDFViewer url={oCertificate} />
           </DialogContent>
         </Dialog>
       </Grid>

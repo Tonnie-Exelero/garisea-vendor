@@ -17,6 +17,5 @@ export interface Vendor {
   country: string;
   emailVerified: string;
   addedOrganization: string;
-  identification: string;
   organization: Partial<Organization>;
 }

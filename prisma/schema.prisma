@@ -61,7 +61,6 @@ model Vendor {
   country           String?
   emailVerified     String?
   addedOrganization String?
-  identification    String?
   organization      Organization? @relation(fields: [organizationId], references: [id])
   organizationId    String?
   Vehicle           Vehicle[]
@@ -92,7 +91,6 @@ model Organization {
   createdAt   DateTime @default(now()) @map(name: "created_at")
   updatedAt   DateTime @updatedAt @map(name: "updated_at")
   name        String   @unique
-  nicename    String?
   email       String?
   phone       String?
   address     String?
@@ -101,7 +99,6 @@ model Organization {
   country     String?
   logo        String?
   certificate String?
-  kraPin      String?
   Vendor      Vendor[]
 }
 

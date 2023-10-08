@@ -30,12 +30,11 @@ const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
   handleEditDialogToggle,
   handleUpdateOrganization,
 }) => {
-  const { id, name, nicename, email, phone, address, address2, city, country } =
+  const { id, name, email, phone, address, address2, city, country } =
     organization;
 
   // ** State
   const [oName, setOName] = useState<string>(name || "");
-  const [oNicename, setONicename] = useState<string>(nicename || "");
   const [oEmail, setOEmail] = useState<string>(email || "");
   const [oPhone, setOPhone] = useState<string>(phone || "");
   const [oAddress, setOAddress] = useState<string>(address || "");
@@ -49,7 +48,6 @@ const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
     const organizationData = {
       id,
       name: oName,
-      nicename: oNicename,
       email: oEmail,
       phone: oPhone,
       address: oAddress,
@@ -109,20 +107,7 @@ const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
                 type="text"
                 sx={{ mb: 4 }}
                 label="Name"
-                placeholder="e.g. Garisea Limited"
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                id="nicename"
-                aria-label="nicename"
-                value={oNicename}
-                onChange={(e) => setONicename(e.target.value)}
-                type="text"
-                sx={{ mb: 4 }}
-                label="Trading Name"
-                placeholder="e.g. GariseaCars"
+                placeholder="johndoe"
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -174,7 +159,7 @@ const OrganizationEditDialog: React.FC<OrganizationEditDialogProps> = ({
                 type="text"
                 sx={{ mb: 4 }}
                 label="Address Line 2"
-                placeholder="e.g. Upperhill, along Ngong Rd"
+                placeholder="e.g. Plymouth, MN 55441"
               />
             </Grid>
             <Grid item xs={12} sm={6}>

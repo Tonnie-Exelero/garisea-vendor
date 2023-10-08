@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 // ** Next Import
 import Link from "next/link";
@@ -10,21 +10,21 @@ import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import FormControl from "@mui/material/FormControl";
 import InputAdornment from "@mui/material/InputAdornment";
 import { styled } from "@mui/material/styles";
-import {
-  Checkbox,
-  CircularProgress,
-  FormControlLabel,
-  FormHelperText,
-} from "@mui/material";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
 
-// ** API
-import apolloClient from "@src/lib/apollo";
-import { GET_ORGANIZATION_NAME } from "@src/api/vendor/organization";
+// ** Others
+import { uploadFile } from "@core/utils/file-manager";
+import {
+  Checkbox,
+  CircularProgress,
+  FormControlLabel,
+  Tooltip,
+} from "@mui/material";
 
 // ** Styled Components
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -48,50 +48,44 @@ const StepOrganizationInfo = (props: Props) => {
   const [address, setAddress] = useState<string>("");
   const [address2, setAddress2] = useState<string>("");
   const [city, setCity] = useState<string>("");
+  const [logo, setLogo] = useState<string>("");
+  const [certificate, setCertificate] = useState<string>("");
+  const [inputValue, setInputValue] = useState<string>("");
+  const [certInputValue, setCertInputValue] = useState<string>("");
+  const [uploadingLogo, setUploadingLogo] = useState<boolean>(false);
+  const [uploadingFile, setUploadingFile] = useState<boolean>(false);
   const [termsChecked, setTermsChecked] = useState<boolean>(false);
-  const [nameVerifying, setNameVerifying] = useState<string>("");
-  const [allowedName, setAllowedName] = useState<string>("");
+
+  const handleInputLogoChange = async (file: ChangeEvent) => {
+    setUploadingLogo(true);
+
+    const newFile = await uploadFile(file);
+
+    newFile && setLogo(newFile.url);
+
+    setUploadingLogo(false);
+  };
+
+  const handleInputCertificateChange = async (file: ChangeEvent) => {
+    setUploadingFile(true);
+
+    const newFile = await uploadFile(file);
+
+    newFile && setCertificate(newFile.url);
+
+    setUploadingFile(false);
+  };
 
   const organizationData = {
     name,
     email,
-    phone: `+254${phone}`,
+    phone: "+254" + phone,
     address,
     address2,
     city,
     country: "Kenya",
-  };
-
-  // Handle verify name
-  const handleNameVerify = async (value: string) => {
-    if (value.length > 5) {
-      setNameVerifying("ongoing");
-
-      const { data } = await apolloClient.query({
-        query: GET_ORGANIZATION_NAME,
-        variables: {
-          name: value,
-        },
-        fetchPolicy: "no-cache",
-      });
-
-      const {
-        organizationCheckName: { name },
-      }: any = data;
-
-      if (name === "no-name") {
-        setAllowedName("yes");
-      }
-
-      if (name === value) {
-        setAllowedName("no");
-      }
-
-      setNameVerifying("complete");
-    } else {
-      setAllowedName("");
-      setNameVerifying("");
-    }
+    logo,
+    certificate,
   };
 
   return (
@@ -112,50 +106,12 @@ const StepOrganizationInfo = (props: Props) => {
             aria-label="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            onBlur={(e) => handleNameVerify(e.target.value)}
             type="text"
-            sx={{ mb: allowedName === "no" ? 0 : 4 }}
+            sx={{ mb: 4 }}
             label="Organization Name"
             placeholder="Garisea Cars Ltd"
-            inputProps={{ minLength: 5 }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment
-                  position="end"
-                  sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
-                >
-                  {nameVerifying === "ongoing" && (
-                    <CircularProgress size={15} />
-                  )}
-                  {nameVerifying === "complete" && (
-                    <>
-                      {allowedName === "yes" ? (
-                        <Icon
-                          icon="material-symbols:done"
-                          fontSize={25}
-                          style={{ color: "#67C932" }}
-                        />
-                      ) : (
-                        allowedName === "no" && (
-                          <Icon
-                            icon="material-symbols:close"
-                            fontSize={25}
-                            style={{ color: "red" }}
-                          />
-                        )
-                      )}
-                    </>
-                  )}
-                </InputAdornment>
-              ),
-            }}
             required
           />
-          {allowedName === "no" && (
-            <FormHelperText sx={{ color: "error.main" }}>
-              Name already exists
-            </FormHelperText>
-          )}
         </Grid>
 
         <Grid item xs={12} sm={6}>
@@ -233,6 +189,99 @@ const StepOrganizationInfo = (props: Props) => {
           />
         </Grid>
 
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth>
+            {logo ? (
+              <Typography sx={{ color: "green", textAlign: "center" }}>
+                Uploaded!
+              </Typography>
+            ) : (
+              <>
+                {uploadingLogo ? (
+                  <Box
+                    sx={{
+                      ml: 4,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <CircularProgress size="1.5rem" sx={{ mr: 2 }} />
+                  </Box>
+                ) : (
+                  <Tooltip
+                    title="Allowed PNG/JPEG/SVG. Max size of 2MB."
+                    placement="top"
+                  >
+                    <Button
+                      // @ts-ignore
+                      component={"label"}
+                      variant="contained"
+                      htmlFor="upload-logo"
+                    >
+                      Logo
+                      <input
+                        hidden
+                        type="file"
+                        value={inputValue}
+                        accept="image/png, image/jpeg, image/svg"
+                        onChange={handleInputLogoChange}
+                        id="upload-logo"
+                      />
+                    </Button>
+                  </Tooltip>
+                )}
+              </>
+            )}
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <FormControl fullWidth>
+            {certificate ? (
+              <Typography sx={{ color: "green", textAlign: "center" }}>
+                Uploaded!
+              </Typography>
+            ) : (
+              <>
+                {uploadingFile ? (
+                  <Box
+                    sx={{
+                      ml: 4,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <CircularProgress size="1.5rem" sx={{ mr: 2 }} />
+                  </Box>
+                ) : (
+                  <Tooltip
+                    title="Allowed PDF only. Max size of 2MB."
+                    placement="top"
+                  >
+                    <Button
+                      // @ts-ignore
+                      component={"label"}
+                      variant="contained"
+                      color="info"
+                      htmlFor="upload-certificate"
+                    >
+                      Registration Certificate
+                      <input
+                        hidden
+                        type="file"
+                        value={certInputValue}
+                        accept="application/pdf"
+                        onChange={handleInputCertificateChange}
+                        id="upload-certificate"
+                      />
+                    </Button>
+                  </Tooltip>
+                )}
+              </>
+            )}
+          </FormControl>
+        </Grid>
         <Grid item xs={12}>
           <FormControlLabel
             control={
@@ -277,7 +326,6 @@ const StepOrganizationInfo = (props: Props) => {
               disabled={
                 !termsChecked ||
                 name === "" ||
-                allowedName === "no" ||
                 email === "" ||
                 phone === "" ||
                 address === "" ||

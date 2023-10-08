@@ -9,17 +9,10 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
 import InputAdornment from "@mui/material/InputAdornment";
-import { CircularProgress, FormHelperText, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
-
-// ** API
-import apolloClient from "@src/lib/apollo";
-import {
-  GET_VENDOR_EMAIL,
-  GET_VENDOR_STORE_LINK,
-} from "@src/api/vendor/vendor";
 
 interface Props {
   handleNext: () => void;
@@ -38,85 +31,17 @@ const StepAccountDetails = (props: Props) => {
   const [storeLink, setStoreLink] = useState<string>("");
   const [address, setAddress] = useState<string>("");
   const [city, setCity] = useState<string>("");
-  const [emailVerifying, setEmailVerifying] = useState<string>("");
-  const [storeLinkVerifying, setStoreLinkVVerifying] = useState<string>("");
-  const [allowedEmail, setAllowedEmail] = useState<string>("");
-  const [allowedStoreLink, setAllowedStoreLink] = useState<string>("");
 
   const personalInfo = {
     firstName,
     lastName,
     username,
-    email: email.trim(),
-    phone: `+254${phone}`,
-    storeLink: storeLink.toLowerCase(),
+    email,
+    phone: "+254" + phone,
+    storeLink,
     address,
     city,
     country: "Kenya",
-  };
-
-  // Handle verify email
-  const handleEmailVerify = async (value: string) => {
-    if (value.length > 5) {
-      setEmailVerifying("ongoing");
-
-      const { data } = await apolloClient.query({
-        query: GET_VENDOR_EMAIL,
-        variables: {
-          email: value.trim(),
-        },
-        fetchPolicy: "no-cache",
-      });
-
-      const {
-        vendorCheckEmail: { email },
-      }: any = data;
-
-      if (email === "no-email") {
-        setAllowedEmail("yes");
-      }
-
-      if (email === value) {
-        setAllowedEmail("no");
-      }
-
-      setEmailVerifying("complete");
-    } else {
-      setAllowedEmail("");
-      setEmailVerifying("");
-    }
-  };
-
-  // Handle verify store link
-  const handleStoreLinkVerify = async (value: string) => {
-    if (value.length > 3) {
-      setStoreLinkVVerifying("ongoing");
-
-      const { data } = await apolloClient.query({
-        query: GET_VENDOR_STORE_LINK,
-        variables: {
-          storeLink: value.toLowerCase(),
-        },
-        fetchPolicy: "no-cache",
-      });
-
-      const {
-        vendorStoreLink: { storeLink },
-      }: any = data;
-
-      if (storeLink === null) {
-        setAllowedStoreLink("yes");
-      }
-
-      if (storeLink === value) {
-        setAllowedStoreLink("no");
-      }
-
-      setStoreLinkVVerifying("complete");
-    } else {
-      setAllowedStoreLink("");
-      setStoreLinkVVerifying("");
-    }
   };
 
   return (
@@ -191,50 +116,12 @@ const StepAccountDetails = (props: Props) => {
               aria-label="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              onBlur={(e) => handleEmailVerify(e.target.value)}
               type="email"
-              sx={{ mb: allowedEmail === "no" ? 0 : 4 }}
+              sx={{ mb: 4 }}
               label="Email"
               placeholder="e.g. johndoe@email.com"
-              inputProps={{ minLength: 5 }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment
-                    position="end"
-                    sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
-                  >
-                    {emailVerifying === "ongoing" && (
-                      <CircularProgress size={15} />
-                    )}
-                    {emailVerifying === "complete" && (
-                      <>
-                        {allowedEmail === "yes" ? (
-                          <Icon
-                            icon="material-symbols:done"
-                            fontSize={25}
-                            style={{ color: "#67C932" }}
-                          />
-                        ) : (
-                          allowedEmail === "no" && (
-                            <Icon
-                              icon="material-symbols:close"
-                              fontSize={25}
-                              style={{ color: "red" }}
-                            />
-                          )
-                        )}
-                      </>
-                    )}
-                  </InputAdornment>
-                ),
-              }}
               required
             />
-            {allowedEmail === "no" && (
-              <FormHelperText sx={{ color: "error.main" }}>
-                Email already exists
-              </FormHelperText>
-            )}
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -266,12 +153,10 @@ const StepAccountDetails = (props: Props) => {
               aria-label="storeLink"
               value={storeLink}
               onChange={(e) => setStoreLink(e.target.value)}
-              onBlur={(e) => handleStoreLinkVerify(e.target.value)}
               type="text"
-              sx={{ mb: allowedStoreLink === "no" ? 0 : 4 }}
+              sx={{ mb: 4 }}
               label="Unique Garisea Link"
               placeholder="e.g. gariseacars"
-              inputProps={{ minLength: 4 }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">garisea.com/</InputAdornment>
@@ -284,44 +169,17 @@ const StepAccountDetails = (props: Props) => {
                     placement="top"
                     sx={{ cursor: "pointer" }}
                   >
-                    <InputAdornment
-                      position="end"
-                      sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
-                    >
-                      {storeLinkVerifying === "ongoing" && (
-                        <CircularProgress size={15} />
-                      )}
-                      {storeLinkVerifying === "complete" && (
-                        <>
-                          {allowedStoreLink === "yes" ? (
-                            <Icon
-                              icon="material-symbols:done"
-                              fontSize={25}
-                              style={{ color: "#67C932" }}
-                            />
-                          ) : (
-                            allowedStoreLink === "no" && (
-                              <Icon
-                                icon="material-symbols:close"
-                                fontSize={25}
-                                style={{ color: "red" }}
-                              />
-                            )
-                          )}
-                        </>
-                      )}
-                      <Icon icon="material-symbols:error" fontSize={20} />
+                    <InputAdornment position="end">
+                      <Icon
+                        icon="material-symbols:error"
+                        fontSize={20}
+                      />
                     </InputAdornment>
                   </Tooltip>
                 ),
               }}
               required
             />
-            {allowedStoreLink === "no" && (
-              <FormHelperText sx={{ color: "error.main" }}>
-                Store link already exists
-              </FormHelperText>
-            )}
           </FormControl>
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -378,8 +236,6 @@ const StepAccountDetails = (props: Props) => {
                 username === "" ||
                 email === "" ||
                 phone === "" ||
-                allowedEmail === "no" ||
-                allowedStoreLink === "no" ||
                 storeLink === "" ||
                 address === "" ||
                 city === ""

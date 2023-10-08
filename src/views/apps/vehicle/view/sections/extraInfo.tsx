@@ -71,7 +71,7 @@ const ExtraInfo: React.FC<ExtraInfoProps> = ({ vehicle }) => {
     } else {
       setPublishedTime("Not yet published");
     }
-  }, [formatTime, publishedTime, publishedAt]);
+  }, [formatTime, publishedTime]);
 
   return (
     <>

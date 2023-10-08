@@ -11,13 +11,12 @@ import {
   UPDATE_PASSWORD,
   UPDATE_EMAIL_VERIFIED,
   UPDATE_ADDED_ORGANIZATION,
-  UPDATE_VENDOR_STATUS,
-  UPDATE_VENDOR_IDENTIFICATION,
   DELETE_VENDOR,
 } from "@api/vendor/vendor";
 
 // ** Others
 import { Vendor } from "../types";
+import { UPDATE_VENDOR_STATUS } from "@src/api/vendor/vendor";
 
 // ** Vendor initial state
 const vendorInitialState = {
@@ -37,7 +36,6 @@ const vendorInitialState = {
   country: "",
   emailVerified: "",
   addedOrganization: "",
-  identification: "",
   organization: {
     id: "",
     name: "",
@@ -170,28 +168,6 @@ export const editStatus = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_VENDOR_STATUS,
-        variables: { ...vendorData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Update Identification
-export const editIdentification = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
-  "appVendor/editIdentification",
-  async (vendorData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: UPDATE_VENDOR_IDENTIFICATION,
         variables: { ...vendorData },
       });
 
@@ -357,14 +333,12 @@ export const appVendorSlice = createSlice({
         state.vendor = { ...updatePassword };
       })
       .addCase(editStatus.fulfilled, (state, { payload }) => {
+        // Reset vendor state.
+        state.vendor = { ...vendorInitialState };
+
         const { updateVendorStatus }: any = payload;
 
-        state.vendor.status = updateVendorStatus.status;
-      })
-      .addCase(editIdentification.fulfilled, (state, { payload }) => {
-        const { updateVendorIdentification }: any = payload;
-
-        state.vendor.identification = updateVendorIdentification.identification;
+        state.vendor = { ...updateVendorStatus };
       })
       .addCase(editEmailVerified.fulfilled, (state, { payload }) => {
         // Reset vendor state.

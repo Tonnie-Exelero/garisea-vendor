@@ -18,7 +18,6 @@ export type VendorNode = {
   country: string;
   emailVerified: string;
   addedOrganization: string;
-  identification: string;
   organization: Partial<OrganizationNode>;
   avatarColor?: ThemeColor;
 };

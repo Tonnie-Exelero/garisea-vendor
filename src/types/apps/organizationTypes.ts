@@ -1,7 +1,6 @@
 export type OrganizationNode = {
   id: string;
   name: string;
-  nicename: string;
   email: string;
   phone: string;
   address: string;
@@ -10,7 +9,6 @@ export type OrganizationNode = {
   country: string;
   logo: string;
   certificate: string;
-  kraPin: string;
 };
 
 export type OrganizationRowType = {
