@@ -21,9 +21,11 @@ export const GET_VENDORS = gql`
           country
           emailVerified
           addedOrganization
+          identification
           organization {
             id
             name
+            nicename
             email
             phone
             address
@@ -32,6 +34,7 @@ export const GET_VENDORS = gql`
             country
             logo
             certificate
+            kraPin
           }
         }
       }
@@ -79,9 +82,11 @@ export const GET_VENDORS_BY_STATUS = gql`
           country
           emailVerified
           addedOrganization
+          identification
           organization {
             id
             name
+            nicename
             email
             phone
             address
@@ -90,6 +95,7 @@ export const GET_VENDORS_BY_STATUS = gql`
             country
             logo
             certificate
+            kraPin
           }
         }
       }
@@ -125,9 +131,11 @@ export const GET_FILTERED_VENDORS = gql`
           country
           emailVerified
           addedOrganization
+          identification
           organization {
             id
             name
+            nicename
             email
             phone
             address
@@ -136,6 +144,7 @@ export const GET_FILTERED_VENDORS = gql`
             country
             logo
             certificate
+            kraPin
           }
         }
       }
@@ -168,9 +177,11 @@ export const GET_VENDOR_BY_ID = gql`
       country
       emailVerified
       addedOrganization
+      identification
       organization {
         id
         name
+        nicename
         email
         phone
         address
@@ -179,6 +190,7 @@ export const GET_VENDOR_BY_ID = gql`
         country
         logo
         certificate
+        kraPin
       }
     }
   }
@@ -202,9 +214,11 @@ export const GET_VENDOR_BY_EMAIL = gql`
       country
       emailVerified
       addedOrganization
+      identification
       organization {
         id
         name
+        nicename
         email
         phone
         address
@@ -213,7 +227,24 @@ export const GET_VENDOR_BY_EMAIL = gql`
         country
         logo
         certificate
+        kraPin
       }
+    }
+  }
+`;
+
+export const GET_VENDOR_EMAIL = gql`
+  query GetVendorEmail($email: String!) {
+    vendorCheckEmail(email: $email) {
+      email
+    }
+  }
+`;
+
+export const GET_VENDOR_STORE_LINK = gql`
+  query GetVendorStoreLink($storeLink: String!) {
+    vendorStoreLink(storeLink: $storeLink) {
+      storeLink
     }
   }
 `;
@@ -270,9 +301,11 @@ export const CREATE_VENDOR = gql`
       country
       emailVerified
       addedOrganization
+      identification
       organization {
         id
         name
+        nicename
         email
         phone
         address
@@ -281,6 +314,7 @@ export const CREATE_VENDOR = gql`
         country
         logo
         certificate
+        kraPin
       }
     }
   }
@@ -330,9 +364,11 @@ export const UPDATE_VENDOR = gql`
       country
       emailVerified
       addedOrganization
+      identification
       organization {
         id
         name
+        nicename
         email
         phone
         address
@@ -341,6 +377,7 @@ export const UPDATE_VENDOR = gql`
         country
         logo
         certificate
+        kraPin
       }
     }
   }
@@ -364,9 +401,11 @@ export const UPDATE_PASSWORD = gql`
       country
       emailVerified
       addedOrganization
+      identification
       organization {
         id
         name
+        nicename
         email
         phone
         address
@@ -375,6 +414,7 @@ export const UPDATE_PASSWORD = gql`
         country
         logo
         certificate
+        kraPin
       }
     }
   }
@@ -384,32 +424,7 @@ export const UPDATE_IMAGE = gql`
   mutation UpdateImage($id: String!, $image: String!) {
     updateVendorImage(id: $id, image: $image) {
       id
-      firstName
-      lastName
-      username
-      email
-      phone
       image
-      storeLink
-      language
-      status
-      address
-      city
-      country
-      emailVerified
-      addedOrganization
-      organization {
-        id
-        name
-        email
-        phone
-        address
-        address2
-        city
-        country
-        logo
-        certificate
-      }
     }
   }
 `;
@@ -418,32 +433,16 @@ export const UPDATE_VENDOR_STATUS = gql`
   mutation UpdateVendorStatus($id: String!, $status: String!) {
     updateVendorStatus(id: $id, status: $status) {
       id
-      firstName
-      lastName
-      username
-      email
-      phone
-      image
-      storeLink
-      language
       status
-      address
-      city
-      country
-      emailVerified
-      addedOrganization
-      organization {
-        id
-        name
-        email
-        phone
-        address
-        address2
-        city
-        country
-        logo
-        certificate
-      }
+    }
+  }
+`;
+
+export const UPDATE_VENDOR_IDENTIFICATION = gql`
+  mutation UpdateVendorIdentification($id: String!, $identification: String!) {
+    updateVendorIdentification(id: $id, identification: $identification) {
+      id
+      identification
     }
   }
 `;
@@ -466,9 +465,11 @@ export const UPDATE_EMAIL_VERIFIED = gql`
       country
       emailVerified
       addedOrganization
+      identification
       organization {
         id
         name
+        nicename
         email
         phone
         address
@@ -477,6 +478,7 @@ export const UPDATE_EMAIL_VERIFIED = gql`
         country
         logo
         certificate
+        kraPin
       }
     }
   }
@@ -505,9 +507,11 @@ export const UPDATE_ADDED_ORGANIZATION = gql`
       country
       emailVerified
       addedOrganization
+      identification
       organization {
         id
         name
+        nicename
         email
         phone
         address
@@ -516,6 +520,7 @@ export const UPDATE_ADDED_ORGANIZATION = gql`
         country
         logo
         certificate
+        kraPin
       }
     }
   }

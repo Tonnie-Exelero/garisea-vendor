@@ -26,6 +26,7 @@ const defaultProvider: AuthValuesType = {
   setLoading: () => Boolean,
   login: () => Promise.resolve(),
   logout: () => Promise.resolve(),
+  softLogout: () => Promise.resolve(),
 };
 
 const AuthContext = createContext(defaultProvider);
@@ -156,6 +157,40 @@ const AuthProvider = ({ children }: Props) => {
     }
   };
 
+  const handleSoftLogout = async () => {
+    setLoading(true);
+
+    try {
+      const resultAction = await dispatch(logOut({ email: vendor?.email }));
+
+      if (logOut.fulfilled.match(resultAction)) {
+        // vendor will have a type signature of Vendor as we passed that as the Returned parameter in createAsyncThunk
+        const vendor = resultAction.payload;
+        const { logoutVendor }: any = vendor;
+
+        if (logoutVendor.email) {
+          setVendor(null);
+          setLoading(false);
+
+          window.localStorage.removeItem("uD");
+          window.localStorage.removeItem(authConfig.storageTokenKeyName);
+
+          router.replace({
+            pathname: "/login",
+            query: { returnUrl: router.asPath },
+          });
+        } else {
+          toast.error(`An error occurred while logging out. Try again.`);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(`An error occurred while logging out. Try again.`);
+      setLoading(false);
+      return;
+    }
+  };
+
   const values = {
     vendor,
     loading,
@@ -163,6 +198,7 @@ const AuthProvider = ({ children }: Props) => {
     setLoading,
     login: handleLogin,
     logout: handleLogout,
+    softLogout: handleSoftLogout,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
