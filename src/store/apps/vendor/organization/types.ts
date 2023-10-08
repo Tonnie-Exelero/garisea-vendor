@@ -1,6 +1,7 @@
 export interface Organization {
   id: string;
   name: string;
+  nicename: string;
   email: string;
   phone: string;
   address: string;
@@ -9,4 +10,5 @@ export interface Organization {
   country: string;
   logo: string;
   certificate: string;
+  kraPin: string;
 }
