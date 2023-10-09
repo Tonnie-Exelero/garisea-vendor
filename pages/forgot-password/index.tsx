@@ -42,6 +42,7 @@ import { createToken } from "@src/configs/jwt";
 import { sendEmail } from "@src/configs/email";
 import { baseUrl } from "@src/configs/baseUrl";
 import { idleTimer } from "@src/configs/idleOrReload";
+import { encryptData } from "@core/utils/encryption";
 
 // ** Styled Components
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -84,7 +85,7 @@ const ForgotPassword = () => {
 
       const tokenPayload = {
         data: { id, email, firstName },
-        secret: secret.toString(),
+        secret: encryptData(secret.toString()),
         expirationTime: "1d",
       };
       const tokenObject = await createToken(tokenPayload);

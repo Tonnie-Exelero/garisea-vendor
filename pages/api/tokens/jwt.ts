@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next/types";
 import jwt from "jsonwebtoken";
+import { decryptData } from "@core/utils/encryption";
 
 export default async function createToken(
   req: NextApiRequest,
@@ -7,9 +8,11 @@ export default async function createToken(
 ) {
   const { data, secret, expirationTime } = JSON.parse(req.body);
 
+  const decryptedSecret = decryptData(secret);
+
   const signedToken =
     req.method === "POST" &&
-    jwt.sign({ ...data }, secret as string, {
+    jwt.sign({ ...data }, decryptedSecret as string, {
       expiresIn: expirationTime,
     });
 
