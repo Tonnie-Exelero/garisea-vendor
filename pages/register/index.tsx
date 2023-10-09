@@ -39,6 +39,7 @@ import { createToken } from "@src/configs/jwt";
 import { sendEmail } from "@src/configs/email";
 import { APP_SECRET } from "@graphql/utils/auth";
 import { idleTimer } from "@src/configs/idleOrReload";
+import { encryptData } from "@core/utils/encryption";
 
 // ** Styled Components
 const RegisterMultiStepsIllustration = styled("img")({
@@ -161,7 +162,7 @@ const Register = () => {
             email: createVendor.email,
             firstName: createVendor.firstName,
           },
-          secret: newSecret.toString(),
+          secret: encryptData(newSecret.toString()),
           expirationTime: "1d",
         };
 
