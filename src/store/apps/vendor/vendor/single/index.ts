@@ -13,6 +13,7 @@ import {
   UPDATE_ADDED_ORGANIZATION,
   UPDATE_VENDOR_STATUS,
   UPDATE_VENDOR_IDENTIFICATION,
+  UPDATE_VENDOR_VERIFIED,
   DELETE_VENDOR,
 } from "@api/vendor/vendor";
 
@@ -36,6 +37,7 @@ const vendorInitialState = {
   city: "",
   country: "",
   emailVerified: "",
+  vendorVerified: "",
   addedOrganization: "",
   identification: "",
   organization: {
@@ -229,6 +231,28 @@ export const editEmailVerified = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
   }
 );
 
+// ** Update Vendor Verified
+export const editVendorVerified = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
+  "appVendor/editVendorVerified",
+  async (vendorData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_VENDOR_VERIFIED,
+        variables: { ...vendorData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // ** Update Added Organization
 export const editAddedOrganization = createAsyncThunk<Vendor, any, {}>(
   "appVendor/editAddedOrganization",
@@ -365,6 +389,11 @@ export const appVendorSlice = createSlice({
         const { updateVendorIdentification }: any = payload;
 
         state.vendor.identification = updateVendorIdentification.identification;
+      })
+      .addCase(editVendorVerified.fulfilled, (state, { payload }) => {
+        const { updateVendorVerified }: any = payload;
+
+        state.vendor.vendorVerified = updateVendorVerified.vendorVerified;
       })
       .addCase(editEmailVerified.fulfilled, (state, { payload }) => {
         // Reset vendor state.

@@ -23,6 +23,7 @@ export const Vendor = builder.prismaObject("Vendor", {
     city: t.exposeString("city", { nullable: true }),
     country: t.exposeString("country", { nullable: true }),
     emailVerified: t.exposeString("emailVerified", { nullable: true }),
+    vendorVerified: t.exposeString("vendorVerified", { nullable: true }),
     addedOrganization: t.exposeString("addedOrganization", { nullable: true }),
     identification: t.exposeString("identification", { nullable: true }),
     organization: t.relation("organization", { nullable: true }),
@@ -304,6 +305,7 @@ builder.mutationFields((t) => ({
       city: t.arg.string(),
       country: t.arg.string(),
       emailVerified: t.arg.string(),
+      vendorVerified: t.arg.string(),
       addedOrganization: t.arg.string(),
       organizationId: t.arg.string(),
     },
@@ -323,6 +325,7 @@ builder.mutationFields((t) => ({
         city,
         country,
         emailVerified,
+        vendorVerified,
         addedOrganization,
         organizationId,
       } = args;
@@ -346,6 +349,7 @@ builder.mutationFields((t) => ({
           city,
           country,
           emailVerified,
+          vendorVerified,
           addedOrganization,
           organization: {
             connect: { id: String(organizationId) || undefined },
@@ -506,6 +510,26 @@ builder.mutationFields((t) => ({
         },
         data: {
           emailVerified: emailVerified ? emailVerified : undefined,
+        },
+      });
+    },
+  }),
+  updateVendorVerified: t.prismaField({
+    type: "Vendor",
+    args: {
+      id: t.arg.string({ required: true }),
+      vendorVerified: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { vendorVerified } = args;
+
+      return await prisma.vendor.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          vendorVerified: vendorVerified ? vendorVerified : undefined,
         },
       });
     },
