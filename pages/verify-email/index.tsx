@@ -43,6 +43,7 @@ import { createToken, decodeToken } from "@src/configs/jwt";
 import { sendEmail } from "@src/configs/email";
 import { baseUrl } from "@src/configs/baseUrl";
 import { idleTimer } from "@src/configs/idleOrReload";
+import { encryptData } from "@core/utils/encryption";
 
 // ** Styled Components
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -68,6 +69,7 @@ const VerifyEmail = (props: Props) => {
   } = props;
 
   // ** States
+  const [currentVendorVerified, setCurrentVendorVerified] = useState<string>();
   const [sending, setSending] = useState<string>("");
 
   // ** Hooks
@@ -81,13 +83,15 @@ const VerifyEmail = (props: Props) => {
 
   useEffect(() => {
     dispatch(fetchVendorById({ id }));
-  }, [dispatch, vendor]);
+
+    setCurrentVendorVerified(vendor.emailVerified);
+  }, [dispatch, vendor, currentVendorVerified]);
 
   // Update Email Verification status
   const updateEmailVerified = async () => {
     const resetPasswordTokenPayload = {
       data: { id },
-      secret: APP_SECRET,
+      secret: encryptData(APP_SECRET),
       expirationTime: "7d",
     };
 
@@ -127,7 +131,7 @@ const VerifyEmail = (props: Props) => {
 
     const tokenPayload = {
       data: { id, email, firstName },
-      secret: secret.toString(),
+      secret: encryptData(secret.toString()),
       expirationTime: "1d",
     };
     const tokenObject = await createToken(tokenPayload);
@@ -195,7 +199,7 @@ const VerifyEmail = (props: Props) => {
                 </Box>
               </Box>
             </Box>
-            {vendor && vendor.emailVerified === "Yes" && (
+            {currentVendorVerified === "Yes" && (
               <>
                 <Typography
                   variant="h5"
@@ -243,14 +247,14 @@ const VerifyEmail = (props: Props) => {
                     variant="h5"
                     sx={{ mb: 1.5, color: "red", textAlign: "center" }}
                   >
-                    Activation Link Expired!
+                    Activation Link Invalid!
                   </Typography>
                   <Typography
                     sx={{ mb: 6, color: "text.secondary", textAlign: "center" }}
                   >
                     Account activation link sent to your email address{" "}
-                    <strong>{email}</strong> has expired. Please click the
-                    button below to get a new link.
+                    <strong>{email}</strong> has expired or is invalid. Please
+                    click the button below to get a new link.
                   </Typography>
                   {sending === "" ? (
                     <Box sx={{ display: "flex", justifyContent: "center" }}>
