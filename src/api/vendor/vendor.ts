@@ -20,6 +20,7 @@ export const GET_VENDORS = gql`
           city
           country
           emailVerified
+          vendorVerified
           addedOrganization
           identification
           organization {
@@ -81,6 +82,7 @@ export const GET_VENDORS_BY_STATUS = gql`
           city
           country
           emailVerified
+          vendorVerified
           addedOrganization
           identification
           organization {
@@ -130,6 +132,7 @@ export const GET_FILTERED_VENDORS = gql`
           city
           country
           emailVerified
+          vendorVerified
           addedOrganization
           identification
           organization {
@@ -176,6 +179,7 @@ export const GET_VENDOR_BY_ID = gql`
       city
       country
       emailVerified
+      vendorVerified
       addedOrganization
       identification
       organization {
@@ -213,6 +217,7 @@ export const GET_VENDOR_BY_EMAIL = gql`
       city
       country
       emailVerified
+      vendorVerified
       addedOrganization
       identification
       organization {
@@ -265,6 +270,7 @@ export const CREATE_VENDOR = gql`
     $city: String
     $country: String
     $emailVerified: String
+    $vendorVerified: String
     $addedOrganization: String
     $organizationId: String
   ) {
@@ -283,6 +289,7 @@ export const CREATE_VENDOR = gql`
       city: $city
       country: $country
       emailVerified: $emailVerified
+      vendorVerified: $vendorVerified
       addedOrganization: $addedOrganization
       organizationId: $organizationId
     ) {
@@ -300,6 +307,7 @@ export const CREATE_VENDOR = gql`
       city
       country
       emailVerified
+      vendorVerified
       addedOrganization
       identification
       organization {
@@ -363,6 +371,7 @@ export const UPDATE_VENDOR = gql`
       city
       country
       emailVerified
+      vendorVerified
       addedOrganization
       identification
       organization {
@@ -400,6 +409,7 @@ export const UPDATE_PASSWORD = gql`
       city
       country
       emailVerified
+      vendorVerified
       addedOrganization
       identification
       organization {
@@ -447,6 +457,15 @@ export const UPDATE_VENDOR_IDENTIFICATION = gql`
   }
 `;
 
+export const UPDATE_VENDOR_VERIFIED = gql`
+  mutation UpdateVendorVerified($id: String!, $vendorVerified: String!) {
+    updateVendorVerified(id: $id, vendorVerified: $vendorVerified) {
+      id
+      vendorVerified
+    }
+  }
+`;
+
 export const UPDATE_EMAIL_VERIFIED = gql`
   mutation UpdateVendorEmailVerified($id: String!, $emailVerified: String!) {
     updateVendorEmailVerified(id: $id, emailVerified: $emailVerified) {
@@ -464,6 +483,7 @@ export const UPDATE_EMAIL_VERIFIED = gql`
       city
       country
       emailVerified
+      vendorVerified
       addedOrganization
       identification
       organization {
@@ -506,6 +526,7 @@ export const UPDATE_ADDED_ORGANIZATION = gql`
       city
       country
       emailVerified
+      vendorVerified
       addedOrganization
       identification
       organization {

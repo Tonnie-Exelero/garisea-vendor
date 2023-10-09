@@ -70,6 +70,7 @@ const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
     status,
     storeLink,
     identification,
+    vendorVerified,
   } = user;
 
   // ** State
@@ -168,7 +169,7 @@ const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
                 {status === "pending" && (
                   <Tooltip
                     title={
-                      "Your information is being verified by Garisea. Once completed successfully, your account will be activated."
+                      "Your account information is being verified by Garisea. Once completed successfully, your account will be activated and vehicle listings will show up on Garisea."
                     }
                     placement="top"
                     sx={{ cursor: "pointer" }}
@@ -181,7 +182,7 @@ const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
                 {status === "suspended" && (
                   <Tooltip
                     title={
-                      "Your account has been suspended. Please contact support to resolve."
+                      "Your account has been suspended and vehicle listings will not show up on Garisea. Please contact support to resolve."
                     }
                     placement="top"
                     sx={{ cursor: "pointer" }}
@@ -194,7 +195,50 @@ const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
                 {status === "inactive" && (
                   <Tooltip
                     title={
-                      "Your account has been deactivated. Please contact support to resolve."
+                      "Your account has been deactivated and vehicle listings will not show up on Garisea. Please contact support to resolve."
+                    }
+                    placement="top"
+                    sx={{ cursor: "pointer" }}
+                  >
+                    <IconButton>
+                      <Icon icon="material-symbols:error" fontSize={20} />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
+                <Typography
+                  sx={{ mr: 2, fontWeight: 700, color: "text.secondary" }}
+                >
+                  Verified:
+                </Typography>
+                <CustomChip
+                  rounded
+                  skin="light"
+                  size="small"
+                  label={
+                    vendorVerified === "yes" ? "Verified" : "Not Yet Verified"
+                  }
+                  sx={{ fontWeight: 500, mr: 2 }}
+                  color={vendorVerified === "yes" ? "success" : "warning"}
+                />
+                {vendorVerified === "yes" && (
+                  <Tooltip
+                    title={
+                      "Your physical address and other personal/organization information has been verified by Garisea."
+                    }
+                    placement="top"
+                    sx={{ cursor: "pointer" }}
+                  >
+                    <IconButton>
+                      <Icon icon="material-symbols:error" fontSize={20} />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                {vendorVerified === "no" && (
+                  <Tooltip
+                    title={
+                      "Your physical address and other personal/organization information is not yet verified by Garisea. Once done successfully, you will receive a Verified badge on your Garisea shop and vehicle listings."
                     }
                     placement="top"
                     sx={{ cursor: "pointer" }}
