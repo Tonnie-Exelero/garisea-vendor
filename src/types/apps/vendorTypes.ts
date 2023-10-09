@@ -17,6 +17,7 @@ export type VendorNode = {
   city: string;
   country: string;
   emailVerified: string;
+  vendorVerified: string;
   addedOrganization: string;
   identification: string;
   organization: Partial<OrganizationNode>;

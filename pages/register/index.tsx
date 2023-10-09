@@ -137,6 +137,7 @@ const Register = () => {
         language: "english",
         status: "pending",
         emailVerified: "No",
+        vendorVerified: "no",
         addedOrganization: id ? "Yes" : "No",
         organizationId: id,
       };
