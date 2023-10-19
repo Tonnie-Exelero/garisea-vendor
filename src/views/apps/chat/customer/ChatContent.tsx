@@ -8,15 +8,16 @@ import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import Box, { BoxProps } from "@mui/material/Box";
+import { Menu, MenuItem } from "@mui/material";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
 
 // ** Custom Components Import
 import ChatLog from "./ChatLog";
-import SendMsgForm from "src/views/apps/chat/SendMsgForm";
+import SendMsgForm from "@src/views/apps/chat/customer/SendMsgForm";
 import CustomAvatar from "src/@core/components/mui/avatar";
-import UserProfileRight from "src/views/apps/chat/UserProfileRight";
+import UserProfileRight from "@src/views/apps/chat/customer/UserProfileRight";
 
 // ** Types
 import { ChatContentType } from "src/types/apps/chatTypes";
@@ -26,8 +27,7 @@ import { useSettings } from "src/@core/hooks/useSettings";
 import { useSelector } from "react-redux";
 import { RootState } from "@src/store";
 import apolloClient from "@src/lib/apollo";
-import { GET_MESSAGES } from "@src/api/shared/adminVendorMessage";
-import { Menu, MenuItem } from "@mui/material";
+import { GET_MESSAGES } from "@src/api/shared/vendorCustomerMessage";
 
 // ** Styled Components
 const ChatWrapperStartChat = styled(Box)<BoxProps>(({ theme }) => ({
@@ -58,23 +58,23 @@ const ChatContent = (props: ChatContentType) => {
 
   // ** States
   const [messages, setMessages] = useState<any>();
-  const [currAdmin, setCurrAdmin] = useState<any>();
+  const [currCustomer, setCurrCustomer] = useState<any>();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   // ** Hooks
-  const { adminVendorMessages } = useSelector(
-    (state: RootState) => state.adminVendorMessages
+  const { vendorCustomerMessages } = useSelector(
+    (state: RootState) => state.vendorCustomerMessages
   );
-  const { user } = useSelector(
-    (state: RootState) => state.activeAdminVendorContact
+  const { customer } = useSelector(
+    (state: RootState) => state.activeVendorCustomerContact
   );
   const { settings } = useSettings();
   const { direction } = settings;
 
   useEffect(() => {
-    setMessages(adminVendorMessages);
-    setCurrAdmin(user);
-  }, [adminVendorMessages, user]);
+    setMessages(vendorCustomerMessages);
+    setCurrCustomer(customer);
+  }, [vendorCustomerMessages, customer]);
 
   const handleStartConversation = () => {
     if (!mdAbove) {
@@ -87,16 +87,16 @@ const ChatContent = (props: ChatContentType) => {
       query: GET_MESSAGES,
       variables: {
         vendorId: authedVendor.id,
-        userId: currAdmin.id,
+        customerId: currCustomer.id,
         last: 50,
       },
       fetchPolicy: "no-cache",
     });
 
-    const { adminVendorMessages }: any = data;
+    const { vendorCustomerMessages }: any = data;
 
-    setMessages(adminVendorMessages);
-  }, [messages, currAdmin]);
+    setMessages(vendorCustomerMessages);
+  }, [messages, currCustomer]);
 
   const handleClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -107,7 +107,7 @@ const ChatContent = (props: ChatContentType) => {
   };
 
   const renderContent = () => {
-    if (currAdmin && currAdmin.id !== "") {
+    if (currCustomer && currCustomer.id !== "") {
       return (
         <Box
           sx={{
@@ -157,7 +157,7 @@ const ChatContent = (props: ChatContentType) => {
                         borderRadius: "50%",
                         color: `${
                           statusObj[
-                            currAdmin.onlineStatus === "online"
+                            currCustomer.onlineStatus === "online"
                               ? "online"
                               : "offline"
                           ]
@@ -166,7 +166,7 @@ const ChatContent = (props: ChatContentType) => {
                           `0 0 0 2px ${theme.palette.background.paper}`,
                         backgroundColor: `${
                           statusObj[
-                            currAdmin.onlineStatus === "online"
+                            currCustomer.onlineStatus === "online"
                               ? "online"
                               : "offline"
                           ]
@@ -175,10 +175,10 @@ const ChatContent = (props: ChatContentType) => {
                     />
                   }
                 >
-                  {currAdmin.image ? (
+                  {currCustomer.image ? (
                     <MuiAvatar
-                      src={currAdmin.image}
-                      alt={currAdmin.firstName + " " + currAdmin.lastName}
+                      src={currCustomer.image}
+                      alt={currCustomer.firstName + " " + currCustomer.lastName}
                       sx={{ width: "2.375rem", height: "2.375rem" }}
                     />
                   ) : (
@@ -192,17 +192,17 @@ const ChatContent = (props: ChatContentType) => {
                       }}
                     >
                       {getInitials(
-                        currAdmin.firstName + " " + currAdmin.lastName
+                        currCustomer.firstName + " " + currCustomer.lastName
                       )}
                     </CustomAvatar>
                   )}
                 </Badge>
                 <Box sx={{ display: "flex", flexDirection: "column" }}>
                   <Typography sx={{ fontWeight: 500, fontSize: "0.875rem" }}>
-                    {currAdmin.firstName + " " + currAdmin.lastName}
+                    {currCustomer.firstName + " " + currCustomer.lastName}
                   </Typography>
                   <Typography variant="caption" sx={{ color: "text.disabled" }}>
-                    Admin
+                    Customer
                   </Typography>
                 </Box>
               </Box>
@@ -266,17 +266,20 @@ const ChatContent = (props: ChatContentType) => {
             </Box>
           </Box>
 
-          <ChatLog hidden={hidden} data={{ ...messages, admin: currAdmin }} />
+          <ChatLog
+            hidden={hidden}
+            data={{ ...messages, customer: currCustomer }}
+          />
 
           <SendMsgForm
             dispatch={dispatch}
             authedVendor={authedVendor}
-            recipient={currAdmin}
+            recipient={currCustomer}
             handleRefresh={handleRefresh}
           />
 
           <UserProfileRight
-            currAdmin={currAdmin}
+            currCustomer={currCustomer}
             hidden={hidden}
             statusObj={statusObj}
             getInitials={getInitials}

@@ -21,11 +21,11 @@ import { getInitials } from "src/@core/utils/get-initials";
 import { formatDateToMonthShort } from "src/@core/utils/format";
 
 // ** Chat App Components Imports
-import SidebarLeft from "@src/views/apps/chat/admin/SidebarLeft";
-import ChatContent from "@src/views/apps/chat/admin/ChatContent";
-import { fetchAdminVendorContacts } from "@src/store/apps/shared/adminVendorContact";
+import SidebarLeft from "@src/views/apps/chat/customer/SidebarLeft";
+import ChatContent from "@src/views/apps/chat/customer/ChatContent";
+import { fetchVendorCustomerContacts } from "@src/store/apps/shared/vendorCustomerContact";
 
-const AdminChat = () => {
+const CustomerChat = () => {
   // ** States
   const [userStatus, setUserStatus] = useState<StatusType>("online");
   const [leftSidebarOpen, setLeftSidebarOpen] = useState<boolean>(false);
@@ -42,8 +42,8 @@ const AdminChat = () => {
   const { authedVendor } = useSelector(
     (state: RootState) => state.authedVendor
   );
-  const { adminVendorContacts } = useSelector(
-    (state: RootState) => state.adminVendorContacts
+  const { vendorCustomerContacts } = useSelector(
+    (state: RootState) => state.vendorCustomerContacts
   );
 
   // ** Vars
@@ -57,8 +57,8 @@ const AdminChat = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchAdminVendorContacts({ vendorId: authedVendor.id }));
-  }, [dispatch, adminVendorContacts]);
+    dispatch(fetchVendorCustomerContacts({ vendorId: authedVendor.id }));
+  }, [dispatch, vendorCustomerContacts]);
 
   const handleLeftSidebarToggle = () => setLeftSidebarOpen(!leftSidebarOpen);
   const handleUserProfileLeftSidebarToggle = () =>
@@ -84,7 +84,7 @@ const AdminChat = () => {
     >
       <SidebarLeft
         authedVendor={authedVendor}
-        adminVendorContacts={adminVendorContacts}
+        vendorCustomerContacts={vendorCustomerContacts}
         hidden={hidden}
         mdAbove={mdAbove}
         dispatch={dispatch}
@@ -117,11 +117,11 @@ const AdminChat = () => {
   );
 };
 
-AdminChat.contentHeightFixed = true;
+CustomerChat.contentHeightFixed = true;
 
-AdminChat.acl = {
+CustomerChat.acl = {
   action: "read",
   subject: "messages",
 };
 
-export default AdminChat;
+export default CustomerChat;

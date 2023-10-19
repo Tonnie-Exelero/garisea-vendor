@@ -6,6 +6,6 @@ export interface VendorCustomerContact {
   id: string;
   vendor: Partial<Vendor>;
   customer: Partial<Customer>;
-  vehicle: Partial<Vehicle>;
+  vehicle?: Partial<Vehicle>;
   latestMessageTime: string;
 }

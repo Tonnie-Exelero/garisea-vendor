@@ -4,7 +4,6 @@ export const GET_MESSAGES = gql`
   query GetMessages(
     $vendorId: String!
     $customerId: String!
-    $vehicleId: String!
     $first: Int
     $last: Int
     $after: ID
@@ -55,7 +54,7 @@ export const CREATE_MESSAGE = gql`
   mutation CreateMessage(
     $vendorId: String!
     $customerId: String!
-    $vehicleId: String!
+    $vehicleId: String
     $senderId: String!
     $type: String
     $message: String!

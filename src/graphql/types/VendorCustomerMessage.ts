@@ -26,17 +26,15 @@ builder.queryFields((t) => ({
     args: {
       vendorId: t.arg.string({ required: true }),
       customerId: t.arg.string({ required: true }),
-      vehicleId: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
-      const { vendorId, customerId, vehicleId } = args;
+      const { vendorId, customerId } = args;
 
       return await prisma.vendorCustomerMessage.findMany({
         ...query,
         where: {
           vendorId,
           customerId,
-          vehicleId,
         },
         orderBy: {
           timeSent: "asc",
@@ -49,7 +47,6 @@ builder.queryFields((t) => ({
         where: {
           vendorId: args.vendorId,
           customerId: args.customerId,
-          vehicleId: args.vehicleId,
           isSeen: false,
         },
       }),
@@ -62,7 +59,7 @@ builder.mutationFields((t) => ({
     args: {
       vendorId: t.arg.string({ required: true }),
       customerId: t.arg.string({ required: true }),
-      vehicleId: t.arg.string({ required: true }),
+      vehicleId: t.arg.string({ required: false }),
       senderId: t.arg.string({ required: true }),
       type: t.arg.string({ required: false }),
       message: t.arg.string({ required: true }),

@@ -65,7 +65,6 @@ export const GET_CONTACTS_BY_IDS = gql`
   query GetContactsByIds(
     $vendorId: String!
     $customerId: String!
-    $vehicleId: String!
     $first: Int
     $last: Int
     $after: ID
@@ -130,7 +129,7 @@ export const CREATE_CONTACT = gql`
   mutation CreateContact(
     $vendorId: String!
     $customerId: String!
-    $vehicleId: String!
+    $vehicleId: String
     $latestMessageTime: String!
   ) {
     createVendorCustomerContact(

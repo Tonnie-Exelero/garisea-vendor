@@ -5,11 +5,12 @@ import { configureStore } from "@reduxjs/toolkit";
 import authedVendor from "@redux/apps/auth";
 import adminVendorContacts from "@redux/apps/shared/adminVendorContact";
 import singleAdminVendorContact from "@redux/apps/shared/adminVendorContact/single";
-import activeAdminVendorContact from "@src/store/apps/shared/adminVendorContact/single/activeAdmin";
+import activeAdminVendorContact from "@redux/apps/shared/adminVendorContact/single/activeAdmin";
 import adminVendorMessages from "@redux/apps/shared/adminVendorMessage";
 import singleAdminVendorMessage from "@redux/apps/shared/adminVendorMessage/single";
 import vendorCustomerContacts from "@redux/apps/shared/vendorCustomerContact";
 import singleVendorCustomerContact from "@redux/apps/shared/vendorCustomerContact/single";
+import activeVendorCustomerContact from "@redux/apps/shared/vendorCustomerContact/single/activeCustomer";
 import vendorCustomerMessages from "@redux/apps/shared/vendorCustomerMessage";
 import singleVendorCustomerMessage from "@redux/apps/shared/vendorCustomerMessage/single";
 import vendors from "@redux/apps/vendor/vendor";
@@ -39,6 +40,7 @@ export const store = configureStore({
     singleAdminVendorMessage,
     vendorCustomerContacts,
     singleVendorCustomerContact,
+    activeVendorCustomerContact,
     vendorCustomerMessages,
     singleVendorCustomerMessage,
     vendors,

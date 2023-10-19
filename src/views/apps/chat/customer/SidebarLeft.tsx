@@ -1,11 +1,5 @@
 // ** React Imports
-import {
-  useState,
-  useEffect,
-  ChangeEvent,
-  ReactNode,
-  useCallback,
-} from "react";
+import { useState, useEffect, ChangeEvent, ReactNode } from "react";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
@@ -22,7 +16,6 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemButton from "@mui/material/ListItemButton";
 import InputAdornment from "@mui/material/InputAdornment";
-import { CircularProgress } from "@mui/material";
 
 // ** Third Party Components
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -38,10 +31,9 @@ import CustomAvatar from "src/@core/components/mui/avatar";
 
 // ** API
 import apolloClient from "@src/lib/apollo";
-import { fetchAdminVendorMessages } from "@src/store/apps/shared/adminVendorMessage";
-import { GET_MESSAGES } from "@src/api/shared/adminVendorMessage";
-import { GET_FILTERED_USERS } from "@src/api/admin/user";
-import { fetchActiveAdminById } from "@src/store/apps/shared/adminVendorContact/single/activeAdmin";
+import { GET_MESSAGES } from "@src/api/shared/vendorCustomerMessage";
+import { fetchActiveCustomerById } from "@src/store/apps/shared/vendorCustomerContact/single/activeCustomer";
+import { fetchVendorCustomerMessages } from "@src/store/apps/shared/vendorCustomerMessage";
 
 const ScrollWrapper = ({
   children,
@@ -65,7 +57,7 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
   // ** Props
   const {
     authedVendor,
-    adminVendorContacts,
+    vendorCustomerContacts,
     hidden,
     mdAbove,
     dispatch,
@@ -80,20 +72,18 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
   // ** States
   const [query, setQuery] = useState<string>("");
   const [filteredContacts, setFilteredContacts] = useState<any[]>([]);
-  const [filteredAdmins, setFiltereAdmins] = useState<any[]>([]);
   const [active, setActive] = useState<null | {
     type: string;
     id: string | number;
   }>(null);
-  const [adminMessages, setAdminMessages] = useState<any[]>([]);
-  const [loading, setLoading] = useState<string>("");
+  const [customerMessages, setCustomerMessages] = useState<any[]>([]);
 
   const handleChatClick = (type: "chat" | "contact", id: string) => {
-    dispatch(fetchActiveAdminById({ id }));
+    dispatch(fetchActiveCustomerById({ id }));
     dispatch(
-      fetchAdminVendorMessages({
+      fetchVendorCustomerMessages({
         vendorId: authedVendor.id,
-        userId: id,
+        customerId: id,
         last: 50,
       })
     );
@@ -104,14 +94,14 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
   };
 
   useEffect(() => {
-    if (adminVendorContacts && adminVendorContacts.totalCount !== 0) {
+    if (vendorCustomerContacts && vendorCustomerContacts.totalCount !== 0) {
       const fetchLastMessage = () => {
-        adminVendorContacts.edges.forEach(async (user: any) => {
+        vendorCustomerContacts.edges.forEach(async (customer: any) => {
           const { data } = await apolloClient.query({
             query: GET_MESSAGES,
             variables: {
               vendorId: authedVendor.id,
-              userId: user.node.user.id,
+              customerId: customer.node.customer.id,
               last: 1,
             },
           });
@@ -125,7 +115,7 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
 
           const messageData = { lastMessage, unreadCount };
 
-          setAdminMessages((prev) =>
+          setCustomerMessages((prev) =>
             prev ? [...prev, messageData] : [messageData]
           );
         });
@@ -133,10 +123,10 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
 
       fetchLastMessage();
     }
-  }, [adminVendorContacts]);
+  }, [vendorCustomerContacts]);
 
   const AdminVendorContacts = () => {
-    if (adminVendorContacts && adminVendorContacts.totalCount !== 0) {
+    if (vendorCustomerContacts && vendorCustomerContacts.totalCount !== 0) {
       if (query.length && !filteredContacts.length) {
         return (
           <List sx={{ mb: 4, p: 0 }}>
@@ -151,7 +141,7 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
         const arrToMap =
           query.length && filteredContacts.length
             ? filteredContacts
-            : adminVendorContacts.edges;
+            : vendorCustomerContacts.edges;
 
         if (arrToMap.length === 0) {
           return (
@@ -167,19 +157,19 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
 
         return (
           <List sx={{ mb: 4, p: 0 }}>
-            {arrToMap.map((user: any, index: number) => {
-              const currAdmin =
-                adminMessages &&
-                adminMessages.length > 0 &&
-                adminMessages.find(
+            {arrToMap.map((customer: any, index: number) => {
+              const currCustomer =
+                customerMessages &&
+                customerMessages.length > 0 &&
+                customerMessages.find(
                   (message) =>
                     message.lastMessage &&
-                    message.lastMessage.senderId === user.node.user.id
+                    message.lastMessage.senderId === customer.node.customer.id
                 );
 
               const activeCondition =
                 active !== null &&
-                active.id === user.node.user.id &&
+                active.id === customer.node.customer.id &&
                 active.type === "chat";
 
               return (
@@ -190,7 +180,9 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                 >
                   <ListItemButton
                     disableRipple
-                    onClick={() => handleChatClick("chat", user.node.user.id)}
+                    onClick={() =>
+                      handleChatClick("chat", customer.node.customer.id)
+                    }
                     sx={{
                       px: 3,
                       py: 2.5,
@@ -219,14 +211,16 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                               borderRadius: "50%",
                               color: `${
                                 statusObj[
-                                  user.node.user.onlineStatus === "online"
+                                  customer.node.customer.onlineStatus ===
+                                  "online"
                                     ? "online"
                                     : "offline"
                                 ]
                               }.main`,
                               backgroundColor: `${
                                 statusObj[
-                                  user.node.user.onlineStatus === "online"
+                                  customer.node.customer.onlineStatus ===
+                                  "online"
                                     ? "online"
                                     : "offline"
                                 ]
@@ -241,13 +235,13 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                           />
                         }
                       >
-                        {user.node.user.image ? (
+                        {customer.node.customer.image ? (
                           <MuiAvatar
-                            src={user.node.user.image}
+                            src={customer.node.customer.image}
                             alt={
-                              user.node.user.firstName +
+                              customer.node.customer.firstName +
                               " " +
-                              user.node.user.lastName
+                              customer.node.customer.lastName
                             }
                             sx={{
                               width: 38,
@@ -277,9 +271,9 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                             }}
                           >
                             {getInitials(
-                              user.node.user.firstName +
+                              customer.node.customer.firstName +
                                 " " +
-                                user.node.user.lastName
+                                customer.node.customer.lastName
                             )}
                           </CustomAvatar>
                         )}
@@ -299,9 +293,9 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                           noWrap
                           sx={{ fontWeight: 500, fontSize: "0.875rem" }}
                         >
-                          {user.node.user.firstName +
+                          {customer.node.customer.firstName +
                             " " +
-                            user.node.user.lastName}
+                            customer.node.customer.lastName}
                         </Typography>
                       }
                       secondary={
@@ -312,7 +306,9 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                             ...(!activeCondition && { color: "text.disabled" }),
                           }}
                         >
-                          {currAdmin ? currAdmin.lastMessage.message : null}
+                          {currCustomer
+                            ? currCustomer.lastMessage.message
+                            : null}
                         </Typography>
                       }
                     />
@@ -334,20 +330,20 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                         }}
                       >
                         <>
-                          {currAdmin &&
-                            currAdmin.lastMessage &&
+                          {currCustomer &&
+                            currCustomer.lastMessage &&
                             formatDateToMonthShort(
-                              currAdmin.lastMessage.timeSent as string,
+                              currCustomer.lastMessage.timeSent as string,
                               true
                             )}
                         </>
                       </Typography>
-                      {currAdmin &&
-                      currAdmin.unreadCount &&
-                      currAdmin.unreadCount > 0 ? (
+                      {currCustomer &&
+                      currCustomer.unreadCount &&
+                      currCustomer.unreadCount > 0 ? (
                         <Chip
                           color="error"
-                          label={currAdmin.unreadCount}
+                          label={currCustomer.unreadCount}
                           sx={{
                             mt: 0.5,
                             height: 18,
@@ -378,34 +374,16 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
     }
   };
 
-  const handleVendorsFilter = useCallback(
-    async (value: string) => {
-      setLoading("loading");
-
-      const { data } = await apolloClient.query({
-        query: GET_FILTERED_USERS,
-        variables: {
-          filter: value,
-          first: 1,
-        },
-      });
-
-      const { usersFiltered }: any = data;
-
-      setFiltereAdmins(usersFiltered.edges);
-
-      setLoading("complete");
-    },
-    [dispatch, filteredAdmins]
-  );
-
   const handleFilter = (e: ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
 
-    if (adminVendorContacts !== null && adminVendorContacts.edges.length) {
-      const filteredContactsArr = adminVendorContacts.edges.filter(
+    if (
+      vendorCustomerContacts !== null &&
+      vendorCustomerContacts.edges.length
+    ) {
+      const filteredContactsArr = vendorCustomerContacts.edges.filter(
         (item: any) =>
-          `${item.node.user.firstName} ${item.node.user.lastName}`
+          `${item.node.customer.firstName} ${item.node.customer.lastName}`
             .toLowerCase()
             .includes(e.target.value.toLowerCase())
       );
@@ -493,7 +471,7 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end" sx={{ color: "text.secondary" }}>
-                  <IconButton onClick={() => handleVendorsFilter(query)}>
+                  <IconButton>
                     <Icon icon="bx:search" fontSize={20} />
                   </IconButton>
                 </InputAdornment>
@@ -517,194 +495,6 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                 Chats
               </Typography>
               <AdminVendorContacts />
-              <Typography
-                variant="h6"
-                sx={{ ml: 3, mb: 3, color: "primary.main" }}
-              >
-                Contacts
-              </Typography>
-              <List sx={{ p: 0 }}>
-                {loading === "loading" ? (
-                  <ListItem
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <CircularProgress size={"1.5rem"} />
-                  </ListItem>
-                ) : (
-                  loading === "complete" && (
-                    <>
-                      {filteredAdmins && filteredAdmins.length > 0 && (
-                        <>
-                          {filteredAdmins.map((user: any, index: any) => {
-                            const activeCondition =
-                              active !== null &&
-                              active.id === user.node.id &&
-                              active.type === "chat";
-
-                            return (
-                              <ListItem
-                                key={index}
-                                disablePadding
-                                sx={{ "&:not(:last-child)": { mb: 1.5 } }}
-                              >
-                                <ListItemButton
-                                  disableRipple
-                                  onClick={() =>
-                                    handleChatClick("chat", user.node.id)
-                                  }
-                                  sx={{
-                                    px: 3,
-                                    py: 2.5,
-                                    width: "100%",
-                                    borderRadius: 1,
-                                    alignItems: "flex-start",
-                                    ...(activeCondition && {
-                                      backgroundColor: (theme) =>
-                                        `${theme.palette.primary.main} !important`,
-                                    }),
-                                  }}
-                                >
-                                  <ListItemAvatar sx={{ m: 0 }}>
-                                    <Badge
-                                      overlap="circular"
-                                      anchorOrigin={{
-                                        vertical: "bottom",
-                                        horizontal: "right",
-                                      }}
-                                      badgeContent={
-                                        <Box
-                                          component="span"
-                                          sx={{
-                                            width: 8,
-                                            height: 8,
-                                            borderRadius: "50%",
-                                            color: `${
-                                              statusObj[
-                                                user.node.onlineStatus ===
-                                                "online"
-                                                  ? "online"
-                                                  : "offline"
-                                              ]
-                                            }.main`,
-                                            backgroundColor: `${
-                                              statusObj[
-                                                user.node.onlineStatus ===
-                                                "online"
-                                                  ? "online"
-                                                  : "offline"
-                                              ]
-                                            }.main`,
-                                            boxShadow: (theme) =>
-                                              `0 0 0 2px ${
-                                                !activeCondition
-                                                  ? theme.palette.background
-                                                      .paper
-                                                  : theme.palette.common.white
-                                              }`,
-                                          }}
-                                        />
-                                      }
-                                    >
-                                      {user.node.image ? (
-                                        <MuiAvatar
-                                          src={user.node.image}
-                                          alt={
-                                            user.node.firstName +
-                                            " " +
-                                            user.node.lastName
-                                          }
-                                          sx={{
-                                            width: 38,
-                                            height: 38,
-                                            outline: (theme) =>
-                                              `2px solid ${
-                                                activeCondition
-                                                  ? theme.palette.common.white
-                                                  : "transparent"
-                                              }`,
-                                          }}
-                                        />
-                                      ) : (
-                                        <CustomAvatar
-                                          color={"primary"}
-                                          skin={
-                                            activeCondition
-                                              ? "light-static"
-                                              : "light"
-                                          }
-                                          sx={{
-                                            width: 38,
-                                            height: 38,
-                                            fontSize: "1rem",
-                                            outline: (theme) =>
-                                              `2px solid ${
-                                                activeCondition
-                                                  ? theme.palette.common.white
-                                                  : "transparent"
-                                              }`,
-                                          }}
-                                        >
-                                          {getInitials(
-                                            user.node.firstName +
-                                              " " +
-                                              user.node.lastName
-                                          )}
-                                        </CustomAvatar>
-                                      )}
-                                    </Badge>
-                                  </ListItemAvatar>
-                                  <ListItemText
-                                    sx={{
-                                      my: 0,
-                                      ml: 4,
-                                      mr: 1.5,
-                                      "& .MuiTypography-root": {
-                                        ...(activeCondition && {
-                                          color: "common.white",
-                                        }),
-                                      },
-                                    }}
-                                    primary={
-                                      <Typography
-                                        noWrap
-                                        sx={{
-                                          fontWeight: 600,
-                                          fontSize: "0.875rem",
-                                        }}
-                                      >
-                                        {user.node.firstName +
-                                          " " +
-                                          user.node.lastName}
-                                      </Typography>
-                                    }
-                                    secondary={
-                                      <Typography
-                                        noWrap
-                                        variant="body2"
-                                        sx={{
-                                          ...(!activeCondition && {
-                                            color: "text.disabled",
-                                          }),
-                                        }}
-                                      >
-                                        Admin
-                                      </Typography>
-                                    }
-                                  />
-                                </ListItemButton>
-                              </ListItem>
-                            );
-                          })}
-                        </>
-                      )}
-                    </>
-                  )
-                )}
-              </List>
             </Box>
           </ScrollWrapper>
         </Box>

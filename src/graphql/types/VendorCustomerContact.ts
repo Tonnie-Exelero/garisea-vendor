@@ -50,7 +50,6 @@ builder.queryFields((t) => ({
     args: {
       vendorId: t.arg.string({ required: true }),
       customerId: t.arg.string({ required: true }),
-      vehicleId: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _info) =>
       await prisma.vendorCustomerContact.findMany({
@@ -58,7 +57,6 @@ builder.queryFields((t) => ({
         where: {
           vendorId: args.vendorId,
           customerId: args.customerId,
-          vehicleId: args.vehicleId,
         },
       }),
     totalCount: async (connection, args, _ctx, _info) =>
@@ -67,7 +65,6 @@ builder.queryFields((t) => ({
         where: {
           vendorId: args.vendorId,
           customerId: args.customerId,
-          vehicleId: args.vehicleId,
         },
       }),
   }),
@@ -79,18 +76,16 @@ builder.mutationFields((t) => ({
     args: {
       vendorId: t.arg.string({ required: true }),
       customerId: t.arg.string({ required: true }),
-      vehicleId: t.arg.string({ required: true }),
       latestMessageTime: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { vendorId, customerId, vehicleId, latestMessageTime } = args;
+      const { vendorId, customerId, latestMessageTime } = args;
 
       return await prisma.vendorCustomerContact.create({
         ...query,
         data: {
           vendor: { connect: { id: String(vendorId) || undefined } },
           customer: { connect: { id: String(customerId) || undefined } },
-          vehicle: { connect: { id: String(vehicleId) || undefined } },
           latestMessageTime,
         },
       });

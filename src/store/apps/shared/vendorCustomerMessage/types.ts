@@ -2,7 +2,7 @@ export interface VendorCustomerMessage {
   id: string;
   vendor: any;
   customer: any;
-  vehicle: any;
+  vehicle?: any;
   senderId: string;
   type: string;
   message: string;

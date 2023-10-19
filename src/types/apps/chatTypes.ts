@@ -112,7 +112,8 @@ export type ChatSidebarLeftType = {
   hidden: boolean;
   mdAbove: boolean;
   authedVendor: any;
-  adminVendorContacts: any;
+  adminVendorContacts?: any;
+  vendorCustomerContacts?: any;
   sidebarWidth: number;
   userStatus: StatusType;
   dispatch: Dispatch<any>;
@@ -138,7 +139,8 @@ export type UserProfileLeftType = {
 };
 
 export type UserProfileRightType = {
-  currAdmin: any;
+  currAdmin?: any;
+  currCustomer?: any;
   hidden: boolean;
   sidebarWidth: number;
   statusObj: StatusObjType;
@@ -160,7 +162,8 @@ export type ChatLogType = {
     edges: MessageEdgeType[];
     pageInfo: any;
     totalCount: number;
-    admin: any;
+    admin?: any;
+    customer?: any;
   };
 };
 
