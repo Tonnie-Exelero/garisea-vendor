@@ -12,4 +12,5 @@ export interface Customer {
   city: string;
   country: string;
   emailVerified: string;
+  onlineStatus: string;
 }

@@ -17,6 +17,18 @@ const navigation = (): VerticalNavItemsType => {
       subject: "vehicles",
     },
     {
+      title: "Chat",
+      icon: "bx:message",
+      action: "read",
+      subject: "messages",
+      children: [
+        {
+          title: "Admin",
+          path: `/${authedVendor.id}/apps/chat/admin`,
+        },
+      ],
+    },
+    {
       title: "Profile",
       icon: "bx:bxs-user-account",
       action: "read",

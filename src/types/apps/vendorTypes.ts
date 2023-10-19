@@ -20,6 +20,7 @@ export type VendorNode = {
   vendorVerified: string;
   addedOrganization: string;
   identification: string;
+  onlineStatus: string;
   organization: Partial<OrganizationNode>;
   avatarColor?: ThemeColor;
 };

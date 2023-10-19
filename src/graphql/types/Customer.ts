@@ -3,13 +3,14 @@ import * as jwt from "jsonwebtoken";
 import prisma from "@src/lib/prisma";
 import { APP_SECRET } from "@graphql/utils/auth";
 import { builder } from "../builder";
+import { encryptData } from "@core/utils/encryption";
 
 export const Customer = builder.prismaObject("Customer", {
   fields: (t) => ({
     id: t.exposeID("id"),
     firstName: t.exposeString("firstName", { nullable: true }),
     lastName: t.exposeString("lastName", { nullable: true }),
-    username: t.exposeString("username", { nullable: false }),
+    username: t.exposeString("username", { nullable: true }),
     email: t.exposeString("email", { nullable: false }),
     password: t.exposeString("password", { nullable: true }),
     phone: t.exposeString("phone", { nullable: true }),
@@ -21,6 +22,7 @@ export const Customer = builder.prismaObject("Customer", {
     city: t.exposeString("city", { nullable: true }),
     country: t.exposeString("country", { nullable: true }),
     emailVerified: t.exposeString("emailVerified", { nullable: true }),
+    onlineStatus: t.exposeString("onlineStatus", { nullable: true }),
   }),
 });
 
@@ -28,16 +30,16 @@ builder.queryFields((t) => ({
   customers: t.prismaConnection({
     type: Customer,
     cursor: "id",
-    resolve: (query, _parent, _args, _ctx, _info) => {
-      return prisma.customer.findMany({
+    resolve: async (query, _parent, _args, _ctx, _info) => {
+      return await prisma.customer.findMany({
         ...query,
         orderBy: {
           firstName: "asc",
         },
       });
     },
-    totalCount: (connection, _args, _ctx, _info) =>
-      prisma.customer.count({ ...connection }),
+    totalCount: async (connection, _args, _ctx, _info) =>
+      await prisma.customer.count({ ...connection }),
   }),
   customersByStatus: t.prismaConnection({
     type: Customer,
@@ -45,10 +47,10 @@ builder.queryFields((t) => ({
     args: {
       status: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _ctx, _info) => {
+    resolve: async (query, _parent, args, _ctx, _info) => {
       const { status } = args;
 
-      return prisma.customer.findMany({
+      return await prisma.customer.findMany({
         ...query,
         where: {
           status,
@@ -58,8 +60,8 @@ builder.queryFields((t) => ({
         },
       });
     },
-    totalCount: (connection, args, _ctx, _info) =>
-      prisma.customer.count({
+    totalCount: async (connection, args, _ctx, _info) =>
+      await prisma.customer.count({
         ...connection,
         where: {
           status: args.status,
@@ -94,7 +96,7 @@ builder.queryFields((t) => ({
         },
       });
     },
-    totalCount: (connection, args, _ctx, _info) => {
+    totalCount: async (connection, args, _ctx, _info) => {
       const where = {
         OR: [
           { id: { contains: args.filter } },
@@ -108,7 +110,7 @@ builder.queryFields((t) => ({
         ],
       };
 
-      return prisma.customer.count({ ...connection, where });
+      return await prisma.customer.count({ ...connection, where });
     },
   }),
   customerById: t.prismaField({
@@ -117,8 +119,8 @@ builder.queryFields((t) => ({
     args: {
       id: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _info) =>
-      prisma.customer.findUniqueOrThrow({
+    resolve: async (query, _parent, args, _info) =>
+      await prisma.customer.findUnique({
         ...query,
         where: {
           id: args.id,
@@ -134,11 +136,11 @@ builder.mutationFields((t) => ({
       email: t.arg.string({ required: true }),
       password: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx): Promise<any | undefined> => {
+    resolve: async (query, _parent, args, ctx): Promise<any | undefined> => {
       const { email, password } = args;
       let errMessage: string | null = null;
 
-      const customer = await prisma.customer.findUniqueOrThrow({
+      const customer = await prisma.customer.findUnique({
         ...query,
         where: { email },
       });
@@ -156,16 +158,40 @@ builder.mutationFields((t) => ({
         throw new Error("Invalid password.");
       }
 
+      // Update online status
+      customer &&
+        (await prisma.customer.update({
+          ...query,
+          where: { email },
+          data: {
+            onlineStatus: "online",
+          },
+        }));
+
       const authToken =
-        (customer &&
-          valid &&
-          jwt.sign({ customerId: customer.id }, APP_SECRET)) ||
-        null;
+        (customer && valid && jwt.sign({ customer }, APP_SECRET)) || null;
 
       if (customer && true === valid && null !== authToken) {
+        const domain =
+          process.env.NEXT_PUBLIC_BASE_URL &&
+          new URL(process.env.NEXT_PUBLIC_BASE_URL);
+
+        // Set the auth cookie on the response
+
+        await ctx.request.cookieStore.set({
+          name: "auth",
+          sameSite: "strict",
+          // @ts-ignore
+          secure: domain?.hostname.includes("localhost") ? false : true,
+          // @ts-ignore
+          domain: domain?.hostname,
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+          value: await encryptData(authToken),
+          httpOnly: true,
+        });
+
         return {
-          ...customer,
-          token: authToken,
+          token: encryptData(authToken),
         };
       }
 
@@ -176,6 +202,37 @@ builder.mutationFields((t) => ({
           message: errMessage,
         },
       };
+    },
+  }),
+  logoutCustomer: t.prismaField({
+    type: Customer,
+    args: {
+      email: t.arg.string({ required: true }),
+    },
+    resolve: async (query, _parent, args, ctx): Promise<any | undefined> => {
+      const { email } = args;
+
+      const customer = await prisma.customer.findUnique({
+        ...query,
+        where: { email },
+      });
+
+      if (!customer) return { email };
+
+      // Update online status
+      customer &&
+        (await prisma.customer.update({
+          ...query,
+          where: { email },
+          data: {
+            onlineStatus: "offline",
+          },
+        }));
+
+      // Remove the auth cookie
+      await (await ctx).request.cookieStore.delete("auth");
+
+      return { email: customer.email };
     },
   }),
   createCustomer: t.prismaField({
@@ -331,7 +388,7 @@ builder.mutationFields((t) => ({
       id: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) =>
-      prisma.customer.delete({
+      await prisma.customer.delete({
         ...query,
         where: {
           id: args.id,

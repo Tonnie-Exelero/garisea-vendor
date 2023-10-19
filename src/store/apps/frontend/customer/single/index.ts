@@ -30,6 +30,7 @@ const customerInitialState = {
   city: "",
   country: "",
   emailVerified: "",
+  onlineStatus: "",
 };
 
 // ** Fetch Customer By ID

@@ -15,16 +15,16 @@ builder.queryFields((t) => ({
   models: t.prismaConnection({
     type: Model,
     cursor: "id",
-    resolve: (query, _parent, _args, _ctx, _info) => {
-      return prisma.model.findMany({
+    resolve: async (query, _parent, _args, _ctx, _info) => {
+      return await prisma.model.findMany({
         ...query,
         orderBy: {
           name: "asc",
         },
       });
     },
-    totalCount: (connection, _args, _ctx, _info) =>
-      prisma.model.count({ ...connection }),
+    totalCount: async (connection, _args, _ctx, _info) =>
+      await prisma.model.count({ ...connection }),
   }),
   modelsFiltered: t.prismaConnection({
     type: Model,
@@ -49,7 +49,7 @@ builder.queryFields((t) => ({
         },
       });
     },
-    totalCount: (connection, args, _ctx, _info) => {
+    totalCount: async (connection, args, _ctx, _info) => {
       const where = {
         OR: [
           { id: { contains: args.filter } },
@@ -58,7 +58,7 @@ builder.queryFields((t) => ({
         ],
       };
 
-      return prisma.model.count({ ...connection, where });
+      return await prisma.model.count({ ...connection, where });
     },
   }),
   modelById: t.prismaField({
@@ -67,8 +67,8 @@ builder.queryFields((t) => ({
     args: {
       id: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _info) =>
-      prisma.model.findUniqueOrThrow({
+    resolve: async (query, _parent, args, _info) =>
+      await prisma.model.findUnique({
         ...query,
         where: {
           id: args.id,
@@ -81,8 +81,8 @@ builder.queryFields((t) => ({
     args: {
       brandId: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _ctx, _info) => {
-      return prisma.model.findMany({
+    resolve: async (query, _parent, args, _ctx, _info) => {
+      return await prisma.model.findMany({
         ...query,
         where: {
           brandId: args.brandId,
@@ -92,8 +92,8 @@ builder.queryFields((t) => ({
         },
       });
     },
-    totalCount: (connection, args, _ctx, _info) =>
-      prisma.model.count({
+    totalCount: async (connection, args, _ctx, _info) =>
+      await prisma.model.count({
         ...connection,
         where: {
           brandId: args.brandId,
@@ -135,7 +135,7 @@ builder.mutationFields((t) => ({
       brandId: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx) =>
-      prisma.model.update({
+      await prisma.model.update({
         ...query,
         where: {
           id: args.id,
@@ -156,7 +156,7 @@ builder.mutationFields((t) => ({
       id: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) =>
-      prisma.model.delete({
+      await prisma.model.delete({
         ...query,
         where: {
           id: args.id,
