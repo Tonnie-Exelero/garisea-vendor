@@ -163,9 +163,9 @@ export const appAdminVendorMessageSlice = createSlice({
         state.adminVendorMessage = { ...updateAdminVendorMessage };
       })
       .addCase(editAdminVendorMessageSeen.fulfilled, (state, { payload }) => {
-        const { updateAdminVendorMessage }: any = payload;
+        const { updateAdminVendorMessageSeen }: any = payload;
 
-        state.adminVendorMessage.isSeen = updateAdminVendorMessage.isSeen;
+        state.adminVendorMessage.isSeen = updateAdminVendorMessageSeen.isSeen;
       })
       .addCase(removeAdminVendorMessage.fulfilled, (state, { payload }) => {
         const { deleteAdminVendorMessage }: any = payload;

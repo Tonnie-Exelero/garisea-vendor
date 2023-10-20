@@ -185,6 +185,7 @@ export type MessageEdgeType = {
 };
 
 export type ChatLogChatType = {
+  id: string;
   msg: string;
   time: string | Date;
   isSent: boolean;

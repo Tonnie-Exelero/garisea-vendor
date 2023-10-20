@@ -168,10 +168,10 @@ export const appVendorCustomerMessageSlice = createSlice({
       .addCase(
         editVendorCustomerMessageSeen.fulfilled,
         (state, { payload }) => {
-          const { updateVendorCustomerMessage }: any = payload;
+          const { updateVendorCustomerMessageSeen }: any = payload;
 
           state.vendorCustomerMessage.isSeen =
-            updateVendorCustomerMessage.isSeen;
+            updateVendorCustomerMessageSeen.isSeen;
         }
       )
       .addCase(removeVendorCustomerMessage.fulfilled, (state, { payload }) => {

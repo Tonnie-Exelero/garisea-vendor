@@ -35,6 +35,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@src/store";
 import { fetchMoreAdminVendorMessages } from "@src/store/apps/shared/adminVendorMessage";
+import { editAdminVendorMessageSeen } from "@src/store/apps/shared/adminVendorMessage/single";
 import { formatMessageTime } from "@src/configs/formatTime";
 
 const PerfectScrollbar = styled(PerfectScrollbarComponent)<
@@ -69,6 +70,57 @@ const FetchMore = (props: any) => {
           <Box sx={{ display: "flex", justifyContent: "center" }}>
             <CircularProgress ref={ref} size={"2rem"} />
           </Box>
+        );
+      }}
+    </InView>
+  );
+};
+
+const ChatMessage = (props: any) => {
+  const {
+    chat: { id, isSeen, msg },
+    isSender,
+  } = props;
+
+  // ** Hooks
+  const dispatch = useDispatch<AppDispatch>();
+
+  const updateIsSeen = useCallback(async () => {
+    !isSender &&
+      !isSeen &&
+      (await dispatch(
+        editAdminVendorMessageSeen({
+          id,
+          isSeen: true,
+        })
+      ));
+  }, []);
+
+  return (
+    <InView>
+      {({ inView, ref }) => {
+        inView && !isSender && !isSeen && updateIsSeen();
+
+        return (
+          <Typography
+            ref={ref}
+            sx={{
+              boxShadow: 1,
+              borderRadius: 1,
+              maxWidth: "100%",
+              width: "fit-content",
+              fontSize: "0.875rem",
+              wordWrap: "break-word",
+              p: (theme) => theme.spacing(3, 4),
+              ml: isSender ? "auto" : undefined,
+              borderTopLeftRadius: !isSender ? 0 : undefined,
+              borderTopRightRadius: isSender ? 0 : undefined,
+              color: isSender ? "common.white" : "text.primary",
+              backgroundColor: isSender ? "primary.main" : "background.paper",
+            }}
+          >
+            {msg}
+          </Typography>
         );
       }}
     </InView>
@@ -123,6 +175,7 @@ const ChatLog = (props: ChatLogType) => {
     chatLog.forEach((msg: MessageEdgeType, index: number) => {
       if (chatMessageSenderId === msg.node.senderId) {
         msgGroup.messages.push({
+          id: msg.node.id,
           time: msg.node.timeSent,
           msg: msg.node.message,
           isSent: msg.node.isSent,
@@ -136,6 +189,7 @@ const ChatLog = (props: ChatLogType) => {
           senderId: msg.node.senderId,
           messages: [
             {
+              id: msg.node.id,
               time: msg.node.timeSent,
               msg: msg.node.message,
               isSent: msg.node.isSent,
@@ -181,7 +235,7 @@ const ChatLog = (props: ChatLogType) => {
               },
             }}
           >
-            <Icon icon="bx:check-all" fontSize="1rem" />
+            <Icon icon="bx:check-double" fontSize="1rem" />
           </Box>
         );
       } else {
@@ -260,26 +314,7 @@ const ChatLog = (props: ChatLogType) => {
                       sx={{ "&:not(:last-of-type)": { mb: 3.5 } }}
                     >
                       <div>
-                        <Typography
-                          sx={{
-                            boxShadow: 1,
-                            borderRadius: 1,
-                            maxWidth: "100%",
-                            width: "fit-content",
-                            fontSize: "0.875rem",
-                            wordWrap: "break-word",
-                            p: (theme) => theme.spacing(3, 4),
-                            ml: isSender ? "auto" : undefined,
-                            borderTopLeftRadius: !isSender ? 0 : undefined,
-                            borderTopRightRadius: isSender ? 0 : undefined,
-                            color: isSender ? "common.white" : "text.primary",
-                            backgroundColor: isSender
-                              ? "primary.main"
-                              : "background.paper",
-                          }}
-                        >
-                          {chat.msg}
-                        </Typography>
+                        <ChatMessage chat={chat} isSender={isSender} />
                       </div>
                       {index + 1 === length ? (
                         <Box

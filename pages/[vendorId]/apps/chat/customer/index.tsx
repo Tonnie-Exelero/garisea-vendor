@@ -24,8 +24,12 @@ import { formatDateToMonthShort } from "src/@core/utils/format";
 import SidebarLeft from "@src/views/apps/chat/customer/SidebarLeft";
 import ChatContent from "@src/views/apps/chat/customer/ChatContent";
 import { fetchVendorCustomerContacts } from "@src/store/apps/shared/vendorCustomerContact";
+import { idleTimer } from "@src/configs/idleOrReload";
 
 const CustomerChat = () => {
+  // ** Watch for idle time or reload
+  idleTimer();
+
   // ** States
   const [userStatus, setUserStatus] = useState<StatusType>("online");
   const [leftSidebarOpen, setLeftSidebarOpen] = useState<boolean>(false);
