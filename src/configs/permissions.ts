@@ -18,6 +18,7 @@ export const subjectsList = [
   "users",
   "vehicles",
   "organizations",
+  "messages",
 ];
 
 interface Colors {
@@ -36,4 +37,5 @@ export const colors: Colors = {
   users: "success",
   vehicles: "warning",
   organizations: "primary",
+  messages: "info",
 };

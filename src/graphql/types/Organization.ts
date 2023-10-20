@@ -22,16 +22,16 @@ builder.queryFields((t) => ({
   organizations: t.prismaConnection({
     type: Organization,
     cursor: "id",
-    resolve: (query, _parent, _args, _ctx, _info) => {
-      return prisma.organization.findMany({
+    resolve: async (query, _parent, _args, _ctx, _info) => {
+      return await prisma.organization.findMany({
         ...query,
         orderBy: {
           name: "asc",
         },
       });
     },
-    totalCount: (connection, _args, _ctx, _info) =>
-      prisma.organization.count({ ...connection }),
+    totalCount: async (connection, _args, _ctx, _info) =>
+      await prisma.organization.count({ ...connection }),
   }),
   organizationsFiltered: t.prismaConnection({
     type: Organization,
@@ -60,7 +60,7 @@ builder.queryFields((t) => ({
         },
       });
     },
-    totalCount: (connection, args, _ctx, _info) => {
+    totalCount: async (connection, args, _ctx, _info) => {
       const where = {
         OR: [
           { id: { contains: args.filter } },
@@ -73,7 +73,7 @@ builder.queryFields((t) => ({
         ],
       };
 
-      return prisma.organization.count({ ...connection, where });
+      return await prisma.organization.count({ ...connection, where });
     },
   }),
   organizationById: t.prismaField({
@@ -82,8 +82,8 @@ builder.queryFields((t) => ({
     args: {
       id: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _info) =>
-      prisma.organization.findUniqueOrThrow({
+    resolve: async (query, _parent, args, _info) =>
+      await prisma.organization.findUnique({
         ...query,
         where: {
           id: args.id,
@@ -96,8 +96,8 @@ builder.queryFields((t) => ({
     args: {
       name: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _info) =>
-      prisma.organization.findUniqueOrThrow({
+    resolve: async (query, _parent, args, _info) =>
+      await prisma.organization.findUnique({
         ...query,
         where: {
           name: args.name,
@@ -263,7 +263,7 @@ builder.mutationFields((t) => ({
       id: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) =>
-      prisma.organization.delete({
+      await prisma.organization.delete({
         ...query,
         where: {
           id: args.id,

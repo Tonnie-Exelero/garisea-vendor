@@ -31,6 +31,7 @@ const customersInitialState = {
         city: "",
         country: "",
         emailVerified: "",
+        onlineStatus: "",
       },
     },
   ],

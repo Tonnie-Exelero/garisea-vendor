@@ -61,16 +61,16 @@ builder.queryFields((t) => ({
   vehicles: t.prismaConnection({
     type: Vehicle,
     cursor: "id",
-    resolve: (query, _parent, _args, _ctx, _info) => {
-      return prisma.vehicle.findMany({
+    resolve: async (query, _parent, _args, _ctx, _info) => {
+      return await prisma.vehicle.findMany({
         ...query,
         orderBy: {
           createdAt: "desc",
         },
       });
     },
-    totalCount: (connection, _args, _ctx, _info) =>
-      prisma.vehicle.count({ ...connection }),
+    totalCount: async (connection, _args, _ctx, _info) =>
+      await prisma.vehicle.count({ ...connection }),
   }),
   vehicleById: t.prismaField({
     type: Vehicle,
@@ -78,8 +78,8 @@ builder.queryFields((t) => ({
     args: {
       id: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _info) =>
-      prisma.vehicle.findUniqueOrThrow({
+    resolve: async (query, _parent, args, _info) =>
+      await prisma.vehicle.findUnique({
         ...query,
         where: {
           id: args.id,
@@ -92,8 +92,8 @@ builder.queryFields((t) => ({
     args: {
       entryNo: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _info) =>
-      prisma.vehicle.findUniqueOrThrow({
+    resolve: async (query, _parent, args, _info) =>
+      await prisma.vehicle.findUnique({
         ...query,
         where: {
           entryNo: args.entryNo,
@@ -106,8 +106,8 @@ builder.queryFields((t) => ({
     args: {
       slug: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _info) =>
-      prisma.vehicle.findUniqueOrThrow({
+    resolve: async (query, _parent, args, _info) =>
+      await prisma.vehicle.findUnique({
         ...query,
         where: {
           slug: args.slug,
@@ -120,10 +120,10 @@ builder.queryFields((t) => ({
     args: {
       vendorId: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _ctx, _info) => {
+    resolve: async (query, _parent, args, _ctx, _info) => {
       const { vendorId } = args;
 
-      return prisma.vehicle.findMany({
+      return await prisma.vehicle.findMany({
         ...query,
         where: {
           vendorId,
@@ -133,8 +133,8 @@ builder.queryFields((t) => ({
         },
       });
     },
-    totalCount: (connection, args, _ctx, _info) =>
-      prisma.vehicle.count({
+    totalCount: async (connection, args, _ctx, _info) =>
+      await prisma.vehicle.count({
         ...connection,
         where: {
           vendorId: args.vendorId,
@@ -366,7 +366,7 @@ builder.queryFields((t) => ({
         },
       });
     },
-    totalCount: (connection, args, _ctx, _info) => {
+    totalCount: async (connection, args, _ctx, _info) => {
       const where = {
         ...(args.vendorId && {
           vendorId: {
@@ -551,7 +551,7 @@ builder.queryFields((t) => ({
           }),
       };
 
-      return prisma.vehicle.count({ ...connection, where });
+      return await prisma.vehicle.count({ ...connection, where });
     },
   }),
 }));
@@ -1178,7 +1178,7 @@ builder.mutationFields((t) => ({
       id: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) =>
-      prisma.vehicle.delete({
+      await prisma.vehicle.delete({
         ...query,
         where: {
           id: args.id,

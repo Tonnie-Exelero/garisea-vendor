@@ -19,5 +19,6 @@ export interface Vendor {
   vendorVerified: string;
   addedOrganization: string;
   identification: string;
+  onlineStatus: string;
   organization: Partial<Organization>;
 }

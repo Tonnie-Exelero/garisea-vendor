@@ -22,7 +22,7 @@ const HomePage = () => {
     (state: RootState) => state.authedVendor
   );
 
-  const vendorApps = ["vehicles"];
+  const vendorApps = ["vehicles", "admin messages", "customer messages"];
 
   return (
     <>

@@ -19,6 +19,7 @@ export const GET_CUSTOMERS = gql`
           city
           country
           emailVerified
+          onlineStatus
         }
       }
       pageInfo {
@@ -63,6 +64,7 @@ export const GET_CUSTOMERS_BY_STATUS = gql`
           city
           country
           emailVerified
+          onlineStatus
         }
       }
       pageInfo {
@@ -95,6 +97,7 @@ export const GET_FILTERED_CUSTOMERS = gql`
           city
           country
           emailVerified
+          onlineStatus
         }
       }
       pageInfo {
@@ -124,6 +127,7 @@ export const GET_CUSTOMER_BY_ID = gql`
       city
       country
       emailVerified
+      onlineStatus
     }
   }
 `;
@@ -172,6 +176,7 @@ export const CREATE_CUSTOMER = gql`
       city
       country
       emailVerified
+      onlineStatus
     }
   }
 `;
@@ -216,6 +221,7 @@ export const UPDATE_CUSTOMER = gql`
       city
       country
       emailVerified
+      onlineStatus
     }
   }
 `;

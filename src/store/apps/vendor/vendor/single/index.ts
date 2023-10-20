@@ -40,6 +40,7 @@ const vendorInitialState = {
   vendorVerified: "",
   addedOrganization: "",
   identification: "",
+  onlineStatus: "",
   organization: {
     id: "",
     name: "",
