@@ -55,7 +55,7 @@ const FetchMore = (props: any) => {
         vendorId: authedVendor.id,
         customerId: customer.id,
         before: pageInfo.startCursor,
-        last: 50,
+        last: 100,
       })
     );
   }, []);
