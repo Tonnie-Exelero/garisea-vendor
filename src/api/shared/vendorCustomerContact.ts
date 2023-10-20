@@ -73,7 +73,6 @@ export const GET_CONTACTS_BY_IDS = gql`
     contactsByVendorCustomerVehicleIds(
       vendorId: $vendorId
       customerId: $customerId
-      vehicleId: $vehicleId
       first: $first
       last: $last
       after: $after

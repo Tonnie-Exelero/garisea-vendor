@@ -35,6 +35,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@src/store";
 import { fetchMoreAdminVendorMessages } from "@src/store/apps/shared/adminVendorMessage";
+import { formatMessageTime } from "@src/configs/formatTime";
 
 const PerfectScrollbar = styled(PerfectScrollbarComponent)<
   ScrollBarProps & { ref: Ref<unknown> }
@@ -297,13 +298,7 @@ const ChatLog = (props: ChatLogType) => {
                             chat.isSeen
                           )}
                           <Typography variant="caption">
-                            {time
-                              ? new Date(time).toLocaleString("en-US", {
-                                  hour: "numeric",
-                                  minute: "numeric",
-                                  hour12: true,
-                                })
-                              : null}
+                            {time ? formatMessageTime(time) : null}
                           </Typography>
                         </Box>
                       ) : null}
