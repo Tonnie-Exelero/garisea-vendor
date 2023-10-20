@@ -84,7 +84,7 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
       fetchVendorCustomerMessages({
         vendorId: authedVendor.id,
         customerId: id,
-        last: 50,
+        last: 100,
       })
     );
     setActive({ type, id });

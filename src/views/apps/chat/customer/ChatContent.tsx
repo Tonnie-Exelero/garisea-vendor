@@ -88,7 +88,7 @@ const ChatContent = (props: ChatContentType) => {
       variables: {
         vendorId: authedVendor.id,
         customerId: currCustomer.id,
-        last: 50,
+        last: 100,
       },
       fetchPolicy: "no-cache",
     });
