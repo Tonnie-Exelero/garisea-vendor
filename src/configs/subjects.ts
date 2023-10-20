@@ -17,7 +17,7 @@ export const subjects: any[] = [
   {
     name: "customer messages",
     description: "Manage customers communication",
-    path: "/apps/chat/customer",
+    path: "/apps/chat/customer/messages",
   },
   {
     name: "profile",

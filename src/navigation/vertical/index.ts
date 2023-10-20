@@ -28,7 +28,7 @@ const navigation = (): VerticalNavItemsType => {
         },
         {
           title: "Customer",
-          path: `/${authedVendor.id}/apps/chat/customer`,
+          path: `/${authedVendor.id}/apps/chat/customer/messages`,
         },
       ],
     },
