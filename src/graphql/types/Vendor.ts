@@ -26,6 +26,7 @@ export const Vendor = builder.prismaObject("Vendor", {
     vendorVerified: t.exposeString("vendorVerified", { nullable: true }),
     addedOrganization: t.exposeString("addedOrganization", { nullable: true }),
     identification: t.exposeString("identification", { nullable: true }),
+    onlineStatus: t.exposeString("onlineStatus", { nullable: true }),
     organization: t.relation("organization", { nullable: true }),
   }),
 });
@@ -34,16 +35,16 @@ builder.queryFields((t) => ({
   vendors: t.prismaConnection({
     type: Vendor,
     cursor: "id",
-    resolve: (query, _parent, _args, _ctx, _info) => {
-      return prisma.vendor.findMany({
+    resolve: async (query, _parent, _args, _ctx, _info) => {
+      return await prisma.vendor.findMany({
         ...query,
         orderBy: {
           firstName: "asc",
         },
       });
     },
-    totalCount: (connection, _args, _ctx, _info) =>
-      prisma.vendor.count({ ...connection }),
+    totalCount: async (connection, _args, _ctx, _info) =>
+      await prisma.vendor.count({ ...connection }),
   }),
   vendorsByStatus: t.prismaConnection({
     type: Vendor,
@@ -51,10 +52,10 @@ builder.queryFields((t) => ({
     args: {
       status: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _ctx, _info) => {
+    resolve: async (query, _parent, args, _ctx, _info) => {
       const { status } = args;
 
-      return prisma.vendor.findMany({
+      return await prisma.vendor.findMany({
         ...query,
         where: {
           status,
@@ -64,8 +65,8 @@ builder.queryFields((t) => ({
         },
       });
     },
-    totalCount: (connection, args, _ctx, _info) =>
-      prisma.vendor.count({
+    totalCount: async (connection, args, _ctx, _info) =>
+      await prisma.vendor.count({
         ...connection,
         where: {
           status: args.status,
@@ -100,7 +101,7 @@ builder.queryFields((t) => ({
         },
       });
     },
-    totalCount: (connection, args, _ctx, _info) => {
+    totalCount: async (connection, args, _ctx, _info) => {
       const where = {
         OR: [
           { id: { contains: args.filter } },
@@ -114,7 +115,7 @@ builder.queryFields((t) => ({
         ],
       };
 
-      return prisma.vendor.count({ ...connection, where });
+      return await prisma.vendor.count({ ...connection, where });
     },
   }),
   vendorById: t.prismaField({
@@ -123,8 +124,8 @@ builder.queryFields((t) => ({
     args: {
       id: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _info) =>
-      prisma.vendor.findUniqueOrThrow({
+    resolve: async (query, _parent, args, _info) =>
+      await prisma.vendor.findUnique({
         ...query,
         where: {
           id: args.id,
@@ -137,8 +138,8 @@ builder.queryFields((t) => ({
     args: {
       email: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _info) =>
-      prisma.vendor.findUniqueOrThrow({
+    resolve: async (query, _parent, args, _info) =>
+      await prisma.vendor.findUnique({
         ...query,
         where: {
           email: args.email,
@@ -212,7 +213,7 @@ builder.mutationFields((t) => ({
       const { email, password } = args;
       let errMessage: string | null = null;
 
-      const vendor = await prisma.vendor.findUniqueOrThrow({
+      const vendor = await prisma.vendor.findUnique({
         ...query,
         where: { email },
         include: {
@@ -231,6 +232,16 @@ builder.mutationFields((t) => ({
         errMessage = "Invalid password.";
         throw new Error("Invalid password.");
       }
+
+      // Update online status
+      vendor &&
+        (await prisma.vendor.update({
+          ...query,
+          where: { email },
+          data: {
+            onlineStatus: "online",
+          },
+        }));
 
       const authToken =
         (vendor && valid && jwt.sign({ vendor }, APP_SECRET)) || null;
@@ -275,12 +286,22 @@ builder.mutationFields((t) => ({
     resolve: async (query, _parent, args, ctx): Promise<any | undefined> => {
       const { email } = args;
 
-      const vendor = await prisma.vendor.findUniqueOrThrow({
+      const vendor = await prisma.vendor.findUnique({
         ...query,
         where: { email },
       });
 
       if (!vendor) return { email };
+
+      // Update online status
+      vendor &&
+        (await prisma.vendor.update({
+          ...query,
+          where: { email },
+          data: {
+            onlineStatus: "offline",
+          },
+        }));
 
       // Remove the auth cookie
       await (await ctx).request.cookieStore.delete("auth");
@@ -560,7 +581,7 @@ builder.mutationFields((t) => ({
       id: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) =>
-      prisma.vendor.delete({
+      await prisma.vendor.delete({
         ...query,
         where: {
           id: args.id,

@@ -5,6 +5,21 @@ export const subjects: any[] = [
     path: "/home",
   },
   {
+    name: "vehicles",
+    description: "Manage Garisea vehicle inventory",
+    path: "/apps/vehicles/list",
+  },
+  {
+    name: "admin messages",
+    description: "Manage communication with Garisea Admins",
+    path: "/apps/chat/admin",
+  },
+  {
+    name: "customer messages",
+    description: "Manage customers communication",
+    path: "/apps/chat/customer/messages",
+  },
+  {
     name: "profile",
     description: "Manage your account profile",
     path: "/account/user/profile",
@@ -13,10 +28,5 @@ export const subjects: any[] = [
     name: "settings",
     description: "Manage your account settings",
     path: "/account/settings/account",
-  },
-  {
-    name: "vehicles",
-    description: "Manage Garisea vehicle inventory",
-    path: "/apps/vehicles/list",
   },
 ];

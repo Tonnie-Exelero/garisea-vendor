@@ -23,6 +23,7 @@ export const GET_VENDORS = gql`
           vendorVerified
           addedOrganization
           identification
+          onlineStatus
           organization {
             id
             name
@@ -85,6 +86,7 @@ export const GET_VENDORS_BY_STATUS = gql`
           vendorVerified
           addedOrganization
           identification
+          onlineStatus
           organization {
             id
             name
@@ -135,6 +137,7 @@ export const GET_FILTERED_VENDORS = gql`
           vendorVerified
           addedOrganization
           identification
+          onlineStatus
           organization {
             id
             name
@@ -182,6 +185,7 @@ export const GET_VENDOR_BY_ID = gql`
       vendorVerified
       addedOrganization
       identification
+      onlineStatus
       organization {
         id
         name
@@ -220,6 +224,7 @@ export const GET_VENDOR_BY_EMAIL = gql`
       vendorVerified
       addedOrganization
       identification
+      onlineStatus
       organization {
         id
         name
@@ -310,6 +315,7 @@ export const CREATE_VENDOR = gql`
       vendorVerified
       addedOrganization
       identification
+      onlineStatus
       organization {
         id
         name
@@ -374,6 +380,7 @@ export const UPDATE_VENDOR = gql`
       vendorVerified
       addedOrganization
       identification
+      onlineStatus
       organization {
         id
         name
@@ -412,6 +419,7 @@ export const UPDATE_PASSWORD = gql`
       vendorVerified
       addedOrganization
       identification
+      onlineStatus
       organization {
         id
         name
@@ -486,6 +494,7 @@ export const UPDATE_EMAIL_VERIFIED = gql`
       vendorVerified
       addedOrganization
       identification
+      onlineStatus
       organization {
         id
         name
@@ -529,6 +538,7 @@ export const UPDATE_ADDED_ORGANIZATION = gql`
       vendorVerified
       addedOrganization
       identification
+      onlineStatus
       organization {
         id
         name

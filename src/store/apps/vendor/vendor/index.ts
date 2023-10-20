@@ -35,6 +35,7 @@ const vendorsInitialState = {
         vendorVerified: "",
         addedOrganization: "",
         identification: "",
+        onlineStatus: "",
         organization: {
           id: "",
           name: "",

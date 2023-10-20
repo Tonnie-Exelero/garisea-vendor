@@ -3,10 +3,24 @@ import { configureStore } from "@reduxjs/toolkit";
 
 // ** Reducers
 import authedVendor from "@redux/apps/auth";
+import adminVendorContacts from "@redux/apps/shared/adminVendorContact";
+import singleAdminVendorContact from "@redux/apps/shared/adminVendorContact/single";
+import activeAdminVendorContact from "@redux/apps/shared/adminVendorContact/single/activeAdmin";
+import adminVendorMessages from "@redux/apps/shared/adminVendorMessage";
+import singleAdminVendorMessage from "@redux/apps/shared/adminVendorMessage/single";
+import vendorCustomerContacts from "@redux/apps/shared/vendorCustomerContact";
+import singleVendorCustomerContact from "@redux/apps/shared/vendorCustomerContact/single";
+import activeVendorCustomerContact from "@redux/apps/shared/vendorCustomerContact/single/activeCustomer";
+import vendorCustomerMessages from "@redux/apps/shared/vendorCustomerMessage";
+import singleVendorCustomerMessage from "@redux/apps/shared/vendorCustomerMessage/single";
 import vendors from "@redux/apps/vendor/vendor";
 import singleVendor from "@redux/apps/vendor/vendor/single";
 import customers from "@redux/apps/frontend/customer";
 import singleCustomer from "@redux/apps/frontend/customer/single";
+import permissions from "@redux/apps/admin/permission";
+import singlePermission from "@redux/apps/admin/permission/single";
+import roles from "@redux/apps/admin/role";
+import singleRole from "@redux/apps/admin/role/single";
 import brands from "@redux/apps/admin/brand";
 import singleBrand from "@redux/apps/admin/brand/single";
 import models from "@redux/apps/admin/model";
@@ -19,10 +33,24 @@ import singleOrganization from "@redux/apps/vendor/organization/single";
 export const store = configureStore({
   reducer: {
     authedVendor,
+    adminVendorContacts,
+    singleAdminVendorContact,
+    activeAdminVendorContact,
+    adminVendorMessages,
+    singleAdminVendorMessage,
+    vendorCustomerContacts,
+    singleVendorCustomerContact,
+    activeVendorCustomerContact,
+    vendorCustomerMessages,
+    singleVendorCustomerMessage,
     vendors,
     singleVendor,
     customers,
     singleCustomer,
+    permissions,
+    singlePermission,
+    roles,
+    singleRole,
     brands,
     singleBrand,
     models,

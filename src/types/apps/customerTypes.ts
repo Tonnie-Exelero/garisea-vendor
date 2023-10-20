@@ -15,6 +15,7 @@ export type CustomerNode = {
   city: string;
   country: string;
   emailVerified: string;
+  onlineStatus: string;
   avatarColor?: ThemeColor;
 };
 

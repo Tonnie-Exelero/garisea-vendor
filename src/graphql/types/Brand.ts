@@ -18,12 +18,12 @@ builder.queryFields((t) => ({
       return await prisma.brand.findMany({
         ...query,
         orderBy: {
-          name: 'asc',
+          name: "asc",
         },
       });
     },
-    totalCount: (connection, _args, _ctx, _info) =>
-      prisma.brand.count({ ...connection }),
+    totalCount: async (connection, _args, _ctx, _info) =>
+      await prisma.brand.count({ ...connection }),
   }),
   brandsFiltered: t.prismaConnection({
     type: Brand,
@@ -48,7 +48,7 @@ builder.queryFields((t) => ({
         },
       });
     },
-    totalCount: (connection, args, _ctx, _info) => {
+    totalCount: async (connection, args, _ctx, _info) => {
       const where = {
         OR: [
           { id: { contains: args.filter } },
@@ -57,7 +57,7 @@ builder.queryFields((t) => ({
         ],
       };
 
-      return prisma.brand.count({ ...connection, where });
+      return await prisma.brand.count({ ...connection, where });
     },
   }),
   brandById: t.prismaField({
@@ -66,8 +66,8 @@ builder.queryFields((t) => ({
     args: {
       id: t.arg.string({ required: true }),
     },
-    resolve: (query, _parent, args, _info) =>
-      prisma.brand.findUniqueOrThrow({
+    resolve: async (query, _parent, args, _info) =>
+      await prisma.brand.findUnique({
         ...query,
         where: {
           id: args.id,
@@ -106,7 +106,7 @@ builder.mutationFields((t) => ({
       description: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx) =>
-      prisma.brand.update({
+      await prisma.brand.update({
         ...query,
         where: {
           id: args.id,
@@ -124,7 +124,7 @@ builder.mutationFields((t) => ({
       id: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) =>
-      prisma.brand.delete({
+      await prisma.brand.delete({
         ...query,
         where: {
           id: args.id,

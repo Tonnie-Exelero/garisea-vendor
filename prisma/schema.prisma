@@ -11,81 +11,92 @@ generator pothos {
 
 datasource db {
   provider          = "postgresql"
-  //   url      = env("LOCAL_DATABASE_URL")
+  // url      = env("LOCAL_DATABASE_URL")
   url               = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl         = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
   shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
 }
 
 model User {
-  id            String   @id @default(cuid())
-  createdAt     DateTime @default(now()) @map(name: "created_at")
-  updatedAt     DateTime @updatedAt @map(name: "updated_at")
-  firstName     String?
-  lastName      String?
-  username      String   @unique
-  email         String   @unique
-  password      String
-  phone         String?
-  token         String?
-  status        String?
-  image         String?
-  language      String?
-  address       String?
-  city          String?
-  country       String?
-  role          Role?    @relation(fields: [roleId], references: [id])
-  roleId        String?
-  emailVerified String?
+  id                 String               @id @default(cuid())
+  createdAt          DateTime             @default(now()) @map(name: "created_at")
+  updatedAt          DateTime             @updatedAt @map(name: "updated_at")
+  firstName          String?
+  lastName           String?
+  username           String?
+  email              String               @unique
+  password           String
+  phone              String?
+  token              String?
+  status             String?
+  image              String?
+  language           String?
+  address            String?
+  city               String?
+  country            String?
+  onlineStatus       String?
+  role               Role?                @relation(fields: [roleId], references: [id])
+  roleId             String?
+  emailVerified      String?
+  AdminVendorContact AdminVendorContact[]
+  AdminVendorMessage AdminVendorMessage[]
 
   @@map(name: "AdminUsers")
 }
 
 model Vendor {
-  id                String        @id @default(cuid())
-  createdAt         DateTime      @default(now()) @map(name: "created_at")
-  updatedAt         DateTime      @updatedAt @map(name: "updated_at")
-  firstName         String?
-  lastName          String?
-  username          String?
-  email             String        @unique
-  password          String
-  phone             String?
-  token             String?
-  status            String?
-  image             String?
-  storeLink         String?       @unique
-  language          String?
-  address           String?
-  city              String?
-  country           String?
-  emailVerified     String?
-  vendorVerified    String?
-  addedOrganization String?
-  identification    String?
-  organization      Organization? @relation(fields: [organizationId], references: [id])
-  organizationId    String?
-  Vehicle           Vehicle[]
+  id                    String                  @id @default(cuid())
+  createdAt             DateTime                @default(now()) @map(name: "created_at")
+  updatedAt             DateTime                @updatedAt @map(name: "updated_at")
+  firstName             String?
+  lastName              String?
+  username              String?
+  email                 String                  @unique
+  password              String
+  phone                 String?
+  token                 String?
+  status                String?
+  image                 String?
+  storeLink             String?                 @unique
+  language              String?
+  address               String?
+  city                  String?
+  country               String?
+  emailVerified         String?
+  vendorVerified        String?
+  addedOrganization     String?
+  identification        String?
+  onlineStatus          String?
+  organization          Organization?           @relation(fields: [organizationId], references: [id])
+  organizationId        String?
+  Vehicle               Vehicle[]
+  AdminVendorContact    AdminVendorContact[]
+  VendorCustomerContact VendorCustomerContact[]
+  AdminVendorMessage    AdminVendorMessage[]
+  VendorCustomerMessage VendorCustomerMessage[]
 }
 
 model Customer {
-  id            String   @id @default(cuid())
-  createdAt     DateTime @default(now()) @map(name: "created_at")
-  updatedAt     DateTime @updatedAt @map(name: "updated_at")
-  firstName     String?
-  lastName      String?
-  username      String   @unique
-  email         String   @unique
-  password      String
-  phone         String?
-  token         String?
-  status        String?
-  image         String?
-  language      String?
-  address       String?
-  city          String?
-  country       String?
-  emailVerified String?
+  id                    String                  @id @default(cuid())
+  createdAt             DateTime                @default(now()) @map(name: "created_at")
+  updatedAt             DateTime                @updatedAt @map(name: "updated_at")
+  firstName             String?
+  lastName              String?
+  username              String?
+  email                 String                  @unique
+  password              String
+  phone                 String?
+  token                 String?
+  status                String?
+  image                 String?
+  language              String?
+  address               String?
+  city                  String?
+  country               String?
+  emailVerified         String?
+  onlineStatus          String?
+  VendorCustomerContact VendorCustomerContact[]
+  VendorCustomerMessage VendorCustomerMessage[]
 }
 
 model Organization {
@@ -153,18 +164,18 @@ model Model {
 }
 
 model Vehicle {
-  id                      String   @id @default(cuid())
-  createdAt               DateTime @default(now()) @map(name: "created_at")
-  updatedAt               DateTime @updatedAt @map(name: "updated_at")
-  entryNo                 String   @unique
-  vendor                  Vendor   @relation(fields: [vendorId], references: [id])
+  id                      String                  @id @default(cuid())
+  createdAt               DateTime                @default(now()) @map(name: "created_at")
+  updatedAt               DateTime                @updatedAt @map(name: "updated_at")
+  entryNo                 String                  @unique
+  vendor                  Vendor                  @relation(fields: [vendorId], references: [id])
   vendorId                String
-  brand                   Brand    @relation(fields: [brandId], references: [id])
+  brand                   Brand                   @relation(fields: [brandId], references: [id])
   brandId                 String
-  model                   Model    @relation(fields: [modelId], references: [id])
+  model                   Model                   @relation(fields: [modelId], references: [id])
   modelId                 String
   trim                    String?
-  slug                    String?  @unique
+  slug                    String?                 @unique
   yearOfManufacture       String?
   yearOfFirstRegistration String?
   registered              String?
@@ -201,4 +212,64 @@ model Vehicle {
   impressions             Int?
   detailExpands           Int?
   interested              Int?
+  VendorCustomerContact   VendorCustomerContact[]
+  VendorCustomerMessage   VendorCustomerMessage[]
+}
+
+model AdminVendorContact {
+  id                String   @id @default(cuid())
+  createdAt         DateTime @default(now()) @map(name: "created_at")
+  updatedAt         DateTime @updatedAt @map(name: "updated_at")
+  user              User?    @relation(fields: [userId], references: [id])
+  userId            String?
+  vendor            Vendor?  @relation(fields: [vendorId], references: [id])
+  vendorId          String?
+  latestMessageTime String?
+}
+
+model AdminVendorMessage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+  vendor    Vendor?  @relation(fields: [vendorId], references: [id])
+  vendorId  String?
+  senderId  String?
+  type      String?
+  message   String?
+  timeSent  String?
+  isSent    Boolean?
+  isSeen    Boolean?
+}
+
+model VendorCustomerContact {
+  id                String    @id @default(cuid())
+  createdAt         DateTime  @default(now()) @map(name: "created_at")
+  updatedAt         DateTime  @updatedAt @map(name: "updated_at")
+  vendor            Vendor?   @relation(fields: [vendorId], references: [id])
+  vendorId          String?
+  customer          Customer? @relation(fields: [customerId], references: [id])
+  customerId        String?
+  vehicle           Vehicle?  @relation(fields: [vehicleId], references: [id])
+  vehicleId         String?
+  latestMessageTime String?
+}
+
+model VendorCustomerMessage {
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now()) @map(name: "created_at")
+  updatedAt  DateTime  @updatedAt @map(name: "updated_at")
+  vendor     Vendor?   @relation(fields: [vendorId], references: [id])
+  vendorId   String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+  vehicle    Vehicle?  @relation(fields: [vehicleId], references: [id])
+  vehicleId  String?
+  senderId   String?
+  type       String?
+  message    String?
+  timeSent   String?
+  isSent     Boolean?
+  isSeen     Boolean?
 }
