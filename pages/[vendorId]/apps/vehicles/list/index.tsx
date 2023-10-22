@@ -100,15 +100,16 @@ interface CellType {
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   minHeight: 40,
   marginBlock: theme.spacing(4),
+  paddingInline: theme.spacing(2.5),
   "& .MuiTabs-indicator": {
     display: "none",
   },
   "& .MuiTab-root": {
     minHeight: 40,
-    marginInline: theme.spacing(4),
     paddingTop: theme.spacing(2.5),
     paddingBottom: theme.spacing(2.5),
     borderRadius: theme.shape.borderRadius,
+    "&:not(:first-of-type)": { marginInlineStart: theme.spacing(2.5) },
     "&.active": {
       color: theme.palette.common.white,
       backgroundColor: theme.palette.primary.main,
@@ -654,7 +655,11 @@ const VehiclesList = (props: Partial<Props>) => {
             <Divider sx={{ m: "0 !important" }} />
             <TabsWrapper panelTopRound="both">
               <TabContext value={tabValue}>
-                <TabList onChange={handleTabChange} aria-label="vehicles-tabs">
+                <TabList
+                  onChange={handleTabChange}
+                  aria-label="vehicles-tabs"
+                  variant="scrollable"
+                >
                   {vehiclesTabs.map((tab, index) => (
                     <Tab
                       value={tab.status}
