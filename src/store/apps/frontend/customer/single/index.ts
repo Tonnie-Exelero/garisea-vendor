@@ -5,6 +5,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import apolloClient from "@lib/apollo";
 import {
   GET_CUSTOMER_BY_ID,
+  GET_CUSTOMER_BY_EMAIL,
   CREATE_CUSTOMER,
   UPDATE_CUSTOMER,
   UPDATE_PASSWORD,
@@ -41,6 +42,7 @@ export const fetchCustomerById = createAsyncThunk<Customer, { id: string }, {}>(
       const { data } = await apolloClient.query({
         query: GET_CUSTOMER_BY_ID,
         variables: { ...id },
+        fetchPolicy: "no-cache",
       });
 
       return data;
@@ -54,6 +56,29 @@ export const fetchCustomerById = createAsyncThunk<Customer, { id: string }, {}>(
     }
   }
 );
+
+// ** Fetch Customer By Email
+export const fetchCustomerByEmail = createAsyncThunk<
+  Customer,
+  { email: string },
+  {}
+>("appCustomer/fetchCustomerByEmail", async (email, { rejectWithValue }) => {
+  try {
+    const { data } = await apolloClient.query({
+      query: GET_CUSTOMER_BY_EMAIL,
+      variables: { ...email },
+    });
+
+    return data;
+  } catch (err) {
+    let error: any = err; // cast the error for access
+    if (!error.response) {
+      throw err;
+    }
+    // We got validation errors, let's return those so we can reference in our component and set form errors
+    return rejectWithValue(error.response.data);
+  }
+});
 
 // ** Create Customer
 export const addCustomer = createAsyncThunk<Customer, Partial<Customer>, {}>(
@@ -198,6 +223,17 @@ export const appCustomerSlice = createSlice({
         if (state.loading === "pending") {
           state.loading = "";
           state.error = <any>action.error.message;
+        }
+      })
+      .addCase(fetchCustomerByEmail.fulfilled, (state, { payload }) => {
+        // Reset customer state.
+        state.customer = { ...customerInitialState };
+
+        if (state.loading === "pending") {
+          const { customerByEmail }: any = payload;
+
+          state.loading = "";
+          state.customer = customerByEmail;
         }
       })
       .addCase(addCustomer.fulfilled, (state, { payload }) => {

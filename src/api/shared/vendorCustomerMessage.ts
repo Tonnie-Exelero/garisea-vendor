@@ -4,6 +4,8 @@ export const GET_MESSAGES = gql`
   query GetMessages(
     $vendorId: String!
     $customerId: String!
+    $vehicleId: String
+    $senderId: String
     $first: Int
     $last: Int
     $after: ID
@@ -13,6 +15,57 @@ export const GET_MESSAGES = gql`
       vendorId: $vendorId
       customerId: $customerId
       vehicleId: $vehicleId
+      senderId: $senderId
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
+      edges {
+        cursor
+        node {
+          id
+          vendor {
+            id
+            firstName
+            lastName
+            image
+          }
+          customer {
+            id
+            firstName
+            lastName
+            image
+          }
+          senderId
+          type
+          message
+          timeSent
+          isSent
+          isSeen
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+      totalCount
+    }
+  }
+`;
+
+export const GET_CUSTOMER_MESSAGES = gql`
+  query GetMessages(
+    $customerId: String!
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
+    customerMessages(
+      customerId: $customerId
       first: $first
       last: $last
       after: $after
@@ -26,9 +79,6 @@ export const GET_MESSAGES = gql`
             id
           }
           customer {
-            id
-          }
-          vehicle {
             id
           }
           senderId
@@ -46,6 +96,14 @@ export const GET_MESSAGES = gql`
         startCursor
       }
       totalCount
+    }
+  }
+`;
+
+export const GET_NEW_CUSTOMER_MESSAGES_COUNT = gql`
+  query GetNewMessagesCount($customerId: String!) {
+    newMessagesCount(customerId: $customerId) {
+      message
     }
   }
 `;
@@ -78,9 +136,6 @@ export const CREATE_MESSAGE = gql`
         id
       }
       customer {
-        id
-      }
-      vehicle {
         id
       }
       senderId

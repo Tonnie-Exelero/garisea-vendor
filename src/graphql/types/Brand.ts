@@ -1,4 +1,4 @@
-import prisma from "@src/lib/prisma";
+import prisma from "@lib/prisma";
 import { builder } from "../builder";
 
 export const Brand = builder.prismaObject("Brand", {
@@ -7,6 +7,7 @@ export const Brand = builder.prismaObject("Brand", {
     name: t.exposeString("name", { nullable: false }),
     slug: t.exposeString("slug", { nullable: false }),
     description: t.exposeString("description", { nullable: true }),
+    image: t.exposeString("image", { nullable: true }),
   }),
 });
 
@@ -14,16 +15,36 @@ builder.queryFields((t) => ({
   brands: t.prismaConnection({
     type: Brand,
     cursor: "id",
-    resolve: async (query, _parent, _args, _ctx, _info) => {
+    args: {
+      hasVehicles: t.arg.string(),
+      orderBy: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx, _info) => {
       return await prisma.brand.findMany({
         ...query,
+        where: {
+          ...(args.hasVehicles === "yes" && {
+            Vehicle: {
+              some: {},
+            },
+          }),
+        },
         orderBy: {
-          name: "asc",
+          ...(args.orderBy === "random" ? { id: "desc" } : { name: "asc" }),
         },
       });
     },
-    totalCount: async (connection, _args, _ctx, _info) =>
-      await prisma.brand.count({ ...connection }),
+    totalCount: async (connection, args, _ctx, _info) =>
+      await prisma.brand.count({
+        ...connection,
+        where: {
+          ...(args.hasVehicles === "yes" && {
+            Vehicle: {
+              some: {},
+            },
+          }),
+        },
+      }),
   }),
   brandsFiltered: t.prismaConnection({
     type: Brand,
@@ -74,6 +95,20 @@ builder.queryFields((t) => ({
         },
       }),
   }),
+  brandBySlug: t.prismaField({
+    type: Brand,
+    nullable: true,
+    args: {
+      slug: t.arg.string({ required: true }),
+    },
+    resolve: async (query, _parent, args, _info) =>
+      await prisma.brand.findUnique({
+        ...query,
+        where: {
+          slug: args.slug,
+        },
+      }),
+  }),
 }));
 
 builder.mutationFields((t) => ({
@@ -83,9 +118,10 @@ builder.mutationFields((t) => ({
       name: t.arg.string({ required: true }),
       slug: t.arg.string({ required: true }),
       description: t.arg.string({ required: false }),
+      image: t.arg.string({ required: false }),
     },
     resolve: async (query, _parent, args, ctx) => {
-      const { name, slug, description } = args;
+      const { name, slug, description, image } = args;
 
       return await prisma.brand.create({
         ...query,
@@ -93,6 +129,7 @@ builder.mutationFields((t) => ({
           name,
           slug,
           description,
+          image,
         },
       });
     },
@@ -104,6 +141,7 @@ builder.mutationFields((t) => ({
       name: t.arg.string(),
       slug: t.arg.string(),
       description: t.arg.string(),
+      image: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx) =>
       await prisma.brand.update({
@@ -115,6 +153,7 @@ builder.mutationFields((t) => ({
           name: args.name ? args.name : undefined,
           slug: args.slug ? args.slug : undefined,
           description: args.description ? args.description : undefined,
+          image: args.image ? args.image : undefined,
         },
       }),
   }),

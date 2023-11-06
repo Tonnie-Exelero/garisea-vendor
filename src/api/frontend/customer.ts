@@ -132,6 +132,27 @@ export const GET_CUSTOMER_BY_ID = gql`
   }
 `;
 
+export const GET_CUSTOMER_BY_EMAIL = gql`
+  query GetCustomerByEmail($email: String!) {
+    customerByEmail(email: $email) {
+      id
+      firstName
+      lastName
+      username
+      email
+      phone
+      image
+      language
+      status
+      address
+      city
+      country
+      emailVerified
+      onlineStatus
+    }
+  }
+`;
+
 export const CREATE_CUSTOMER = gql`
   mutation CreateCustomer(
     $firstName: String
@@ -236,9 +257,26 @@ export const UPDATE_PASSWORD = gql`
   }
 `;
 
+export const UPDATE_IMAGE = gql`
+  mutation UpdateImage($id: String!, $image: String!) {
+    updateCustomerImage(id: $id, image: $image) {
+      id
+      image
+    }
+  }
+`;
+
 export const UPDATE_EMAIL_VERIFIED = gql`
-  mutation UpdateCustomerEmailVerified($id: String!, $emailVerified: String!) {
-    updateCustomerEmailVerified(id: $id, emailVerified: $emailVerified) {
+  mutation UpdateCustomerEmailVerified(
+    $id: String!
+    $emailVerified: String!
+    $status: String!
+  ) {
+    updateCustomerEmailVerified(
+      id: $id
+      emailVerified: $emailVerified
+      status: $status
+    ) {
       id
       firstName
       lastName

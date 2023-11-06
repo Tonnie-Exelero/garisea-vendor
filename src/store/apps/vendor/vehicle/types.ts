@@ -36,6 +36,7 @@ export interface Vehicle {
   doors: number;
   listingPrice: number;
   discountedPrice: number;
+  discountAmount: number;
   allowedPaymentModes: string;
   offerType: string;
   features: string;
@@ -47,4 +48,5 @@ export interface Vehicle {
   impressions: number;
   detailExpands: number;
   interested: number;
+  vehicleVerified: string;
 }

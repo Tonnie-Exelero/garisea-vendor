@@ -1,9 +1,9 @@
 import * as bcrypt from "bcryptjs";
 import * as jwt from "jsonwebtoken";
-import prisma from "@src/lib/prisma";
+import prisma from "@lib/prisma";
 import { APP_SECRET } from "@graphql/utils/auth";
 import { builder } from "../builder";
-import { encryptData } from "@core/utils/encryption";
+import { encryptData } from "@utils/encryption";
 
 export const Customer = builder.prismaObject("Customer", {
   fields: (t) => ({
@@ -124,6 +124,20 @@ builder.queryFields((t) => ({
         ...query,
         where: {
           id: args.id,
+        },
+      }),
+  }),
+  customerByEmail: t.prismaField({
+    type: Customer,
+    nullable: true,
+    args: {
+      email: t.arg.string({ required: true }),
+    },
+    resolve: async (query, _parent, args, _info) =>
+      await prisma.customer.findUnique({
+        ...query,
+        where: {
+          email: args.email,
         },
       }),
   }),
@@ -362,14 +376,35 @@ builder.mutationFields((t) => ({
       });
     },
   }),
+  updateCustomerImage: t.prismaField({
+    type: "Customer",
+    args: {
+      id: t.arg.string({ required: true }),
+      image: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { image } = args;
+
+      return await prisma.customer.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          image: image ? image : undefined,
+        },
+      });
+    },
+  }),
   updateCustomerEmailVerified: t.prismaField({
     type: "Customer",
     args: {
       id: t.arg.string({ required: true }),
       emailVerified: t.arg.string(),
+      status: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { emailVerified } = args;
+      const { emailVerified, status } = args;
 
       return await prisma.customer.update({
         ...query,
@@ -378,6 +413,7 @@ builder.mutationFields((t) => ({
         },
         data: {
           emailVerified: emailVerified ? emailVerified : undefined,
+          status: status ? status : undefined,
         },
       });
     },

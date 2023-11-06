@@ -15,6 +15,7 @@ export const GET_ORGANIZATIONS = gql`
           address2
           city
           country
+          coverImage
           logo
           certificate
           kraPin
@@ -46,6 +47,7 @@ export const GET_FILTERED_ORGANIZATIONS = gql`
           address2
           city
           country
+          coverImage
           logo
           certificate
           kraPin
@@ -74,6 +76,7 @@ export const GET_ORGANIZATION_BY_ID = gql`
       address2
       city
       country
+      coverImage
       logo
       certificate
       kraPin
@@ -93,6 +96,7 @@ export const GET_ORGANIZATION_BY_NAME = gql`
       address2
       city
       country
+      coverImage
       logo
       certificate
       kraPin
@@ -136,6 +140,7 @@ export const CREATE_ORGANIZATION = gql`
       address2
       city
       country
+      coverImage
       logo
       certificate
       kraPin
@@ -175,9 +180,19 @@ export const UPDATE_ORGANIZATION = gql`
       address2
       city
       country
+      coverImage
       logo
       certificate
       kraPin
+    }
+  }
+`;
+
+export const UPDATE_COVER_IMAGE = gql`
+  mutation UpdateCoverImage($id: String!, $coverImage: String!) {
+    updateOrganizationCoverImage(id: $id, coverImage: $coverImage) {
+      id
+      coverImage
     }
   }
 `;

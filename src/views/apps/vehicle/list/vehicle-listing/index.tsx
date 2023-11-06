@@ -144,6 +144,7 @@ const VehicleListingWizard: React.FC<any> = () => {
     ...featuresData,
     ...priceData,
     status: "pending",
+    vehicleVerified: "No",
     reserved: "No",
     sold: "No",
     impressions: 0,
