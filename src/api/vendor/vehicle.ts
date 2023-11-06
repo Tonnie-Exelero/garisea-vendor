@@ -423,6 +423,14 @@ export const GET_VEHICLES_BY_VENDOR_ID = gql`
   }
 `;
 
+export const GET_VEHICLES_STATS_BY_VENDOR_ID = gql`
+  query GetVehiclesStatsByVendorId($vendorId: String!) {
+    vehiclesCount(vendorId: $vendorId) {
+      vehicleVerified
+    }
+  }
+`;
+
 export const GET_FILTERED_VEHICLES = gql`
   query GetVehiclesFiltered(
     $first: Int

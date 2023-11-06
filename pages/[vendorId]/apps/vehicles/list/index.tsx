@@ -58,7 +58,10 @@ import apolloClient from "@lib/apollo";
 import { fetchVendors } from "@src/store/apps/vendor/vendor";
 import { fetchFilteredVehicles } from "@src/store/apps/vendor/vehicle";
 import { removeVehicle } from "@src/store/apps/vendor/vehicle/single";
-import { GET_FILTERED_VEHICLES } from "@src/api/vendor/vehicle";
+import {
+  GET_FILTERED_VEHICLES,
+  GET_VEHICLES_STATS_BY_VENDOR_ID,
+} from "@src/api/vendor/vehicle";
 
 // ** Third Party Components
 import axios from "axios";
@@ -402,6 +405,7 @@ const VehiclesList = (props: Partial<Props>) => {
   const [vehiclesSearchParams, setVehiclesSearchParams] = useState<any>();
   const [expanded, setExpanded] = useState<string | false>(false);
   const [tabValue, setTabValue] = useState<string>("active");
+  const [vehiclesCount, setVehiclesCount] = useState<any>();
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
@@ -410,7 +414,24 @@ const VehiclesList = (props: Partial<Props>) => {
 
   useEffect(() => {
     dispatch(fetchVendors({ first: 100 }));
+    handleGetVehiclesCount();
   }, [dispatch, vendors]);
+
+  const handleGetVehiclesCount = useCallback(async () => {
+    const { data } = await apolloClient.query({
+      query: GET_VEHICLES_STATS_BY_VENDOR_ID,
+      variables: {
+        vendorId,
+      },
+      fetchPolicy: "no-cache",
+    });
+
+    const {
+      vehiclesCount: { vehicleVerified },
+    }: any = data;
+
+    setVehiclesCount(JSON.parse(vehicleVerified));
+  }, []);
 
   const handleAccordionChange =
     (panel: string) => (event: SyntheticEvent, isExpanded: boolean) => {
@@ -663,7 +684,9 @@ const VehiclesList = (props: Partial<Props>) => {
                   {vehiclesTabs.map((tab, index) => (
                     <Tab
                       value={tab.status}
-                      label={tab.title}
+                      label={`${tab.title} (${
+                        vehiclesCount ? vehiclesCount[tab.status] : 0
+                      })`}
                       className={tab.status}
                       key={index}
                     />

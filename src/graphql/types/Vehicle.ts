@@ -146,6 +146,41 @@ builder.queryFields((t) => ({
         },
       }),
   }),
+  vehiclesCount: t.prismaField({
+    type: Vehicle,
+    nullable: true,
+    args: {
+      vendorId: t.arg.string({ required: true }),
+    },
+    resolve: async (_query, _parent, args, _info): Promise<any | undefined> => {
+      const active = await prisma.vehicle.count({
+        where: {
+          vendorId: args.vendorId,
+          status: "active",
+        },
+      });
+
+      const pending = await prisma.vehicle.count({
+        where: {
+          vendorId: args.vendorId,
+          status: "pending",
+        },
+      });
+
+      const declined = await prisma.vehicle.count({
+        where: {
+          vendorId: args.vendorId,
+          status: "declined",
+        },
+      });
+
+      const stats = { active, pending, declined };
+
+      return {
+        vehicleVerified: JSON.stringify(stats),
+      };
+    },
+  }),
   vehiclesFiltered: t.prismaConnection({
     type: Vehicle,
     cursor: "id",

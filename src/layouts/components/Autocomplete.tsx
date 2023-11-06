@@ -34,6 +34,8 @@ import Icon from "src/@core/components/icon";
 
 // ** Configs Imports
 import themeConfig from "src/configs/themeConfig";
+import { useSelector } from "react-redux";
+import { RootState } from "@src/store";
 
 interface Props {
   hidden: boolean;
@@ -55,6 +57,7 @@ interface DefaultSuggestionsType {
     link: string;
     icon: string;
     suggestion: string;
+    hasId?: boolean;
   }[];
 }
 
@@ -66,6 +69,7 @@ const defaultSuggestionsData: DefaultSuggestionsType[] = [
         icon: "bx:car",
         suggestion: "Add Vehicles",
         link: "/apps/vehicles/add",
+        hasId: true,
       },
       {
         suggestion: "Profile",
@@ -77,6 +81,11 @@ const defaultSuggestionsData: DefaultSuggestionsType[] = [
         suggestion: "Settings",
         link: "/account/settings/account",
       },
+      {
+        icon: "bx:home",
+        suggestion: "Home",
+        link: "/home",
+      },
     ],
   },
   {
@@ -86,11 +95,19 @@ const defaultSuggestionsData: DefaultSuggestionsType[] = [
         icon: "bx:car",
         suggestion: "Manage Vehicles",
         link: "/apps/vehicles/list",
+        hasId: true,
       },
       {
-        icon: "bx:home",
-        suggestion: "Home",
-        link: "/home",
+        icon: "bx:message",
+        suggestion: "Admin Messages",
+        link: "/apps/chat/admin",
+        hasId: true,
+      },
+      {
+        icon: "bx:message",
+        suggestion: "Customer Chats",
+        link: "/apps/chat/customer/messages",
+        hasId: true,
       },
     ],
   },
@@ -234,6 +251,10 @@ const Dialog = styled(MuiDialog)({
 });
 
 const NoResult = ({ value, setOpenDialog }: NoResultProps) => {
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
+
   return (
     <Box
       sx={{
@@ -268,7 +289,7 @@ const NoResult = ({ value, setOpenDialog }: NoResultProps) => {
         >
           <Box
             component={Link}
-            href="/apps/vehicles/list"
+            href={`/${authedVendor.id}/apps/vehicles/list`}
             sx={{
               display: "flex",
               alignItems: "center",
@@ -336,6 +357,10 @@ const NoResult = ({ value, setOpenDialog }: NoResultProps) => {
 };
 
 const DefaultSuggestions = ({ setOpenDialog }: DefaultSuggestionsProps) => {
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
+
   return (
     <Grid container spacing={6} sx={{ ml: 0 }}>
       {defaultSuggestionsData.map((item, index) => (
@@ -352,7 +377,11 @@ const DefaultSuggestions = ({ setOpenDialog }: DefaultSuggestionsProps) => {
               <ListItem key={index2} sx={{ py: 2 }} disablePadding>
                 <Box
                   component={Link}
-                  href={suggestionItem.link}
+                  href={
+                    suggestionItem.hasId
+                      ? `/${authedVendor.id}${suggestionItem.link}`
+                      : suggestionItem.link
+                  }
                   onClick={() => setOpenDialog(false)}
                   sx={{
                     display: "flex",
