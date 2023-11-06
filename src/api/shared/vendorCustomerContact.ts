@@ -2,7 +2,8 @@ import { gql } from "@apollo/client";
 
 export const GET_CONTACTS = gql`
   query GetContacts(
-    $vendorId: String!
+    $vendorId: String
+    $customerId: String
     $first: Int
     $last: Int
     $after: ID
@@ -10,6 +11,7 @@ export const GET_CONTACTS = gql`
   ) {
     vendorCustomerContacts(
       vendorId: $vendorId
+      customerId: $customerId
       first: $first
       last: $last
       after: $after
@@ -26,6 +28,10 @@ export const GET_CONTACTS = gql`
             image
             storeLink
             onlineStatus
+            organization {
+              nicename
+              name
+            }
           }
           customer {
             id
@@ -33,19 +39,6 @@ export const GET_CONTACTS = gql`
             lastName
             image
             onlineStatus
-          }
-          vehicle {
-            id
-            brand {
-              name
-            }
-            model {
-              name
-            }
-            trim
-            slug
-            yearOfManufacture
-            yearOfFirstRegistration
           }
           latestMessageTime
         }
@@ -65,6 +58,7 @@ export const GET_CONTACTS_BY_IDS = gql`
   query GetContactsByIds(
     $vendorId: String!
     $customerId: String!
+    $vehicleId: String
     $first: Int
     $last: Int
     $after: ID
@@ -73,6 +67,7 @@ export const GET_CONTACTS_BY_IDS = gql`
     contactsByVendorCustomerVehicleIds(
       vendorId: $vendorId
       customerId: $customerId
+      vehicleId: $vehicleId
       first: $first
       last: $last
       after: $after
@@ -96,19 +91,6 @@ export const GET_CONTACTS_BY_IDS = gql`
             lastName
             image
             onlineStatus
-          }
-          vehicle {
-            id
-            brand {
-              name
-            }
-            model {
-              name
-            }
-            trim
-            slug
-            yearOfManufacture
-            yearOfFirstRegistration
           }
           latestMessageTime
         }
@@ -153,19 +135,6 @@ export const CREATE_CONTACT = gql`
         image
         onlineStatus
       }
-      vehicle {
-        id
-        brand {
-          name
-        }
-        model {
-          name
-        }
-        trim
-        slug
-        yearOfManufacture
-        yearOfFirstRegistration
-      }
       latestMessageTime
     }
   }
@@ -192,19 +161,6 @@ export const UPDATE_CONTACT = gql`
         lastName
         image
         onlineStatus
-      }
-      vehicle {
-        id
-        brand {
-          name
-        }
-        model {
-          name
-        }
-        trim
-        slug
-        yearOfManufacture
-        yearOfFirstRegistration
       }
       latestMessageTime
     }

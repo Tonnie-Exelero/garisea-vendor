@@ -22,6 +22,7 @@ import {
   UPDATE_VEHICLE_SPECIFICATIONS,
   UPDATE_VEHICLE_EXTRA_INFO,
   DELETE_VEHICLE,
+  UPDATE_VEHICLE_VERIFIED,
 } from "@api/vendor/vehicle";
 
 // ** Others
@@ -39,12 +40,15 @@ const vehicleInitialState = {
     email: "",
     phone: "",
     image: "",
+    storeLink: "",
     address: "",
     city: "",
     country: "",
+    vendorVerified: "",
     organization: {
       id: "",
       name: "",
+      nicename: "",
     },
   },
   brand: {
@@ -85,6 +89,7 @@ const vehicleInitialState = {
   doors: 0,
   listingPrice: 0,
   discountedPrice: 0,
+  discountAmount: 0,
   allowedPaymentModes: "",
   offerType: "",
   features: "",
@@ -96,6 +101,7 @@ const vehicleInitialState = {
   impressions: 0,
   detailExpands: 0,
   interested: 0,
+  vehicleVerified: "",
 };
 
 // ** Fetch Vehicle By ID
@@ -224,6 +230,32 @@ export const editVehicleStatus = createAsyncThunk<
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_VEHICLE_STATUS,
+        variables: { ...vehicleData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Update Vehicle Verified
+export const editVehicleVerified = createAsyncThunk<
+  Vehicle,
+  Partial<Vehicle>,
+  {}
+>(
+  "appSingleVehicle/editVehicleVerified",
+  async (vehicleData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_VEHICLE_VERIFIED,
         variables: { ...vehicleData },
       });
 
@@ -634,6 +666,11 @@ export const appSingleVehicleSlice = createSlice({
         const { updateVehicleStatus }: any = payload;
 
         state.vehicle.status = updateVehicleStatus.status;
+      })
+      .addCase(editVehicleVerified.fulfilled, (state, { payload }) => {
+        const { updateVehicleVerified }: any = payload;
+
+        state.vehicle.vehicleVerified = updateVehicleVerified.vehicleVerified;
       })
       .addCase(editVehicleSlug.fulfilled, (state, { payload }) => {
         const { updateVehicleSlug }: any = payload;

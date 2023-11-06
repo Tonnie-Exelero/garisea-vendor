@@ -4,32 +4,31 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 // ** API
 import apolloClient from "@lib/apollo";
 import {
-  GET_ORGANIZATIONS,
-  GET_FILTERED_ORGANIZATIONS,
-} from "@api/vendor/organization";
+  GET_MAIN_CAROUSELS,
+  GET_FILTERED_MAIN_CAROUSELS,
+} from "@api/admin/mainCarousel";
 
 // ** Others
-import { Organization } from "./types";
+import { MainCarousel } from "./types";
 
-// Initial state
-const organizationsInitialState = {
+// Initial state.
+const mainCarouselsInitialState = {
   edges: [
     {
       cursor: "",
       node: {
         id: "",
-        name: "",
-        nicename: "",
-        email: "",
-        phone: "",
-        address: "",
-        address2: "",
-        city: "",
-        country: "",
-        coverImage: "",
-        logo: "",
-        certificate: "",
-        kraPin: "",
+        type: "",
+        title: "",
+        image: "",
+        buttonLink: "",
+        buttonText: "",
+        description: "",
+        rank: 0,
+        impressions: 0,
+        clicks: 0,
+        targetImpressions: 0,
+        targetClicks: 0,
       },
     },
   ],
@@ -42,10 +41,10 @@ const organizationsInitialState = {
   totalCount: 0,
 };
 
-interface OrganizationsState {
+interface MainCarouselsState {
   edges: {
     cursor: string;
-    node: any;
+    node: MainCarousel;
   }[];
   pageInfo: {
     endCursor: string;
@@ -56,14 +55,14 @@ interface OrganizationsState {
   totalCount: number;
 }
 
-// ** Fetch Organizations
-export const fetchOrganizations = createAsyncThunk<Organization, any, {}>(
-  "appOrganizations/fetchOrganizations",
-  async (organizationData, { rejectWithValue }) => {
+// ** Fetch MainCarousels
+export const fetchMainCarousels = createAsyncThunk<MainCarousel, any, {}>(
+  "appMainCarousels/fetchMainCarousels",
+  async (mainCarouselData, { rejectWithValue }) => {
     try {
       const { data } = await apolloClient.query({
-        query: GET_ORGANIZATIONS,
-        variables: organizationData,
+        query: GET_MAIN_CAROUSELS,
+        variables: mainCarouselData,
       });
 
       return data;
@@ -78,18 +77,18 @@ export const fetchOrganizations = createAsyncThunk<Organization, any, {}>(
   }
 );
 
-// ** Fetch Filtered Organizations
-export const fetchFilteredOrganizations = createAsyncThunk<
-  Organization,
+// ** Fetch Filtered MainCarousels
+export const fetchFilteredMainCarousels = createAsyncThunk<
+  MainCarousel,
   any,
   {}
 >(
-  "appOrganizations/fetchFilteredOrganizations",
-  async (organizationData, { rejectWithValue }) => {
+  "appMainCarousels/fetchFilteredMainCarousels",
+  async (mainCarouselData, { rejectWithValue }) => {
     try {
       const { data } = await apolloClient.query({
-        query: GET_FILTERED_ORGANIZATIONS,
-        variables: organizationData,
+        query: GET_FILTERED_MAIN_CAROUSELS,
+        variables: mainCarouselData,
       });
 
       return data;
@@ -104,11 +103,11 @@ export const fetchFilteredOrganizations = createAsyncThunk<
   }
 );
 
-export const appOrganizationsSlice = createSlice({
-  name: "appOrganizations",
+export const appMainCarouselsSlice = createSlice({
+  name: "appMainCarousels",
   initialState: {
-    organizations: <OrganizationsState>{
-      ...organizationsInitialState,
+    mainCarousels: <MainCarouselsState>{
+      ...mainCarouselsInitialState,
     },
     loading: "",
     error: null,
@@ -116,40 +115,40 @@ export const appOrganizationsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchOrganizations.pending, (state, action) => {
+      .addCase(fetchMainCarousels.pending, (state) => {
         if (state.loading === "") {
           state.loading = "pending";
         }
       })
-      .addCase(fetchOrganizations.fulfilled, (state, { payload }) => {
+      .addCase(fetchMainCarousels.fulfilled, (state, { payload }) => {
         // Reset state.
-        state.organizations = { ...organizationsInitialState };
+        state.mainCarousels = { ...mainCarouselsInitialState };
 
         if (state.loading === "pending") {
           state.loading = "";
         }
 
-        const { organizations }: any = payload;
-        state.organizations = organizations;
+        const { mainCarousels }: any = payload;
+        state.mainCarousels = mainCarousels;
       })
-      .addCase(fetchOrganizations.rejected, (state, action) => {
+      .addCase(fetchMainCarousels.rejected, (state, action) => {
         if (state.loading === "pending") {
           state.loading = "";
           state.error = <any>action.error.message;
         }
       })
-      .addCase(fetchFilteredOrganizations.fulfilled, (state, { payload }) => {
+      .addCase(fetchFilteredMainCarousels.fulfilled, (state, { payload }) => {
         // Reset state.
-        state.organizations = { ...organizationsInitialState };
+        state.mainCarousels = { ...mainCarouselsInitialState };
 
         if (state.loading === "pending") {
           state.loading = "";
         }
 
-        const { organizationsFiltered }: any = payload;
-        state.organizations = organizationsFiltered;
+        const { mainCarouselsFiltered }: any = payload;
+        state.mainCarousels = mainCarouselsFiltered;
       });
   },
 });
 
-export default appOrganizationsSlice.reducer;
+export default appMainCarouselsSlice.reducer;

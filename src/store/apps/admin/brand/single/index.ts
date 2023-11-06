@@ -5,6 +5,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import apolloClient from "@lib/apollo";
 import {
   GET_BRAND_BY_ID,
+  GET_BRAND_BY_SLUG,
   CREATE_BRAND,
   UPDATE_BRAND,
   DELETE_BRAND,
@@ -19,6 +20,7 @@ export const brandInitialState = {
   name: "",
   slug: "",
   description: "",
+  image: "",
 };
 
 // ** Fetch Brand By ID
@@ -29,6 +31,28 @@ export const fetchBrandById = createAsyncThunk<Brand, { id: string }, {}>(
       const { data } = await apolloClient.query({
         query: GET_BRAND_BY_ID,
         variables: { ...id },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Fetch Brand By Slug
+export const fetchBrandBySlug = createAsyncThunk<Brand, { slug: string }, {}>(
+  "appBrand/fetchBrandBySlug",
+  async (slug, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_BRAND_BY_SLUG,
+        variables: { ...slug },
       });
 
       return data;
@@ -128,6 +152,14 @@ export const appBrandSlice = createSlice({
         const { brandById }: any = payload;
 
         state.brand = { ...brandById };
+      })
+      .addCase(fetchBrandBySlug.fulfilled, (state, { payload }) => {
+        // Reset brand state.
+        state.brand = { ...brandInitialState };
+
+        const { brandBySlug }: any = payload;
+
+        state.brand = { ...brandBySlug };
       })
       .addCase(addBrand.fulfilled, (state, { payload }) => {
         // Reset brand state.

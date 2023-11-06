@@ -1,8 +1,22 @@
 import { gql } from "@apollo/client";
 
 export const GET_BRANDS = gql`
-  query GetBrands($first: Int, $last: Int, $after: ID, $before: ID) {
-    brands(first: $first, last: $last, after: $after, before: $before) {
+  query GetBrands(
+    $hasVehicles: String
+    $orderBy: String
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
+    brands(
+      hasVehicles: $hasVehicles
+      orderBy: $orderBy
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
       edges {
         cursor
         node {
@@ -10,6 +24,7 @@ export const GET_BRANDS = gql`
           name
           slug
           description
+          image
         }
       }
       pageInfo {
@@ -33,6 +48,7 @@ export const GET_FILTERED_BRANDS = gql`
           name
           slug
           description
+          image
         }
       }
       pageInfo {
@@ -53,17 +69,41 @@ export const GET_BRAND_BY_ID = gql`
       name
       slug
       description
+      image
+    }
+  }
+`;
+
+export const GET_BRAND_BY_SLUG = gql`
+  query GetBrandBySlug($slug: String!) {
+    brandBySlug(slug: $slug) {
+      id
+      name
+      slug
+      description
+      image
     }
   }
 `;
 
 export const CREATE_BRAND = gql`
-  mutation CreateBrand($name: String!, $slug: String!, $description: String) {
-    createBrand(name: $name, slug: $slug, description: $description) {
+  mutation CreateBrand(
+    $name: String!
+    $slug: String!
+    $description: String
+    $image: String
+  ) {
+    createBrand(
+      name: $name
+      slug: $slug
+      description: $description
+      image: $image
+    ) {
       id
       name
       slug
       description
+      image
     }
   }
 `;
@@ -74,12 +114,20 @@ export const UPDATE_BRAND = gql`
     $name: String
     $slug: String
     $description: String
+    $image: String
   ) {
-    updateBrand(id: $id, name: $name, slug: $slug, description: $description) {
+    updateBrand(
+      id: $id
+      name: $name
+      slug: $slug
+      description: $description
+      image: $image
+    ) {
       id
       name
       slug
       description
+      image
     }
   }
 `;

@@ -4,32 +4,31 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 // ** API
 import apolloClient from "@lib/apollo";
 import {
-  GET_ORGANIZATIONS,
-  GET_FILTERED_ORGANIZATIONS,
-} from "@api/vendor/organization";
+  GET_BANNERS,
+  GET_FILTERED_BANNERS,
+} from "@api/admin/banner";
 
 // ** Others
-import { Organization } from "./types";
+import { Banner } from "./types";
 
-// Initial state
-const organizationsInitialState = {
+// Initial state.
+const bannersInitialState = {
   edges: [
     {
       cursor: "",
       node: {
         id: "",
-        name: "",
-        nicename: "",
-        email: "",
-        phone: "",
-        address: "",
-        address2: "",
-        city: "",
-        country: "",
-        coverImage: "",
-        logo: "",
-        certificate: "",
-        kraPin: "",
+        type: "",
+        title: "",
+        link: "",
+        image: "",
+        page: "",
+        position: "",
+        rank: 0,
+        impressions: 0,
+        clicks: 0,
+        targetImpressions: 0,
+        targetClicks: 0,
       },
     },
   ],
@@ -42,10 +41,10 @@ const organizationsInitialState = {
   totalCount: 0,
 };
 
-interface OrganizationsState {
+interface BannersState {
   edges: {
     cursor: string;
-    node: any;
+    node: Banner;
   }[];
   pageInfo: {
     endCursor: string;
@@ -56,14 +55,14 @@ interface OrganizationsState {
   totalCount: number;
 }
 
-// ** Fetch Organizations
-export const fetchOrganizations = createAsyncThunk<Organization, any, {}>(
-  "appOrganizations/fetchOrganizations",
-  async (organizationData, { rejectWithValue }) => {
+// ** Fetch Banners
+export const fetchBanners = createAsyncThunk<Banner, any, {}>(
+  "appBanners/fetchBanners",
+  async (bannerData, { rejectWithValue }) => {
     try {
       const { data } = await apolloClient.query({
-        query: GET_ORGANIZATIONS,
-        variables: organizationData,
+        query: GET_BANNERS,
+        variables: bannerData,
       });
 
       return data;
@@ -78,18 +77,18 @@ export const fetchOrganizations = createAsyncThunk<Organization, any, {}>(
   }
 );
 
-// ** Fetch Filtered Organizations
-export const fetchFilteredOrganizations = createAsyncThunk<
-  Organization,
+// ** Fetch Filtered Banners
+export const fetchFilteredBanners = createAsyncThunk<
+  Banner,
   any,
   {}
 >(
-  "appOrganizations/fetchFilteredOrganizations",
-  async (organizationData, { rejectWithValue }) => {
+  "appBanners/fetchFilteredBanners",
+  async (bannerData, { rejectWithValue }) => {
     try {
       const { data } = await apolloClient.query({
-        query: GET_FILTERED_ORGANIZATIONS,
-        variables: organizationData,
+        query: GET_FILTERED_BANNERS,
+        variables: bannerData,
       });
 
       return data;
@@ -104,11 +103,11 @@ export const fetchFilteredOrganizations = createAsyncThunk<
   }
 );
 
-export const appOrganizationsSlice = createSlice({
-  name: "appOrganizations",
+export const appBannersSlice = createSlice({
+  name: "appBanners",
   initialState: {
-    organizations: <OrganizationsState>{
-      ...organizationsInitialState,
+    banners: <BannersState>{
+      ...bannersInitialState,
     },
     loading: "",
     error: null,
@@ -116,40 +115,40 @@ export const appOrganizationsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchOrganizations.pending, (state, action) => {
+      .addCase(fetchBanners.pending, (state) => {
         if (state.loading === "") {
           state.loading = "pending";
         }
       })
-      .addCase(fetchOrganizations.fulfilled, (state, { payload }) => {
+      .addCase(fetchBanners.fulfilled, (state, { payload }) => {
         // Reset state.
-        state.organizations = { ...organizationsInitialState };
+        state.banners = { ...bannersInitialState };
 
         if (state.loading === "pending") {
           state.loading = "";
         }
 
-        const { organizations }: any = payload;
-        state.organizations = organizations;
+        const { banners }: any = payload;
+        state.banners = banners;
       })
-      .addCase(fetchOrganizations.rejected, (state, action) => {
+      .addCase(fetchBanners.rejected, (state, action) => {
         if (state.loading === "pending") {
           state.loading = "";
           state.error = <any>action.error.message;
         }
       })
-      .addCase(fetchFilteredOrganizations.fulfilled, (state, { payload }) => {
+      .addCase(fetchFilteredBanners.fulfilled, (state, { payload }) => {
         // Reset state.
-        state.organizations = { ...organizationsInitialState };
+        state.banners = { ...bannersInitialState };
 
         if (state.loading === "pending") {
           state.loading = "";
         }
 
-        const { organizationsFiltered }: any = payload;
-        state.organizations = organizationsFiltered;
+        const { bannersFiltered }: any = payload;
+        state.banners = bannersFiltered;
       });
   },
 });
 
-export default appOrganizationsSlice.reducer;
+export default appBannersSlice.reducer;

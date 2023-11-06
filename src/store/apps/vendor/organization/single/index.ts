@@ -8,6 +8,7 @@ import {
   GET_ORGANIZATION_BY_NAME,
   CREATE_ORGANIZATION,
   UPDATE_ORGANIZATION,
+  UPDATE_COVER_IMAGE,
   UPDATE_LOGO,
   UPDATE_CERTIFICATE,
   UPDATE_KRA_PIN,
@@ -28,6 +29,7 @@ const organizationInitialState = {
   address2: "",
   city: "",
   country: "",
+  coverImage: "",
   logo: "",
   certificate: "",
   kraPin: "",
@@ -107,6 +109,28 @@ export const editOrganization = createAsyncThunk<Organization, any, {}>(
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_ORGANIZATION,
+        variables: { ...organizationData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Update Cover Image
+export const editCoverImage = createAsyncThunk<Organization, any, {}>(
+  "appOrganization/editCoverImage",
+  async (organizationData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_COVER_IMAGE,
         variables: { ...organizationData },
       });
 
@@ -268,6 +292,11 @@ export const appOrganizationSlice = createSlice({
         const { updateOrganization }: any = payload;
 
         state.organization = { ...updateOrganization };
+      })
+      .addCase(editCoverImage.fulfilled, (state, { payload }) => {
+        const { updateOrganizationCoverImage }: any = payload;
+
+        state.organization.coverImage = updateOrganizationCoverImage.coverImage;
       })
       .addCase(editLogo.fulfilled, (state, { payload }) => {
         const { updateOrganizationLogo }: any = payload;
