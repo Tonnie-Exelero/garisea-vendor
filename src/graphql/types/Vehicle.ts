@@ -1,4 +1,4 @@
-import prisma from "@src/lib/prisma";
+import prisma from "@lib/prisma";
 import { builder } from "../builder";
 
 export const Vehicle = builder.prismaObject("Vehicle", {
@@ -40,6 +40,7 @@ export const Vehicle = builder.prismaObject("Vehicle", {
     doors: t.exposeInt("doors", { nullable: true }),
     listingPrice: t.exposeInt("listingPrice", { nullable: true }),
     discountedPrice: t.exposeInt("discountedPrice", { nullable: true }),
+    discountAmount: t.exposeInt("discountAmount", { nullable: true }),
     allowedPaymentModes: t.exposeString("allowedPaymentModes", {
       nullable: true,
     }),
@@ -54,6 +55,7 @@ export const Vehicle = builder.prismaObject("Vehicle", {
     impressions: t.exposeInt("impressions", { nullable: true }),
     detailExpands: t.exposeInt("detailExpands", { nullable: true }),
     interested: t.exposeInt("interested", { nullable: true }),
+    vehicleVerified: t.exposeString("vehicleVerified", { nullable: true }),
   }),
 });
 
@@ -119,14 +121,16 @@ builder.queryFields((t) => ({
     cursor: "id",
     args: {
       vendorId: t.arg.string({ required: true }),
+      status: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
-      const { vendorId } = args;
+      const { vendorId, status } = args;
 
       return await prisma.vehicle.findMany({
         ...query,
         where: {
           vendorId,
+          status,
         },
         orderBy: {
           createdAt: "desc",
@@ -138,6 +142,7 @@ builder.queryFields((t) => ({
         ...connection,
         where: {
           vendorId: args.vendorId,
+          status: args.status,
         },
       }),
   }),
@@ -172,6 +177,12 @@ builder.queryFields((t) => ({
       doors: t.arg.int(),
       minPrice: t.arg.int(),
       maxPrice: t.arg.int(),
+      hasDiscount: t.arg.string(),
+      biggestDiscount: t.arg.string(),
+      reserved: t.arg.string(),
+      sold: t.arg.string(),
+      random: t.arg.string(),
+      sortBy: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
       const where = {
@@ -356,14 +367,51 @@ builder.queryFields((t) => ({
               },
             ],
           }),
+        ...(args.hasDiscount === "yes" && {
+          discountedPrice: {
+            not: null,
+            gt: 0,
+          },
+        }),
+        ...(args.reserved && {
+          reserved: {
+            equals: args.reserved,
+          },
+        }),
+        ...(args.sold && {
+          sold: {
+            equals: args.sold,
+          },
+        }),
       };
 
       return await prisma.vehicle.findMany({
         ...query,
         where,
-        orderBy: {
-          createdAt: "desc",
-        },
+        orderBy: [
+          {
+            ...(args.sortBy === "relevance"
+              ? { impressions: "desc" }
+              : args.sortBy === "price-l-to-h"
+              ? { listingPrice: "asc" }
+              : args.sortBy === "price-h-to-l"
+              ? { listingPrice: "desc" }
+              : args.sortBy === "mileage-l-to-h"
+              ? { mileage: "asc" }
+              : args.sortBy === "mileage-h-to-l"
+              ? { mileage: "desc" }
+              : {}),
+          },
+          {
+            ...(args.biggestDiscount !== "yes" &&
+              !args.sortBy && {
+                ...(args.random === "yes"
+                  ? { mileage: "asc" }
+                  : { createdAt: "desc" }),
+              }),
+          },
+          { ...(args.biggestDiscount === "yes" && { discountAmount: "desc" }) },
+        ],
       });
     },
     totalCount: async (connection, args, _ctx, _info) => {
@@ -549,6 +597,22 @@ builder.queryFields((t) => ({
               },
             ],
           }),
+        ...(args.hasDiscount === "yes" && {
+          discountedPrice: {
+            not: null,
+            gt: 0,
+          },
+        }),
+        ...(args.reserved && {
+          reserved: {
+            equals: args.reserved,
+          },
+        }),
+        ...(args.sold && {
+          sold: {
+            equals: args.sold,
+          },
+        }),
       };
 
       return await prisma.vehicle.count({ ...connection, where });
@@ -592,6 +656,7 @@ builder.mutationFields((t) => ({
       doors: t.arg.int(),
       listingPrice: t.arg.int(),
       discountedPrice: t.arg.int(),
+      discountAmount: t.arg.int(),
       allowedPaymentModes: t.arg.string(),
       offerType: t.arg.string(),
       features: t.arg.string(),
@@ -602,6 +667,7 @@ builder.mutationFields((t) => ({
       impressions: t.arg.int(),
       detailExpands: t.arg.int(),
       interested: t.arg.int(),
+      vehicleVerified: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx) => {
       const {
@@ -637,6 +703,7 @@ builder.mutationFields((t) => ({
         doors,
         listingPrice,
         discountedPrice,
+        discountAmount,
         allowedPaymentModes,
         offerType,
         features,
@@ -647,6 +714,7 @@ builder.mutationFields((t) => ({
         impressions,
         detailExpands,
         interested,
+        vehicleVerified,
       } = args;
 
       return await prisma.vehicle.create({
@@ -684,6 +752,7 @@ builder.mutationFields((t) => ({
           doors,
           listingPrice,
           discountedPrice,
+          discountAmount,
           allowedPaymentModes,
           offerType,
           features,
@@ -694,6 +763,7 @@ builder.mutationFields((t) => ({
           impressions,
           detailExpands,
           interested,
+          vehicleVerified,
         },
       });
     },
@@ -732,6 +802,7 @@ builder.mutationFields((t) => ({
       doors: t.arg.int(),
       listingPrice: t.arg.int(),
       discountedPrice: t.arg.int(),
+      discountAmount: t.arg.int(),
       allowedPaymentModes: t.arg.string(),
       offerType: t.arg.string(),
       features: t.arg.string(),
@@ -771,6 +842,7 @@ builder.mutationFields((t) => ({
         doors,
         listingPrice,
         discountedPrice,
+        discountAmount,
         allowedPaymentModes,
         offerType,
         features,
@@ -825,6 +897,7 @@ builder.mutationFields((t) => ({
           doors: doors ? doors : undefined,
           listingPrice: listingPrice ? listingPrice : undefined,
           discountedPrice: discountedPrice ? discountedPrice : undefined,
+          discountAmount: discountAmount ? discountAmount : undefined,
           allowedPaymentModes: allowedPaymentModes
             ? allowedPaymentModes
             : undefined,
@@ -853,6 +926,26 @@ builder.mutationFields((t) => ({
         },
         data: {
           status: status ? status : undefined,
+        },
+      });
+    },
+  }),
+  updateVehicleVerified: t.prismaField({
+    type: Vehicle,
+    args: {
+      id: t.arg.string({ required: true }),
+      vehicleVerified: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { vehicleVerified } = args;
+
+      return await prisma.vehicle.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          vehicleVerified: vehicleVerified ? vehicleVerified : undefined,
         },
       });
     },
@@ -1012,7 +1105,7 @@ builder.mutationFields((t) => ({
           id: args.id,
         },
         data: {
-          interested: interested ? interested : undefined,
+          interested: interested || interested === 0 ? interested : undefined,
         },
       });
     },
@@ -1035,6 +1128,7 @@ builder.mutationFields((t) => ({
       mileageMetric: t.arg.string(),
       listingPrice: t.arg.int(),
       discountedPrice: t.arg.int(),
+      discountAmount: t.arg.int(),
     },
     resolve: async (query, _parent, args, _ctx) => {
       const {
@@ -1052,6 +1146,7 @@ builder.mutationFields((t) => ({
         mileageMetric,
         listingPrice,
         discountedPrice,
+        discountAmount,
       } = args;
 
       return await prisma.vehicle.update({
@@ -1082,6 +1177,7 @@ builder.mutationFields((t) => ({
           mileageMetric: mileageMetric ? mileageMetric : undefined,
           listingPrice: listingPrice ? listingPrice : undefined,
           discountedPrice: discountedPrice ? discountedPrice : undefined,
+          discountAmount: discountAmount ? discountAmount : undefined,
         },
       });
     },
