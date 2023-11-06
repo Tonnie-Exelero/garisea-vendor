@@ -37,6 +37,8 @@ const vendorInitialState = {
   addedOrganization: "",
   identification: "",
   onlineStatus: "",
+  impressions: 0,
+  pageOpened: 0,
   organization: {
     id: "",
     name: "",
