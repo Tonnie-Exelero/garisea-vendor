@@ -49,7 +49,7 @@ const StepAccountDetails = (props: Props) => {
     username,
     email: email.trim().toLowerCase(),
     phone: `+254${phone}`,
-    storeLink: storeLink.toLowerCase(),
+    storeLink: storeLink.replace(/[^A-Z0-9]+/gi, "").toLowerCase(),
     address,
     city,
     country: "Kenya",
@@ -264,7 +264,7 @@ const StepAccountDetails = (props: Props) => {
               fullWidth
               id="storeLink"
               aria-label="storeLink"
-              value={storeLink}
+              value={storeLink.replace(/[^A-Z0-9]+/gi, "").toLowerCase()}
               onChange={(e) => setStoreLink(e.target.value)}
               onBlur={(e) => handleStoreLinkVerify(e.target.value)}
               type="text"
@@ -279,7 +279,7 @@ const StepAccountDetails = (props: Props) => {
                 endAdornment: (
                   <Tooltip
                     title={
-                      "This will be your permanent Garisea store url. You cannot change it later."
+                      "Only use alphanumeric (a-z|0-9). No spaces or special characters. This will be your permanent Garisea store url. You cannot change it later."
                     }
                     placement="top"
                     sx={{ cursor: "pointer" }}
