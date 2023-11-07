@@ -180,6 +180,7 @@ const BasicEditDialog: React.FC<BasicEditDialogProps> = ({
       vehicleOriginCountry: vVehicleOriginCountry,
       listingPrice: vListingPrice,
       discountedPrice: vDiscountedPrice,
+      discountAmount: Number(vListingPrice - vDiscountedPrice),
     };
 
     const resultAction: any = await dispatch(
