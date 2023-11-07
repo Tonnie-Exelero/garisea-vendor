@@ -36,6 +36,7 @@ export type VehicleNode = {
   doors: number;
   listingPrice: number;
   discountedPrice: number;
+  discountAmount: number;
   allowedPaymentModes: string;
   offerType: string;
   features: string;
@@ -47,6 +48,7 @@ export type VehicleNode = {
   impressions: number;
   detailExpands: number;
   interested: number;
+  vehicleVerified: string;
 };
 
 export type VehicleRowType = {
