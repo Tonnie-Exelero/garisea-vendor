@@ -160,7 +160,11 @@ const App = (props: ExtendedAppProps) => {
               sizes="16x16"
               href="/favicon-16x16.png"
             />
-            <link rel="manifest" href="/site.webmanifest" />
+            <link
+              rel="manifest"
+              href="/site.webmanifest"
+              crossOrigin="use-credentials"
+            />
           </Head>
 
           <AuthProvider>

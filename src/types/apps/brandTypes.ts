@@ -3,6 +3,7 @@ export type BrandNode = {
   name: string;
   slug: string;
   description: string;
+  image: string;
 };
 
 export type BrandRowType = {

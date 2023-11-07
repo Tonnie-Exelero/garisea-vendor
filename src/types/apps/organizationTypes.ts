@@ -8,6 +8,7 @@ export type OrganizationNode = {
   address2: string;
   city: string;
   country: string;
+  coverImage: string;
   logo: string;
   certificate: string;
   kraPin: string;
