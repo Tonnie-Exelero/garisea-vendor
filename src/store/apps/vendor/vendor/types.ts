@@ -20,5 +20,7 @@ export interface Vendor {
   addedOrganization: string;
   identification: string;
   onlineStatus: string;
+  impressions: number;
+  pageOpened: number;
   organization: Partial<Organization>;
 }

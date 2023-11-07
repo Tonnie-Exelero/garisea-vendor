@@ -1,4 +1,4 @@
-import prisma from "@src/lib/prisma";
+import prisma from "@lib/prisma";
 import { builder } from "../builder";
 
 export const VendorCustomerContact = builder.prismaObject(
@@ -21,15 +21,17 @@ builder.queryFields((t) => ({
     type: VendorCustomerContact,
     cursor: "id",
     args: {
-      vendorId: t.arg.string({ required: true }),
+      vendorId: t.arg.string(),
+      customerId: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
-      const { vendorId } = args;
+      const { vendorId, customerId } = args;
 
       return await prisma.vendorCustomerContact.findMany({
         ...query,
         where: {
-          vendorId,
+          ...(vendorId && { vendorId }),
+          ...(customerId && { customerId }),
         },
         orderBy: {
           latestMessageTime: "desc",
@@ -40,7 +42,8 @@ builder.queryFields((t) => ({
       await prisma.vendorCustomerContact.count({
         ...connection,
         where: {
-          vendorId: args.vendorId,
+          ...(args.vendorId && { vendorId: args.vendorId }),
+          ...(args.customerId && { customerId: args.customerId }),
         },
       }),
   }),
@@ -50,6 +53,7 @@ builder.queryFields((t) => ({
     args: {
       vendorId: t.arg.string({ required: true }),
       customerId: t.arg.string({ required: true }),
+      vehicleId: t.arg.string(),
     },
     resolve: async (query, _parent, args, _info) =>
       await prisma.vendorCustomerContact.findMany({
@@ -57,6 +61,7 @@ builder.queryFields((t) => ({
         where: {
           vendorId: args.vendorId,
           customerId: args.customerId,
+          vehicleId: args.vehicleId,
         },
       }),
     totalCount: async (connection, args, _ctx, _info) =>
@@ -65,6 +70,7 @@ builder.queryFields((t) => ({
         where: {
           vendorId: args.vendorId,
           customerId: args.customerId,
+          vehicleId: args.vehicleId,
         },
       }),
   }),
@@ -76,16 +82,20 @@ builder.mutationFields((t) => ({
     args: {
       vendorId: t.arg.string({ required: true }),
       customerId: t.arg.string({ required: true }),
+      vehicleId: t.arg.string(),
       latestMessageTime: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { vendorId, customerId, latestMessageTime } = args;
+      const { vendorId, customerId, vehicleId, latestMessageTime } = args;
 
       return await prisma.vendorCustomerContact.create({
         ...query,
         data: {
           vendor: { connect: { id: String(vendorId) || undefined } },
           customer: { connect: { id: String(customerId) || undefined } },
+          ...(vehicleId && {
+            vehicle: { connect: { id: String(vehicleId) || undefined } },
+          }),
           latestMessageTime,
         },
       });

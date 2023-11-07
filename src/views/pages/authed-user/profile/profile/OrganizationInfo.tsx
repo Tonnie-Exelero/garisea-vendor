@@ -44,6 +44,7 @@ import {
   editLogo,
   editCertificate,
   editKRAPin,
+  editCoverImage,
 } from "@src/store/apps/vendor/organization/single";
 
 // ** Others
@@ -77,6 +78,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
     address2,
     city,
     country,
+    coverImage,
     logo,
     certificate,
     kraPin,
@@ -91,6 +93,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
   const [oAddress2, setOAddress2] = useState<string>(address2);
   const [oCity, setOCity] = useState<string>(city);
   const [oCountry, setOCountry] = useState<string>(country);
+  const [oCoverImage, setOCoverImage] = useState<string>(coverImage);
   const [oLogo, setOLogo] = useState<string>(logo);
   const [oCertificate, setOCertificate] = useState<string>(certificate);
   const [oKraPin, setOKraPin] = useState<string>(kraPin);
@@ -100,6 +103,8 @@ const OrganizationInfo = ({ vendor }: Props) => {
   const [fileToView, setFileToView] = useState<string>("");
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [openFileView, setOpenFileView] = useState<boolean>(false);
+  const [uploadingCoverImage, setUploadingCoverImage] =
+    useState<boolean>(false);
   const [uploadingLogo, setUploadingLogo] = useState<boolean>(false);
   const [uploadingFile, setUploadingFile] = useState<boolean>(false);
   const [uploadingPinFile, setUploadingPinFile] = useState<boolean>(false);
@@ -129,10 +134,41 @@ const OrganizationInfo = ({ vendor }: Props) => {
     setOpenFileView(!openFileView);
   };
 
+  const handleInputCoverImageChange = async (file: ChangeEvent) => {
+    setUploadingCoverImage(true);
+
+    const newFile = await uploadFile(file, 1200, 210);
+
+    newFile && handleUpdateCoverImage(newFile.url);
+    newFile && setOCoverImage(newFile.url);
+
+    // Then remove the previous image from server.
+    coverImage && removeFile(coverImage);
+
+    setUploadingCoverImage(false);
+  };
+
+  const handleUpdateCoverImage = async (imageUrl: string) => {
+    const organizationData = {
+      id,
+      coverImage: imageUrl,
+    };
+
+    const resultAction: any = await dispatch(
+      editCoverImage({ ...organizationData })
+    );
+
+    if (editCoverImage.fulfilled.match(resultAction)) {
+      toast.success(`Cover image updated successfully!`);
+    } else {
+      toast.error(`Error updating cover image: ${resultAction.error}`);
+    }
+  };
+
   const handleInputLogoChange = async (file: ChangeEvent) => {
     setUploadingLogo(true);
 
-    const newFile = await uploadFile(file);
+    const newFile = await uploadFile(file, 200, 200);
 
     newFile && handleUpdateLogo(newFile.url);
     newFile && setOLogo(newFile.url);
@@ -471,6 +507,79 @@ const OrganizationInfo = ({ vendor }: Props) => {
                               color: "text.secondary",
                             }}
                           >
+                            Cover Image:
+                          </Typography>
+                        </TableCell>
+                        <TableCell
+                          sx={{ display: "flex", alignItems: "center" }}
+                        >
+                          {oCoverImage && (
+                            <CustomAvatar
+                              src={oCoverImage}
+                              variant="rounded"
+                              alt={"Cover Image"}
+                              sx={{
+                                width: 75,
+                                height: 60,
+                                marginInlineEnd: (theme) => theme.spacing(6.25),
+                              }}
+                            />
+                          )}
+                          {ability?.can("update", "organizations") && (
+                            <div>
+                              <Box sx={{ display: "flex" }}>
+                                <Tooltip
+                                  title="Allowed PNG/JPEG/SVG. Image dimensions should be 1200 x 210. Max size of 2MB. Ensure the focal point (concentration area) of the image is centered, so that it's not cropped out when displayed on different devices."
+                                  placement="top"
+                                >
+                                  <ButtonStyled
+                                    // @ts-ignore
+                                    component={"label"}
+                                    variant="contained"
+                                    htmlFor="upload-coverimage"
+                                  >
+                                    Upload
+                                    <input
+                                      hidden
+                                      type="file"
+                                      value={inputValue}
+                                      accept="image/png, image/jpeg, image/svg"
+                                      onChange={handleInputCoverImageChange}
+                                      id="upload-coverimage"
+                                    />
+                                  </ButtonStyled>
+                                </Tooltip>
+
+                                {uploadingCoverImage && (
+                                  <Box
+                                    sx={{
+                                      ml: 4,
+                                      display: "flex",
+                                      justifyContent: "flex-start",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    <CircularProgress
+                                      size="1.2rem"
+                                      sx={{ mr: 2 }}
+                                    />
+                                  </Box>
+                                )}
+                              </Box>
+                            </div>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>
+                          <Typography
+                            sx={{
+                              fontWeight: 600,
+                              lineHeight: 1.53,
+                              whiteSpace: "nowrap",
+                              color: "text.secondary",
+                            }}
+                          >
                             Logo:
                           </Typography>
                         </TableCell>
@@ -493,7 +602,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                             <div>
                               <Box sx={{ display: "flex" }}>
                                 <Tooltip
-                                  title="Allowed PNG/JPEG/SVG. Max size of 2MB."
+                                  title="Allowed PNG/JPEG/SVG. Image dimensions should be 200 x 200. Max size of 2MB. Ensure the focal point (concentration area) of the image is centered, so that it's not cropped out when displayed on different devices."
                                   placement="top"
                                 >
                                   <ButtonStyled

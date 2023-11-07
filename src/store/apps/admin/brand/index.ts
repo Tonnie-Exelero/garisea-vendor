@@ -18,6 +18,7 @@ export const brandsInitialState = {
         name: "",
         slug: "",
         description: "",
+        image: "",
       },
     },
   ],

@@ -1,4 +1,4 @@
-import prisma from "@src/lib/prisma";
+import prisma from "@lib/prisma";
 import { builder } from "../builder";
 
 export const Model = builder.prismaObject("Model", {

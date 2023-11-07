@@ -1,4 +1,4 @@
-import prisma from "@src/lib/prisma";
+import prisma from "@lib/prisma";
 import { builder } from "../builder";
 
 export const Organization = builder.prismaObject("Organization", {
@@ -8,6 +8,7 @@ export const Organization = builder.prismaObject("Organization", {
     nicename: t.exposeString("nicename", { nullable: true }),
     email: t.exposeString("email", { nullable: true }),
     phone: t.exposeString("phone", { nullable: true }),
+    coverImage: t.exposeString("coverImage", { nullable: true }),
     logo: t.exposeString("logo", { nullable: true }),
     certificate: t.exposeString("certificate", { nullable: true }),
     kraPin: t.exposeString("kraPin", { nullable: true }),
@@ -193,6 +194,26 @@ builder.mutationFields((t) => ({
           address2: address2 ? address2 : undefined,
           city: city ? city : undefined,
           country: country ? country : undefined,
+        },
+      });
+    },
+  }),
+  updateOrganizationCoverImage: t.prismaField({
+    type: "Organization",
+    args: {
+      id: t.arg.string({ required: true }),
+      coverImage: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { coverImage } = args;
+
+      return await prisma.organization.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          coverImage: coverImage ? coverImage : undefined,
         },
       });
     },

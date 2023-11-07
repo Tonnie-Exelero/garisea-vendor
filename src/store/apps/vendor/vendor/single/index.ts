@@ -6,6 +6,7 @@ import apolloClient from "@lib/apollo";
 import {
   GET_VENDOR_BY_ID,
   GET_VENDOR_BY_EMAIL,
+  GET_VENDOR_BY_STORE_LINK,
   CREATE_VENDOR,
   UPDATE_VENDOR,
   UPDATE_PASSWORD,
@@ -14,6 +15,9 @@ import {
   UPDATE_VENDOR_STATUS,
   UPDATE_VENDOR_IDENTIFICATION,
   UPDATE_VENDOR_VERIFIED,
+  UPDATE_IMAGE,
+  UPDATE_VENDOR_IMPRESSIONS,
+  UPDATE_VENDOR_PAGE_OPENED,
   DELETE_VENDOR,
 } from "@api/vendor/vendor";
 
@@ -41,6 +45,8 @@ const vendorInitialState = {
   addedOrganization: "",
   identification: "",
   onlineStatus: "",
+  impressions: 0,
+  pageOpened: 0,
   organization: {
     id: "",
     name: "",
@@ -99,6 +105,32 @@ export const fetchVendorByEmail = createAsyncThunk<
     return rejectWithValue(error.response.data);
   }
 });
+
+// ** Fetch Vendor By StoreLink
+export const fetchVendorByStoreLink = createAsyncThunk<
+  Vendor,
+  { storeLink: string },
+  {}
+>(
+  "appVendor/fetchVendorByStoreLink",
+  async (storeLink, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_VENDOR_BY_STORE_LINK,
+        variables: { ...storeLink },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
 // ** Create Vendor
 export const addVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
@@ -276,6 +308,72 @@ export const editAddedOrganization = createAsyncThunk<Vendor, any, {}>(
   }
 );
 
+// ** Update Image
+export const editImage = createAsyncThunk<Vendor, any, {}>(
+  "appVendor/editImage",
+  async (vendorData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_IMAGE,
+        variables: { ...vendorData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Update Impressions
+export const editImpressions = createAsyncThunk<Vendor, any, {}>(
+  "appVendor/editImpressions",
+  async (vendorData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_VENDOR_IMPRESSIONS,
+        variables: { ...vendorData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Update Page Opened
+export const editPageOpened = createAsyncThunk<Vendor, any, {}>(
+  "appVendor/editPageOpened",
+  async (vendorData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_VENDOR_PAGE_OPENED,
+        variables: { ...vendorData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // ** Delete Vendor
 export const removeVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
   "appVendor/removeVendor",
@@ -341,6 +439,17 @@ export const appVendorSlice = createSlice({
 
           state.loading = "";
           state.vendor = vendorByEmail;
+        }
+      })
+      .addCase(fetchVendorByStoreLink.fulfilled, (state, { payload }) => {
+        // Reset vendor state.
+        state.vendor = { ...vendorInitialState };
+
+        if (state.loading === "pending") {
+          const { vendorByStoreLink }: any = payload;
+
+          state.loading = "";
+          state.vendor = vendorByStoreLink;
         }
       })
       .addCase(addVendor.pending, (state, action) => {
@@ -411,6 +520,21 @@ export const appVendorSlice = createSlice({
         const { updateVendorAddedOrganization }: any = payload;
 
         state.vendor = { ...updateVendorAddedOrganization };
+      })
+      .addCase(editImage.fulfilled, (state, { payload }) => {
+        const { updateVendorImage }: any = payload;
+
+        state.vendor.image = updateVendorImage.image;
+      })
+      .addCase(editImpressions.fulfilled, (state, { payload }) => {
+        const { updateVendorImpressions }: any = payload;
+
+        state.vendor.impressions = updateVendorImpressions.impressions;
+      })
+      .addCase(editPageOpened.fulfilled, (state, { payload }) => {
+        const { updateVendorPageOpened }: any = payload;
+
+        state.vendor.pageOpened = updateVendorPageOpened.pageOpened;
       })
       .addCase(removeVendor.fulfilled, (state, { payload }) => {
         const { deleteVendor }: any = payload;

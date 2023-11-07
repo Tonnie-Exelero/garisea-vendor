@@ -1,9 +1,9 @@
 import * as bcrypt from "bcryptjs";
 import * as jwt from "jsonwebtoken";
-import prisma from "@src/lib/prisma";
+import prisma from "@lib/prisma";
 import { APP_SECRET } from "@graphql/utils/auth";
 import { builder } from "../builder";
-import { encryptData } from "@core/utils/encryption";
+import { encryptData } from "@utils/encryption";
 
 export const Vendor = builder.prismaObject("Vendor", {
   fields: (t) => ({
@@ -28,6 +28,8 @@ export const Vendor = builder.prismaObject("Vendor", {
     identification: t.exposeString("identification", { nullable: true }),
     onlineStatus: t.exposeString("onlineStatus", { nullable: true }),
     organization: t.relation("organization", { nullable: true }),
+    impressions: t.exposeInt("impressions", { nullable: true }),
+    pageOpened: t.exposeInt("pageOpened", { nullable: true }),
   }),
 });
 
@@ -51,17 +53,24 @@ builder.queryFields((t) => ({
     cursor: "id",
     args: {
       status: t.arg.string({ required: true }),
+      hasVehicles: t.arg.string(),
+      orderBy: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
-      const { status } = args;
+      const { status, hasVehicles, orderBy } = args;
 
       return await prisma.vendor.findMany({
         ...query,
         where: {
           status,
+          ...(hasVehicles === "yes" && {
+            Vehicle: {
+              some: {},
+            },
+          }),
         },
         orderBy: {
-          firstName: "asc",
+          ...(orderBy === "random" ? { id: "desc" } : { firstName: "asc" }),
         },
       });
     },
@@ -70,6 +79,11 @@ builder.queryFields((t) => ({
         ...connection,
         where: {
           status: args.status,
+          ...(args.hasVehicles === "yes" && {
+            Vehicle: {
+              some: {},
+            },
+          }),
         },
       }),
   }),
@@ -143,6 +157,20 @@ builder.queryFields((t) => ({
         ...query,
         where: {
           email: args.email,
+        },
+      }),
+  }),
+  vendorByStoreLink: t.prismaField({
+    type: Vendor,
+    nullable: true,
+    args: {
+      storeLink: t.arg.string({ required: true }),
+    },
+    resolve: async (query, _parent, args, _info) =>
+      await prisma.vendor.findUnique({
+        ...query,
+        where: {
+          storeLink: args.storeLink,
         },
       }),
   }),
@@ -571,6 +599,46 @@ builder.mutationFields((t) => ({
         },
         data: {
           addedOrganization: addedOrganization ? addedOrganization : undefined,
+        },
+      });
+    },
+  }),
+  updateVendorImpressions: t.prismaField({
+    type: Vendor,
+    args: {
+      id: t.arg.string({ required: true }),
+      impressions: t.arg.int(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { impressions } = args;
+
+      return await prisma.vendor.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          impressions: impressions ? impressions : undefined,
+        },
+      });
+    },
+  }),
+  updateVendorPageOpened: t.prismaField({
+    type: Vendor,
+    args: {
+      id: t.arg.string({ required: true }),
+      pageOpened: t.arg.int(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pageOpened } = args;
+
+      return await prisma.vendor.update({
+        ...query,
+        where: {
+          id: args.id,
+        },
+        data: {
+          pageOpened: pageOpened ? pageOpened : undefined,
         },
       });
     },

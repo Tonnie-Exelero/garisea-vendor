@@ -26,6 +26,7 @@ const organizationsInitialState = {
         address2: "",
         city: "",
         country: "",
+        coverImage: "",
         logo: "",
         certificate: "",
         kraPin: "",

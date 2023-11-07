@@ -13,6 +13,10 @@ import singleVendorCustomerContact from "@redux/apps/shared/vendorCustomerContac
 import activeVendorCustomerContact from "@redux/apps/shared/vendorCustomerContact/single/activeCustomer";
 import vendorCustomerMessages from "@redux/apps/shared/vendorCustomerMessage";
 import singleVendorCustomerMessage from "@redux/apps/shared/vendorCustomerMessage/single";
+import vendorReviews from "@redux/apps/shared/vendorReview";
+import singleVendorReview from "@redux/apps/shared/vendorReview/single";
+import vehicleReviews from "@redux/apps/shared/vehicleReview";
+import singleVehicleReview from "@redux/apps/shared/vehicleReview/single";
 import vendors from "@redux/apps/vendor/vendor";
 import singleVendor from "@redux/apps/vendor/vendor/single";
 import customers from "@redux/apps/frontend/customer";
@@ -29,6 +33,14 @@ import vehicles from "@redux/apps/vendor/vehicle";
 import singleVehicle from "@redux/apps/vendor/vehicle/single";
 import organizations from "@redux/apps/vendor/organization";
 import singleOrganization from "@redux/apps/vendor/organization/single";
+import mainCarousels from "@redux/apps/admin/mainCarousel";
+import singleMainCarousel from "@redux/apps/admin/mainCarousel/single";
+import banners from "@redux/apps/admin/banner";
+import singleBanner from "@redux/apps/admin/banner/single";
+import featuredVendors from "@redux/apps/admin/featuredVendor";
+import singleFeaturedVendor from "@redux/apps/admin/featuredVendor/single";
+import featuredVehicles from "@redux/apps/admin/featuredVehicle";
+import singleFeaturedVehicle from "@redux/apps/admin/featuredVehicle/single";
 
 export const store = configureStore({
   reducer: {
@@ -43,6 +55,10 @@ export const store = configureStore({
     activeVendorCustomerContact,
     vendorCustomerMessages,
     singleVendorCustomerMessage,
+    vendorReviews,
+    singleVendorReview,
+    vehicleReviews,
+    singleVehicleReview,
     vendors,
     singleVendor,
     customers,
@@ -59,6 +75,14 @@ export const store = configureStore({
     singleVehicle,
     organizations,
     singleOrganization,
+    mainCarousels,
+    singleMainCarousel,
+    banners,
+    singleBanner,
+    featuredVendors,
+    singleFeaturedVendor,
+    featuredVehicles,
+    singleFeaturedVehicle,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

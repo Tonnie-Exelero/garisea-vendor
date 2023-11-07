@@ -52,7 +52,7 @@ const SendMsgForm = (props: SendMsgComponentType) => {
     });
 
     const {
-      contactsByAdminVendorIds: { edges, totalCount },
+      contactsByVendorCustomerVehicleIds: { edges, totalCount },
     }: any = data;
 
     return { edges, totalCount };

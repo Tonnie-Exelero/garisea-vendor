@@ -24,6 +24,8 @@ export const GET_VENDORS = gql`
           addedOrganization
           identification
           onlineStatus
+          impressions
+          pageOpened
           organization {
             id
             name
@@ -54,6 +56,8 @@ export const GET_VENDORS = gql`
 export const GET_VENDORS_BY_STATUS = gql`
   query GetVendorsByStatus(
     $status: String!
+    $hasVehicles: String
+    $orderBy: String
     $first: Int
     $last: Int
     $after: ID
@@ -61,6 +65,8 @@ export const GET_VENDORS_BY_STATUS = gql`
   ) {
     vendorsByStatus(
       status: $status
+      hasVehicles: $hasVehicles
+      orderBy: $orderBy
       first: $first
       last: $last
       after: $after
@@ -87,6 +93,8 @@ export const GET_VENDORS_BY_STATUS = gql`
           addedOrganization
           identification
           onlineStatus
+          impressions
+          pageOpened
           organization {
             id
             name
@@ -138,6 +146,8 @@ export const GET_FILTERED_VENDORS = gql`
           addedOrganization
           identification
           onlineStatus
+          impressions
+          pageOpened
           organization {
             id
             name
@@ -186,6 +196,8 @@ export const GET_VENDOR_BY_ID = gql`
       addedOrganization
       identification
       onlineStatus
+      impressions
+      pageOpened
       organization {
         id
         name
@@ -225,6 +237,49 @@ export const GET_VENDOR_BY_EMAIL = gql`
       addedOrganization
       identification
       onlineStatus
+      impressions
+      pageOpened
+      organization {
+        id
+        name
+        nicename
+        email
+        phone
+        address
+        address2
+        city
+        country
+        logo
+        certificate
+        kraPin
+      }
+    }
+  }
+`;
+
+export const GET_VENDOR_BY_STORE_LINK = gql`
+  query GetVendorByStoreLink($storeLink: String!) {
+    vendorByStoreLink(storeLink: $storeLink) {
+      id
+      firstName
+      lastName
+      username
+      email
+      phone
+      image
+      storeLink
+      language
+      status
+      address
+      city
+      country
+      emailVerified
+      vendorVerified
+      addedOrganization
+      identification
+      onlineStatus
+      impressions
+      pageOpened
       organization {
         id
         name
@@ -255,6 +310,16 @@ export const GET_VENDOR_STORE_LINK = gql`
   query GetVendorStoreLink($storeLink: String!) {
     vendorStoreLink(storeLink: $storeLink) {
       storeLink
+    }
+  }
+`;
+
+export const GET_VENDOR_ANALYTICS = gql`
+  query GetVendorAnalytics($id: String!) {
+    vendorById(id: $id) {
+      id
+      impressions
+      pageOpened
     }
   }
 `;
@@ -316,6 +381,8 @@ export const CREATE_VENDOR = gql`
       addedOrganization
       identification
       onlineStatus
+      impressions
+      pageOpened
       organization {
         id
         name
@@ -381,6 +448,8 @@ export const UPDATE_VENDOR = gql`
       addedOrganization
       identification
       onlineStatus
+      impressions
+      pageOpened
       organization {
         id
         name
@@ -420,6 +489,8 @@ export const UPDATE_PASSWORD = gql`
       addedOrganization
       identification
       onlineStatus
+      impressions
+      pageOpened
       organization {
         id
         name
@@ -495,6 +566,8 @@ export const UPDATE_EMAIL_VERIFIED = gql`
       addedOrganization
       identification
       onlineStatus
+      impressions
+      pageOpened
       organization {
         id
         name
@@ -539,6 +612,8 @@ export const UPDATE_ADDED_ORGANIZATION = gql`
       addedOrganization
       identification
       onlineStatus
+      impressions
+      pageOpened
       organization {
         id
         name
@@ -553,6 +628,24 @@ export const UPDATE_ADDED_ORGANIZATION = gql`
         certificate
         kraPin
       }
+    }
+  }
+`;
+
+export const UPDATE_VENDOR_IMPRESSIONS = gql`
+  mutation UpdateVendorImpressions($id: String!, $impressions: Int) {
+    updateVendorImpressions(id: $id, impressions: $impressions) {
+      id
+      impressions
+    }
+  }
+`;
+
+export const UPDATE_VENDOR_PAGE_OPENED = gql`
+  mutation UpdateVehiclePageOpened($id: String!, $pageOpened: Int) {
+    updateVendorPageOpened(id: $id, pageOpened: $pageOpened) {
+      id
+      pageOpened
     }
   }
 `;

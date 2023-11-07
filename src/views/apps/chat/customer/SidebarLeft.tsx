@@ -108,10 +108,14 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
 
           const lastMessage =
             data &&
+            data.adminVendorMessages &&
             data.adminVendorMessages.edges &&
             data.adminVendorMessages.edges[0].node;
 
-          const unreadCount = data.adminVendorMessages.totalCount;
+          const unreadCount =
+            data &&
+            data.adminVendorMessages &&
+            data.adminVendorMessages.totalCount;
 
           const messageData = { lastMessage, unreadCount };
 

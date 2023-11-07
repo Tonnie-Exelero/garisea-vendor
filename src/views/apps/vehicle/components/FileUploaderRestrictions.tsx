@@ -185,8 +185,15 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
             <Typography color="textSecondary" sx={{ mb: 2 }}>
               Upto 10 files and max size of 3 MB/file.
             </Typography>
-            <Typography color="textSecondary">
-              The <strong>first</strong> image is the <b>main</b> image.
+            <Typography color="textSecondary" sx={{ mb: 3 }}>
+              The <strong>first</strong> image is the <b>thumbnail</b> image.
+            </Typography>
+            <Typography variant="body1" color="textPrimary">
+              <strong>PRO TIP:</strong>{" "}
+              <i>
+                Use aspect-ratio of <strong>16:9</strong>, and center the image
+                focal point, for maximum visibility on all devices.
+              </i>
             </Typography>
           </Box>
         </Box>

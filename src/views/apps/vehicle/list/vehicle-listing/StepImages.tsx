@@ -18,6 +18,7 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
 
   // ** States
   const [imageUrls, setImageUrls] = useState<string>();
+  const [uploaded, setUploaded] = useState<boolean>(false);
 
   const imagesData = {
     images: imageUrls,
@@ -25,6 +26,7 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
 
   const handleImages = (images: string) => {
     setImageUrls(images);
+    setUploaded(true);
   };
 
   const confirmData = () => {
@@ -65,10 +67,15 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
           }}
         >
           <Typography sx={{ mb: 2 }}>
-            Confirm data entered is correct by clicking below
+            After images are uploaded successfully, confirm by clicking below
           </Typography>
           <Box>
-            <Button color="info" variant="outlined" onClick={confirmData}>
+            <Button
+              color="info"
+              variant="outlined"
+              disabled={!uploaded}
+              onClick={confirmData}
+            >
               Confirm Data
             </Button>
           </Box>

@@ -16,12 +16,15 @@ export const GET_VEHICLES = gql`
             email
             phone
             image
+            storeLink
             address
             city
             country
+            vendorVerified
             organization {
               id
               name
+              nicename
             }
           }
           brand {
@@ -72,6 +75,7 @@ export const GET_VEHICLES = gql`
           impressions
           detailExpands
           interested
+          vehicleVerified
         }
       }
       pageInfo {
@@ -98,12 +102,15 @@ export const GET_VEHICLE_BY_ID = gql`
         email
         phone
         image
+        storeLink
         address
         city
         country
+        vendorVerified
         organization {
           id
           name
+          nicename
         }
       }
       brand {
@@ -154,6 +161,7 @@ export const GET_VEHICLE_BY_ID = gql`
       impressions
       detailExpands
       interested
+      vehicleVerified
     }
   }
 `;
@@ -171,12 +179,15 @@ export const GET_VEHICLE_BY_ENTRY_NO = gql`
         email
         phone
         image
+        storeLink
         address
         city
         country
+        vendorVerified
         organization {
           id
           name
+          nicename
         }
       }
       brand {
@@ -227,6 +238,7 @@ export const GET_VEHICLE_BY_ENTRY_NO = gql`
       impressions
       detailExpands
       interested
+      vehicleVerified
     }
   }
 `;
@@ -244,12 +256,15 @@ export const GET_VEHICLE_BY_SLUG = gql`
         email
         phone
         image
+        storeLink
         address
         city
         country
+        vendorVerified
         organization {
           id
           name
+          nicename
         }
       }
       brand {
@@ -300,6 +315,7 @@ export const GET_VEHICLE_BY_SLUG = gql`
       impressions
       detailExpands
       interested
+      vehicleVerified
     }
   }
 `;
@@ -307,6 +323,7 @@ export const GET_VEHICLE_BY_SLUG = gql`
 export const GET_VEHICLES_BY_VENDOR_ID = gql`
   query GetVehiclesByVendorId(
     $vendorId: String!
+    $status: String
     $first: Int
     $last: Int
     $after: ID
@@ -314,6 +331,7 @@ export const GET_VEHICLES_BY_VENDOR_ID = gql`
   ) {
     vehiclesByVendorId(
       vendorId: $vendorId
+      status: $status
       first: $first
       last: $last
       after: $after
@@ -332,12 +350,15 @@ export const GET_VEHICLES_BY_VENDOR_ID = gql`
             email
             phone
             image
+            storeLink
             address
             city
             country
+            vendorVerified
             organization {
               id
               name
+              nicename
             }
           }
           brand {
@@ -388,6 +409,7 @@ export const GET_VEHICLES_BY_VENDOR_ID = gql`
           impressions
           detailExpands
           interested
+          vehicleVerified
         }
       }
       pageInfo {
@@ -397,6 +419,14 @@ export const GET_VEHICLES_BY_VENDOR_ID = gql`
         startCursor
       }
       totalCount
+    }
+  }
+`;
+
+export const GET_VEHICLES_STATS_BY_VENDOR_ID = gql`
+  query GetVehiclesStatsByVendorId($vendorId: String!) {
+    vehiclesCount(vendorId: $vendorId) {
+      vehicleVerified
     }
   }
 `;
@@ -434,6 +464,12 @@ export const GET_FILTERED_VEHICLES = gql`
     $doors: Int
     $minPrice: Int
     $maxPrice: Int
+    $hasDiscount: String
+    $biggestDiscount: String
+    $reserved: String
+    $sold: String
+    $random: String
+    $sortBy: String
   ) {
     vehiclesFiltered(
       first: $first
@@ -467,6 +503,12 @@ export const GET_FILTERED_VEHICLES = gql`
       doors: $doors
       minPrice: $minPrice
       maxPrice: $maxPrice
+      hasDiscount: $hasDiscount
+      biggestDiscount: $biggestDiscount
+      reserved: $reserved
+      sold: $sold
+      random: $random
+      sortBy: $sortBy
     ) {
       edges {
         cursor
@@ -481,12 +523,15 @@ export const GET_FILTERED_VEHICLES = gql`
             email
             phone
             image
+            storeLink
             address
             city
             country
+            vendorVerified
             organization {
               id
               name
+              nicename
             }
           }
           brand {
@@ -537,6 +582,7 @@ export const GET_FILTERED_VEHICLES = gql`
           impressions
           detailExpands
           interested
+          vehicleVerified
         }
       }
       pageInfo {
@@ -546,6 +592,17 @@ export const GET_FILTERED_VEHICLES = gql`
         startCursor
       }
       totalCount
+    }
+  }
+`;
+
+export const GET_VEHICLE_ANALYTICS = gql`
+  query GetVehicleAnalytics($id: String!) {
+    vehicleById(id: $id) {
+      id
+      impressions
+      detailExpands
+      interested
     }
   }
 `;
@@ -584,6 +641,7 @@ export const CREATE_VEHICLE = gql`
     $doors: Int
     $listingPrice: Int
     $discountedPrice: Int
+    $discountAmount: Int
     $allowedPaymentModes: String
     $offerType: String
     $features: String
@@ -594,6 +652,7 @@ export const CREATE_VEHICLE = gql`
     $impressions: Int
     $detailExpands: Int
     $interested: Int
+    $vehicleVerified: String
   ) {
     createVehicle(
       entryNo: $entryNo
@@ -628,6 +687,7 @@ export const CREATE_VEHICLE = gql`
       doors: $doors
       listingPrice: $listingPrice
       discountedPrice: $discountedPrice
+      discountAmount: $discountAmount
       allowedPaymentModes: $allowedPaymentModes
       offerType: $offerType
       features: $features
@@ -638,6 +698,7 @@ export const CREATE_VEHICLE = gql`
       impressions: $impressions
       detailExpands: $detailExpands
       interested: $interested
+      vehicleVerified: $vehicleVerified
     ) {
       id
       entryNo
@@ -649,12 +710,15 @@ export const CREATE_VEHICLE = gql`
         email
         phone
         image
+        storeLink
         address
         city
         country
+        vendorVerified
         organization {
           id
           name
+          nicename
         }
       }
       brand {
@@ -705,6 +769,7 @@ export const CREATE_VEHICLE = gql`
       impressions
       detailExpands
       interested
+      vehicleVerified
     }
   }
 `;
@@ -742,6 +807,7 @@ export const UPDATE_VEHICLE = gql`
     $doors: Int
     $listingPrice: Int
     $discountedPrice: Int
+    $discountAmount: Int
     $allowedPaymentModes: String
     $offerType: String
     $features: String
@@ -781,6 +847,7 @@ export const UPDATE_VEHICLE = gql`
       doors: $doors
       listingPrice: $listingPrice
       discountedPrice: $discountedPrice
+      discountAmount: $discountAmount
       allowedPaymentModes: $allowedPaymentModes
       offerType: $offerType
       features: $features
@@ -798,12 +865,15 @@ export const UPDATE_VEHICLE = gql`
         email
         phone
         image
+        storeLink
         address
         city
         country
+        vendorVerified
         organization {
           id
           name
+          nicename
         }
       }
       brand {
@@ -854,6 +924,7 @@ export const UPDATE_VEHICLE = gql`
       impressions
       detailExpands
       interested
+      vehicleVerified
     }
   }
 `;
@@ -863,6 +934,15 @@ export const UPDATE_VEHICLE_STATUS = gql`
     updateVehicleStatus(id: $id, status: $status) {
       id
       status
+    }
+  }
+`;
+
+export const UPDATE_VEHICLE_VERIFIED = gql`
+  mutation UpdateVehicleVerified($id: String!, $vehicleVerified: String) {
+    updateVehicleVerified(id: $id, vehicleVerified: $vehicleVerified) {
+      id
+      vehicleVerified
     }
   }
 `;
@@ -956,6 +1036,7 @@ export const UPDATE_VEHICLE_BASIC = gql`
     $mileageMetric: String
     $listingPrice: Int
     $discountedPrice: Int
+    $discountAmount: Int
   ) {
     updateVehicleBasic(
       id: $id
@@ -973,6 +1054,7 @@ export const UPDATE_VEHICLE_BASIC = gql`
       mileageMetric: $mileageMetric
       listingPrice: $listingPrice
       discountedPrice: $discountedPrice
+      discountAmount: $discountAmount
     ) {
       id
       entryNo
@@ -984,12 +1066,15 @@ export const UPDATE_VEHICLE_BASIC = gql`
         email
         phone
         image
+        storeLink
         address
         city
         country
+        vendorVerified
         organization {
           id
           name
+          nicename
         }
       }
       brand {
@@ -1040,6 +1125,7 @@ export const UPDATE_VEHICLE_BASIC = gql`
       impressions
       detailExpands
       interested
+      vehicleVerified
     }
   }
 `;
@@ -1085,12 +1171,15 @@ export const UPDATE_VEHICLE_SPECIFICATIONS = gql`
         email
         phone
         image
+        storeLink
         address
         city
         country
+        vendorVerified
         organization {
           id
           name
+          nicename
         }
       }
       brand {
@@ -1141,6 +1230,7 @@ export const UPDATE_VEHICLE_SPECIFICATIONS = gql`
       impressions
       detailExpands
       interested
+      vehicleVerified
     }
   }
 `;
@@ -1172,12 +1262,15 @@ export const UPDATE_VEHICLE_EXTRA_INFO = gql`
         email
         phone
         image
+        storeLink
         address
         city
         country
+        vendorVerified
         organization {
           id
           name
+          nicename
         }
       }
       brand {
@@ -1228,6 +1321,7 @@ export const UPDATE_VEHICLE_EXTRA_INFO = gql`
       impressions
       detailExpands
       interested
+      vehicleVerified
     }
   }
 `;

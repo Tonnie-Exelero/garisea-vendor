@@ -41,6 +41,10 @@ const StepPrice: React.FC<StepPriceProps> = (props) => {
   const priceData = {
     listingPrice,
     discountedPrice,
+    discountAmount:
+      listingPrice && discountedPrice
+        ? Number(listingPrice - discountedPrice)
+        : 0,
     offerType,
     allowedPaymentModes: [...new Set(paymentModes)].toString(),
   };
