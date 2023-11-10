@@ -56,7 +56,7 @@ import BasicEditDialog from "./dialogs/BasicEditDialog";
 import ImagesControls from "./dialogs/ImagesDialog";
 import { currency } from "../config";
 import { AbilityContext } from "src/layouts/components/acl/Can";
-import { baseUrl } from "@src/configs/baseUrl";
+import { mainSiteUrl } from "@src/configs/baseUrl";
 
 interface ColorsType {
   [key: string]: ThemeColor;
@@ -252,74 +252,81 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
               </CardContent>
 
               <CardContent>
-                <Box sx={{ display: "flex", gap: "1rem" }}>
-                  <TwitterShareButton
-                    title={`Check out this awesome vehicle from ${
-                      vehicle?.vendor?.organization?.nicename
-                        ? vehicle?.vendor?.organization?.nicename
-                        : vehicle?.vendor?.organization?.name
-                    } shop at Garisea. Follow @Gari_sea for more...`}
-                    url={`${baseUrl}/${vehicle.vendor.storeLink}/${vehicle.slug}`}
-                    hashtags={[
-                      "Garisea",
-                      `${
+                {status === "active" && (
+                  <Box sx={{ display: "flex", gap: "1rem" }}>
+                    <TwitterShareButton
+                      title={`Check out this awesome vehicle from ${
                         vehicle?.vendor?.organization?.nicename
                           ? vehicle?.vendor?.organization?.nicename
                           : vehicle?.vendor?.organization?.name
-                      }`,
-                    ]}
-                    related={["cars", "vehicles", "automotive", "auto dealers"]}
-                  >
-                    <TwitterIcon size={32} round />
-                  </TwitterShareButton>
-                  <FacebookShareButton
-                    quote={`Check out this awesome vehicle from ${
-                      vehicle?.vendor?.organization?.nicename
-                        ? vehicle?.vendor?.organization?.nicename
-                        : vehicle?.vendor?.organization?.name
-                    } shop at Garisea. Follow @Garisea for more...`}
-                    url={`${baseUrl}/${vehicle.vendor.storeLink}/${vehicle.slug}`}
-                    hashtag={`#Garisea #${
-                      vehicle?.vendor?.organization?.nicename
-                        ? vehicle?.vendor?.organization?.nicename
-                        : vehicle?.vendor?.organization?.name
-                    }`}
-                  >
-                    <FacebookIcon size={32} round />
-                  </FacebookShareButton>
-                  <WhatsappShareButton
-                    title={`Check out this awesome vehicle from ${
-                      vehicle?.vendor?.organization?.nicename
-                        ? vehicle?.vendor?.organization?.nicename
-                        : vehicle?.vendor?.organization?.name
-                    } shop at Garisea. Follow @Garisea on socials for more...`}
-                    url={`${baseUrl}/${vehicle.vendor.storeLink}/${vehicle.slug}`}
-                    separator=" "
-                  >
-                    <WhatsappIcon size={32} round />
-                  </WhatsappShareButton>
-                  <TelegramShareButton
-                    title={`Check out this awesome vehicle from ${
-                      vehicle?.vendor?.organization?.nicename
-                        ? vehicle?.vendor?.organization?.nicename
-                        : vehicle?.vendor?.organization?.name
-                    } shop at Garisea. Follow @Garisea on socials for more...`}
-                    url={`${baseUrl}/${vehicle.vendor.storeLink}/${vehicle.slug}`}
-                  >
-                    <TelegramIcon size={32} round />
-                  </TelegramShareButton>
-                  <LinkedinShareButton
-                    title={`Check out this awesome vehicle from ${
-                      vehicle?.vendor?.organization?.nicename
-                        ? vehicle?.vendor?.organization?.nicename
-                        : vehicle?.vendor?.organization?.name
-                    } shop at Garisea. Follow @Garisea on socials for more...`}
-                    url={`${baseUrl}/${vehicle.vendor.storeLink}/${vehicle.slug}`}
-                    source={`${baseUrl}`}
-                  >
-                    <LinkedinIcon size={32} round />
-                  </LinkedinShareButton>
-                </Box>
+                      } shop at Garisea. Follow @Gari_sea for more...`}
+                      url={`${mainSiteUrl}/${vehicle.vendor.storeLink}/${vehicle.slug}`}
+                      hashtags={[
+                        "Garisea",
+                        `${
+                          vehicle?.vendor?.organization?.nicename
+                            ? vehicle?.vendor?.organization?.nicename
+                            : vehicle?.vendor?.organization?.name
+                        }`,
+                      ]}
+                      related={[
+                        "cars",
+                        "vehicles",
+                        "automotive",
+                        "auto dealers",
+                      ]}
+                    >
+                      <TwitterIcon size={32} round />
+                    </TwitterShareButton>
+                    <FacebookShareButton
+                      quote={`Check out this awesome vehicle from ${
+                        vehicle?.vendor?.organization?.nicename
+                          ? vehicle?.vendor?.organization?.nicename
+                          : vehicle?.vendor?.organization?.name
+                      } shop at Garisea. Follow @Garisea for more...`}
+                      url={`${mainSiteUrl}/${vehicle.vendor.storeLink}/${vehicle.slug}`}
+                      hashtag={`#Garisea #${
+                        vehicle?.vendor?.organization?.nicename
+                          ? vehicle?.vendor?.organization?.nicename
+                          : vehicle?.vendor?.organization?.name
+                      }`}
+                    >
+                      <FacebookIcon size={32} round />
+                    </FacebookShareButton>
+                    <WhatsappShareButton
+                      title={`Check out this awesome vehicle from ${
+                        vehicle?.vendor?.organization?.nicename
+                          ? vehicle?.vendor?.organization?.nicename
+                          : vehicle?.vendor?.organization?.name
+                      } shop at Garisea. Follow @Garisea on socials for more...`}
+                      url={`${mainSiteUrl}/${vehicle.vendor.storeLink}/${vehicle.slug}`}
+                      separator=" "
+                    >
+                      <WhatsappIcon size={32} round />
+                    </WhatsappShareButton>
+                    <TelegramShareButton
+                      title={`Check out this awesome vehicle from ${
+                        vehicle?.vendor?.organization?.nicename
+                          ? vehicle?.vendor?.organization?.nicename
+                          : vehicle?.vendor?.organization?.name
+                      } shop at Garisea. Follow @Garisea on socials for more...`}
+                      url={`${mainSiteUrl}/${vehicle.vendor.storeLink}/${vehicle.slug}`}
+                    >
+                      <TelegramIcon size={32} round />
+                    </TelegramShareButton>
+                    <LinkedinShareButton
+                      title={`Check out this awesome vehicle from ${
+                        vehicle?.vendor?.organization?.nicename
+                          ? vehicle?.vendor?.organization?.nicename
+                          : vehicle?.vendor?.organization?.name
+                      } shop at Garisea. Follow @Garisea on socials for more...`}
+                      url={`${mainSiteUrl}/${vehicle.vendor.storeLink}/${vehicle.slug}`}
+                      source={`${mainSiteUrl}`}
+                    >
+                      <LinkedinIcon size={32} round />
+                    </LinkedinShareButton>
+                  </Box>
+                )}
                 <Typography variant="h6">Basic Details</Typography>
                 <Divider
                   sx={{ mt: (theme) => `${theme.spacing(1)} !important` }}

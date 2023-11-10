@@ -162,7 +162,15 @@ const SwiperControls: React.FC<any> = ({
                     </IconButton>
                   </Tooltip>
 
-                  <img src={image} alt={`Image ${index + 1}`} />
+                  <img
+                    src={image}
+                    alt={`Image ${index + 1}`}
+                    style={{
+                      objectFit: "contain",
+                      width: "100%",
+                      height: "70vh",
+                    }}
+                  />
                   <Tooltip title="Add more images" placement="top">
                     <IconButton
                       onClick={handleAddImagesSection}
