@@ -343,12 +343,32 @@ const OrganizationInfo = ({ vendor }: Props) => {
                             Name:
                           </Typography>
                         </TableCell>
-                        <TableCell>
+                        <TableCell
+                          sx={{
+                            display: "flex",
+                            gap: ".5rem",
+                            alignItems: "center",
+                          }}
+                        >
                           {oName && (
                             <Typography sx={{ color: "text.secondary" }}>
                               {oName}
                             </Typography>
                           )}
+                          <Tooltip
+                            title={
+                              "The official name of the organization, as stated in the Registration Certificate. e.g. Garisea Limited"
+                            }
+                            placement="top"
+                            sx={{ cursor: "pointer" }}
+                          >
+                            <IconButton>
+                              <Icon
+                                icon="material-symbols:error"
+                                fontSize={20}
+                              />
+                            </IconButton>
+                          </Tooltip>
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -364,12 +384,32 @@ const OrganizationInfo = ({ vendor }: Props) => {
                             Trading Name:
                           </Typography>
                         </TableCell>
-                        <TableCell>
+                        <TableCell
+                          sx={{
+                            display: "flex",
+                            gap: ".5rem",
+                            alignItems: "center",
+                          }}
+                        >
                           {oNicename && (
                             <Typography sx={{ color: "text.secondary" }}>
                               {oNicename}
                             </Typography>
                           )}
+                          <Tooltip
+                            title={
+                              "The brand name that is known and easy to remember by the public. Preferrably the name used in the Store Link. e.g. GariseaCars"
+                            }
+                            placement="top"
+                            sx={{ cursor: "pointer" }}
+                          >
+                            <IconButton>
+                              <Icon
+                                icon="material-symbols:error"
+                                fontSize={20}
+                              />
+                            </IconButton>
+                          </Tooltip>
                         </TableCell>
                       </TableRow>
                       <TableRow>
@@ -717,7 +757,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                             )}
                         </TableCell>
                       </TableRow>
-                      <TableRow>
+                      {/* <TableRow>
                         <TableCell>
                           <Typography
                             sx={{
@@ -790,7 +830,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                               </div>
                             )}
                         </TableCell>
-                      </TableRow>
+                      </TableRow> */}
                     </TableBody>
                   </Table>
                 </TableContainer>
