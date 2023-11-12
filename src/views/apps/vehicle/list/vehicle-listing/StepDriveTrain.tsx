@@ -112,12 +112,10 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
               inputProps={{ placeholder: "Select Transmission Type" }}
             >
               <MenuItem value="Automatic">Automatic</MenuItem>
-              <MenuItem value="Semi-Automatic">Semi-Automatic</MenuItem>
+              <MenuItem value="Semi-Automatic">
+                Semi-Automatic (Tiptronic)
+              </MenuItem>
               <MenuItem value="Manual">Manual</MenuItem>
-              <MenuItem value="Tiptronic">Tiptronic</MenuItem>
-              <MenuItem value="CVT">CVT</MenuItem>
-              <MenuItem value="DCT">DCT</MenuItem>
-              <MenuItem value="Sport AT">Sport AT</MenuItem>
               <MenuItem value="Unspecified">Unspecified</MenuItem>
             </Select>
           </FormControl>
@@ -134,10 +132,14 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
               onChange={(e) => setDriveType(e.target.value)}
               inputProps={{ placeholder: "Select Drive Type" }}
             >
-              <MenuItem value="Front Wheel Drive">Front Wheel Drive </MenuItem>
-              <MenuItem value="Rear Wheel Drive">Rear Wheel Drive</MenuItem>
+              <MenuItem value="2 Wheel Drive (Front)">
+                2 Wheel Drive (Front)
+              </MenuItem>
+              <MenuItem value="2 Wheel Drive (Rear)">
+                2 Wheel Drive (Rear)
+              </MenuItem>
               <MenuItem value="All Wheel Drive">All Wheel Drive</MenuItem>
-              <MenuItem value="4x4">4x4</MenuItem>
+              <MenuItem value="4x4">4x4/4WD</MenuItem>
             </Select>
           </FormControl>
         </Grid>

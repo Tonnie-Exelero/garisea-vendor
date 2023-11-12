@@ -15,7 +15,7 @@ import {
 } from "@react-email/components";
 import { baseUrl } from "@src/configs/baseUrl";
 
-export const EmailVerify = ({
+export const Notification = ({
   url = "#",
   name = "JohnDoe",
 }: {
@@ -24,7 +24,7 @@ export const EmailVerify = ({
 }) => (
   <Html>
     <Head />
-    <Preview>Verify your email address</Preview>
+    <Preview>You have a new message</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={logoContainer}>
@@ -35,20 +35,18 @@ export const EmailVerify = ({
             alt="Garisea"
           />
         </Section>
-        <Heading style={h2}>Hello {name}, welcome to Garisea!</Heading>
-        <Text style={heroText}>Kindly confirm your email address.</Text>
+        <Heading style={h2}>
+          Hello {name}! You have a new message on Garisea.
+        </Heading>
         <Text style={text}>
-          Thank your for joining Garisea community. To verify your email
-          address, follow the link below.
+          Click on the link below to read your new messages.
         </Text>
 
         <Section style={codeBox}>
           <Text style={confirmationCodeText}>
-            <Link href={url}>Verification Link</Link>
+            <Link href={url}>Go To Message</Link>
           </Text>
         </Section>
-
-        <Text style={text}>The link above is valid for 24 hours.</Text>
 
         <Text style={text2}>
           If you didn't request this email, there's nothing to worry about - you
@@ -147,7 +145,7 @@ export const EmailVerify = ({
   </Html>
 );
 
-export default EmailVerify;
+export default Notification;
 
 const footerText = {
   fontSize: "12px",
@@ -192,17 +190,11 @@ const logoContainer = {
 
 const h2 = {
   color: "#1d1c1d",
-  fontSize: "26px",
+  fontSize: "21px",
   fontWeight: "500",
   margin: "30px 0",
   padding: "0",
-  lineHeight: "36px",
-};
-
-const heroText = {
-  fontSize: "20px",
   lineHeight: "28px",
-  marginBottom: "30px",
 };
 
 const codeBox = {
@@ -210,11 +202,11 @@ const codeBox = {
   borderRadius: "4px",
   marginRight: "50px",
   marginBottom: "30px",
-  padding: "43px 23px",
+  padding: "18px 13px",
 };
 
 const confirmationCodeText = {
-  fontSize: "30px",
+  fontSize: "20px",
   textAlign: "center" as const,
   verticalAlign: "middle",
 };

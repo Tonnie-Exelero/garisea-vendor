@@ -18,6 +18,8 @@ import {
   GET_CONTACTS_BY_IDS,
   UPDATE_CONTACT,
 } from "@src/api/shared/vendorCustomerContact";
+import { sendEmail } from "@src/configs/email";
+import Notification from "@emails/Notification";
 
 // ** Styled Components
 const ChatFormWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -120,6 +122,21 @@ const SendMsgForm = (props: SendMsgComponentType) => {
       await dispatch(addVendorCustomerMessage({ ...payload }));
       handleRefresh();
     }
+
+    // Send email notification
+    const url = "https://garisea.com/messages";
+
+    const payload = {
+      name: recipient.firstName,
+      to: recipient.email,
+      subject: `New Message from ${
+        authedVendor.organization.nicename || authedVendor.organization.name
+      }`,
+      template: Notification({ url, name: recipient.firstName }),
+    };
+
+    sendEmail({ ...payload });
+    // End Send email notification
 
     setMsg("");
   };

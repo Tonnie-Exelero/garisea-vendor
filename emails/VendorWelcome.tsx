@@ -337,25 +337,25 @@ export const VendorWelcome = () => (
             target="_blank"
             rel="noopener noreferrer"
           >
-            Our shop
+            Marketplace
           </Link>
           &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
           <Link
             style={footerLink}
-            href="https://garisea.com"
+            href="https://garisea.com/terms"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Policies
+            Terms of Service
           </Link>
           &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
           <Link
             style={footerLink}
-            href="https://garisea.com"
+            href="https://garisea.com/privacy"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Help center
+            Privacy Policy
           </Link>
           <Text style={footerText}>
             <br />

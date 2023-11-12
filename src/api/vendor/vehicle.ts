@@ -437,6 +437,7 @@ export const GET_FILTERED_VEHICLES = gql`
     $last: Int
     $after: ID
     $before: ID
+    $entryNo: String
     $vendorId: String
     $brandId: String
     $modelId: String
@@ -476,6 +477,7 @@ export const GET_FILTERED_VEHICLES = gql`
       last: $last
       after: $after
       before: $before
+      entryNo: $entryNo
       vendorId: $vendorId
       brandId: $brandId
       modelId: $modelId
