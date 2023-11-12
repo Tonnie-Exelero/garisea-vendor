@@ -136,7 +136,7 @@ export const EmailVerify = ({
             Privacy Policy
           </Link>
           <Text style={footerText}>
-            ©2023 Garisea, a Francton Ltd company.
+            ©{new Date().getFullYear()} Garisea, a Francton Ltd company.
             <br />
             <br />
             All rights reserved.

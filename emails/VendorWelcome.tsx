@@ -358,8 +358,7 @@ export const VendorWelcome = () => (
             Privacy Policy
           </Link>
           <Text style={footerText}>
-            <br />
-            ©2023 Garisea, a Francton Ltd company.
+            <br />©{new Date().getFullYear()} Garisea, a Francton Ltd company.
             <br />
             <br />
             All rights reserved.
