@@ -40,7 +40,7 @@ import { editVehicleBasicInfo } from "@src/store/apps/vendor/vehicle/single";
 import CustomChip from "@components/mui/chip";
 
 // ** Others
-import { countries } from "@src/configs/countries";
+import { mainCountries } from "@src/configs/countries";
 
 const metrics = ["kms", "miles"];
 const currency = "KES";
@@ -453,7 +453,7 @@ const BasicEditDialog: React.FC<BasicEditDialogProps> = ({
                   onChange={(e) => setVVehicleOriginCountry(e.target.value)}
                   inputProps={{ placeholder: "e.g. Japan" }}
                 >
-                  {countries.map((country, index) => {
+                  {mainCountries.map((country, index) => {
                     const { name } = country;
 
                     return (

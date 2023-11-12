@@ -52,7 +52,7 @@ import { addModel } from "@src/store/apps/admin/model/single";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@src/store";
 import { country, metrics } from "../../config";
-import { countries } from "@src/configs/countries";
+import { mainCountries } from "@src/configs/countries";
 import toast from "react-hot-toast";
 
 interface IconType {
@@ -558,7 +558,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
               onChange={(e) => setVehicleOriginCountry(e.target.value)}
               inputProps={{ placeholder: "e.g. Japan" }}
             >
-              {countries.map((country, index) => {
+              {mainCountries.map((country, index) => {
                 const { name } = country;
 
                 return (

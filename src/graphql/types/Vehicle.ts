@@ -185,6 +185,7 @@ builder.queryFields((t) => ({
     type: Vehicle,
     cursor: "id",
     args: {
+      entryNo: t.arg.string(),
       vendorId: t.arg.string(),
       brandId: t.arg.string(),
       modelId: t.arg.string(),
@@ -221,6 +222,11 @@ builder.queryFields((t) => ({
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
       const where = {
+        ...(args.entryNo && {
+          entryNo: {
+            equals: args.entryNo,
+          },
+        }),
         ...(args.vendorId && {
           vendorId: {
             equals: args.vendorId,
@@ -451,6 +457,11 @@ builder.queryFields((t) => ({
     },
     totalCount: async (connection, args, _ctx, _info) => {
       const where = {
+        ...(args.entryNo && {
+          entryNo: {
+            equals: args.entryNo,
+          },
+        }),
         ...(args.vendorId && {
           vendorId: {
             equals: args.vendorId,

@@ -28,8 +28,8 @@ import { fetchBrands } from "@src/store/apps/admin/brand";
 import { fetchModelsByBrand } from "@src/store/apps/admin/model";
 
 // ** Others
-import { currency, vehicleBodyTypes } from "../../config";
-import { countries } from "@src/configs/countries";
+import { vehicleBodyTypes } from "../../config";
+import { mainCountries } from "@src/configs/countries";
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: "none",
@@ -45,19 +45,24 @@ const VehicleSearch = (props: Props) => {
   const { handleVehiclesFilter } = props;
 
   // ** States
+  const [entryNo, setEntryNo] = useState<string>("");
   const [brandId, setBrandId] = useState<string>("");
   const [modelId, setModelId] = useState<string>("");
   const [condition, setCondition] = useState<string>("");
   const [registered, setRegistered] = useState<string>("");
-  const [yearRange, setYearRange] = useState<number[]>([
-    1950,
-    new Date().getFullYear() + 2,
-  ]);
-  const [mileage, setMileage] = useState<number[]>([0, 1000000]);
+  const [minYear, setMinYear] = useState<string>("");
+  const [maxYear, setMaxYear] = useState<string>("");
+  const [minMileage, setMinMileage] = useState<string | number>("");
+  const [maxMileage, setMaxMileage] = useState<string | number>("");
   const [engineType, setEngineType] = useState<string>("");
   const [viewingLocation, setViewingLocation] = useState<string>("");
   const [vehicleOriginCountry, setVehicleOriginCountry] = useState<string>("");
-  const [engineCapacity, setEngineCapacity] = useState<number[]>([50, 20000]);
+  const [minEngineCapacity, setMinEngineCapacity] = useState<string | number>(
+    ""
+  );
+  const [maxEngineCapacity, setMaxEngineCapacity] = useState<string | number>(
+    ""
+  );
   const [fuelType, setFuelType] = useState<string>("");
   const [transmissionType, setTransmissionType] = useState<string>("");
   const [driveType, setDriveType] = useState<string>("");
@@ -68,7 +73,8 @@ const VehicleSearch = (props: Props) => {
   const [seats, setSeats] = useState<number | string>("");
   const [doors, setDoors] = useState<number | string>("");
   const [steering, setSteering] = useState<string>("");
-  const [price, setPrice] = useState<number[]>([0, 100000000]);
+  const [minPrice, setMinPrice] = useState<string | number>("");
+  const [maxPrice, setMaxPrice] = useState<string | number>("");
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
@@ -76,16 +82,20 @@ const VehicleSearch = (props: Props) => {
   const { models } = useSelector((state: RootState) => state.models);
 
   const resetData = () => {
+    setEntryNo("");
     setBrandId("");
     setModelId("");
     setCondition("");
     setRegistered("");
-    setYearRange([1950, new Date().getFullYear() + 2]);
-    setMileage([0, 1000000]);
+    setMinYear("");
+    setMaxYear("");
+    setMinMileage("");
+    setMaxMileage("");
     setEngineType("");
     setViewingLocation("");
     setVehicleOriginCountry("");
-    setEngineCapacity([50, 20000]);
+    setMinEngineCapacity("");
+    setMaxEngineCapacity("");
     setFuelType("");
     setTransmissionType("");
     setDriveType("");
@@ -96,7 +106,8 @@ const VehicleSearch = (props: Props) => {
     setSeats("");
     setDoors("");
     setSteering("");
-    setPrice([0, 100000000]);
+    setMinPrice("");
+    setMaxPrice("");
   };
 
   useEffect(() => {
@@ -105,18 +116,23 @@ const VehicleSearch = (props: Props) => {
 
   const handleSearch = () => {
     const searchParams = {
+      ...(entryNo && { entryNo }),
       ...(brandId && { brandId }),
       ...(modelId && { modelId }),
       ...(condition && { condition }),
       ...(registered && { registered }),
-      minYear: yearRange[0].toString(),
-      maxYear: yearRange[1].toString(),
-      minMileage: mileage[0],
-      maxMileage: mileage[1],
+      ...(minYear && { minYear: minYear.toString() }),
+      ...(maxYear && { maxYear: maxYear.toString() }),
+      ...(minMileage && { minMileage: Number(minMileage) }),
+      ...(maxMileage && { maxMileage: Number(maxMileage) }),
       ...(transmissionType && { transmissionType }),
       ...(fuelType && { fuelType }),
-      minEngineCapacity: engineCapacity[0],
-      maxEngineCapacity: engineCapacity[1],
+      ...(minEngineCapacity && {
+        minEngineCapacity: Number(minEngineCapacity),
+      }),
+      ...(maxEngineCapacity && {
+        maxEngineCapacity: Number(maxEngineCapacity),
+      }),
       ...(exteriorColor && { exteriorColor }),
       ...(upholstery && { upholstery }),
       ...(engineType && { engineType }),
@@ -128,8 +144,8 @@ const VehicleSearch = (props: Props) => {
       ...(steering && { steering }),
       ...(seats && { seats: Number(seats) }),
       ...(doors && { doors: Number(doors) }),
-      minPrice: price[0],
-      maxPrice: price[1],
+      ...(minPrice && { minPrice: Number(minPrice) }),
+      ...(maxPrice && { maxPrice: Number(maxPrice) }),
     };
 
     handleVehiclesFilter(searchParams);
@@ -147,27 +163,56 @@ const VehicleSearch = (props: Props) => {
     [dispatch, brandId]
   );
 
-  const handleYearChange = (event: Event, newValue: number | number[]) => {
-    setYearRange(newValue as number[]);
-  };
-
-  const handleMileageChange = (event: Event, newValue: number | number[]) => {
-    setMileage(newValue as number[]);
-  };
-
-  const handleEngineCapacityChange = (
-    event: Event,
-    newValue: number | number[]
-  ) => {
-    setEngineCapacity(newValue as number[]);
-  };
-
-  const handlePriceChange = (event: Event, newValue: number | number[]) => {
-    setPrice(newValue as number[]);
-  };
-
   return (
     <Grid container spacing={5}>
+      <Grid item md={2} sm={3} xs={12}>
+        <TextField
+          fullWidth
+          id="entry-no"
+          aria-label="entry-no"
+          label="Entry No."
+          type="text"
+          size="small"
+          value={entryNo}
+          onChange={(e) => setEntryNo(e.target.value)}
+          placeholder="e.g. GRS000001"
+          sx={{ mb: 4 }}
+        />
+      </Grid>
+      <Grid item md={3} sm={4} xs={12}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: ".5rem",
+          }}
+        >
+          <TextField
+            fullWidth
+            id="min-year"
+            aria-label="min-year"
+            label="Min. Year"
+            type="text"
+            size="small"
+            value={minYear}
+            onChange={(e) => setMinYear(e.target.value)}
+            placeholder="e.g. 2012"
+            sx={{ mb: 4 }}
+          />
+          <TextField
+            fullWidth
+            id="max-year"
+            aria-label="max-year"
+            label="Max. Year"
+            type="text"
+            size="small"
+            value={maxYear}
+            onChange={(e) => setMaxYear(e.target.value)}
+            placeholder="e.g. 2023"
+            sx={{ mb: 4 }}
+          />
+        </Box>
+      </Grid>
       <Grid item md={2} sm={3} xs={12}>
         <FormControl fullWidth sx={{ mb: 4 }} size="small">
           <InputLabel htmlFor="brand-select">Brand</InputLabel>
@@ -232,6 +277,114 @@ const VehicleSearch = (props: Props) => {
             )}
           </Select>
         </FormControl>
+      </Grid>
+      <Grid item md={3} sm={4} xs={12}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: ".5rem",
+          }}
+        >
+          <TextField
+            fullWidth
+            id="min-price"
+            aria-label="min-price"
+            label="Min. Price"
+            type="number"
+            size="small"
+            value={minPrice}
+            onChange={(e) => setMinPrice(Number(e.target.value))}
+            placeholder="e.g. 200000"
+            sx={{ mb: 4 }}
+          />
+          <TextField
+            fullWidth
+            id="max-price"
+            aria-label="max-price"
+            label="Max. Price"
+            type="number"
+            size="small"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(Number(e.target.value))}
+            placeholder="e.g. 3000000"
+            sx={{ mb: 4 }}
+          />
+        </Box>
+      </Grid>
+      <Grid item md={3} sm={4} xs={12}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: ".5rem",
+          }}
+        >
+          <TextField
+            fullWidth
+            id="min-engine-capacity"
+            aria-label="min-engine-capacity"
+            label="Min. Eng. CC"
+            type="number"
+            size="small"
+            value={minEngineCapacity}
+            onChange={(e) => setMinEngineCapacity(Number(e.target.value))}
+            placeholder="e.g. 800"
+            sx={{ mb: 4 }}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">cc</InputAdornment>,
+            }}
+          />
+          <TextField
+            fullWidth
+            id="max-engine-capacity"
+            aria-label="max-engine-capacity"
+            label="Max. Eng. CC"
+            type="number"
+            size="small"
+            value={maxEngineCapacity}
+            onChange={(e) => setMaxEngineCapacity(Number(e.target.value))}
+            placeholder="e.g. 5000"
+            sx={{ mb: 4 }}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">cc</InputAdornment>,
+            }}
+          />
+        </Box>
+      </Grid>
+      <Grid item md={3} sm={4} xs={12}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: ".5rem",
+          }}
+        >
+          <TextField
+            fullWidth
+            id="min-mileage"
+            aria-label="min-mileage"
+            label="Min. Mileage"
+            type="number"
+            size="small"
+            value={minMileage}
+            onChange={(e) => setMinMileage(Number(e.target.value))}
+            placeholder="e.g. 0"
+            sx={{ mb: 4 }}
+          />
+          <TextField
+            fullWidth
+            id="max-mileage"
+            aria-label="max-mileage"
+            label="Max. Mileage"
+            type="number"
+            size="small"
+            value={maxMileage}
+            onChange={(e) => setMaxMileage(Number(e.target.value))}
+            placeholder="e.g. 100000"
+            sx={{ mb: 4 }}
+          />
+        </Box>
       </Grid>
       <Grid item md={2} sm={3} xs={12}>
         <FormControl fullWidth sx={{ mb: 4 }} size="small">
@@ -402,7 +555,7 @@ const VehicleSearch = (props: Props) => {
             onChange={(e) => setVehicleOriginCountry(e.target.value)}
             inputProps={{ placeholder: "e.g. Japan" }}
           >
-            {countries.map((country, index) => {
+            {mainCountries.map((country, index) => {
               const { name } = country;
 
               return (
@@ -506,66 +659,6 @@ const VehicleSearch = (props: Props) => {
         />
       </Grid>
 
-      <Grid item md={2} sm={3} xs={12}>
-        <Typography variant="body2">Year of Manufacture</Typography>
-        <FormControl fullWidth sx={{ mb: 4 }} size="small">
-          <Slider
-            id="year"
-            min={1950}
-            max={new Date().getFullYear() + 2}
-            value={yearRange}
-            onChange={handleYearChange}
-            valueLabelDisplay="auto"
-            getAriaLabel={() => "Year"}
-            getAriaValueText={() => `${yearRange}`}
-          />
-        </FormControl>
-      </Grid>
-      <Grid item md={2} sm={3} xs={12}>
-        <Typography variant="body2">Mileage (km/miles)</Typography>
-        <FormControl fullWidth sx={{ mb: 4 }} size="small">
-          <Slider
-            id="mileage"
-            min={0}
-            max={1000000}
-            value={mileage}
-            onChange={handleMileageChange}
-            valueLabelDisplay="auto"
-            getAriaLabel={() => "Mileage"}
-            getAriaValueText={() => `${mileage} km/miles`}
-          />
-        </FormControl>
-      </Grid>
-      <Grid item md={2} sm={3} xs={12}>
-        <Typography variant="body2">Engine Capacity (cc)</Typography>
-        <FormControl fullWidth sx={{ mb: 4 }} size="small">
-          <Slider
-            id="engine"
-            min={50}
-            max={20000}
-            value={engineCapacity}
-            onChange={handleEngineCapacityChange}
-            valueLabelDisplay="auto"
-            getAriaLabel={() => "Engine Capacity"}
-            getAriaValueText={() => `${engineCapacity} cc`}
-          />
-        </FormControl>
-      </Grid>
-      <Grid item md={2} sm={3} xs={12}>
-        <Typography variant="body2">Price ({currency})</Typography>
-        <FormControl fullWidth sx={{ mb: 4 }} size="small">
-          <Slider
-            id="price"
-            min={0}
-            max={100000000}
-            value={price}
-            onChange={handlePriceChange}
-            valueLabelDisplay="auto"
-            getAriaLabel={() => "Price"}
-            getAriaValueText={() => `${price} ${currency}`}
-          />
-        </FormControl>
-      </Grid>
       <Grid item md={2} sm={3} xs={12}>
         <Box
           sx={{
