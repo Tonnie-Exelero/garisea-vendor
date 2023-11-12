@@ -48,7 +48,7 @@ export const PasswordReset = ({
 
         <Text style={text}>The link above is valid for 24 hours.</Text>
 
-        <Text style={text}>
+        <Text style={text2}>
           If you didn't request this email, there's nothing to worry about - you
           can safely ignore it.
         </Text>
@@ -113,25 +113,25 @@ export const PasswordReset = ({
             target="_blank"
             rel="noopener noreferrer"
           >
-            Our shop
+            Marketplace
           </Link>
           &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
           <Link
             style={footerLink}
-            href="https://garisea.com"
+            href="https://garisea.com/terms"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Policies
+            Terms of Service
           </Link>
           &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
           <Link
             style={footerLink}
-            href="https://garisea.com"
+            href="https://garisea.com/privacy"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Help center
+            Privacy Policy
           </Link>
           <Text style={footerText}>
             ©2023 Garisea, a Francton Ltd company.
@@ -221,4 +221,11 @@ const text = {
   color: "#000",
   fontSize: "14px",
   lineHeight: "24px",
+};
+
+const text2 = {
+  color: "#000",
+  fontSize: "11px",
+  lineHeight: "20px",
+  opacity: "0.6",
 };
