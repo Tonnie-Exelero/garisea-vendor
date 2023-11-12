@@ -406,23 +406,6 @@ const VehicleSearch = (props: Props) => {
       </Grid>
       <Grid item md={2} sm={3} xs={12}>
         <FormControl fullWidth sx={{ mb: 4 }} size="small">
-          <InputLabel htmlFor="registered-select">Registered</InputLabel>
-          <Select
-            fullWidth
-            id="registered"
-            labelId="registered-select"
-            label="Registered"
-            value={registered}
-            onChange={(e) => setRegistered(e.target.value)}
-            inputProps={{ placeholder: "Select Registered" }}
-          >
-            <MenuItem value="yes">Yes</MenuItem>
-            <MenuItem value="no">No</MenuItem>
-          </Select>
-        </FormControl>
-      </Grid>
-      <Grid item md={2} sm={3} xs={12}>
-        <FormControl fullWidth sx={{ mb: 4 }} size="small">
           <InputLabel htmlFor="fuel-type-select">Fuel Type</InputLabel>
           <Select
             fullWidth
@@ -456,12 +439,10 @@ const VehicleSearch = (props: Props) => {
             inputProps={{ placeholder: "Select Transmission Type" }}
           >
             <MenuItem value="Automatic">Automatic</MenuItem>
-            <MenuItem value="Semi-Automatic">Semi-Automatic</MenuItem>
+            <MenuItem value="Semi-Automatic">
+              Semi-Automatic (Tiptronic)
+            </MenuItem>
             <MenuItem value="Manual">Manual</MenuItem>
-            <MenuItem value="Tiptronic">Tiptronic</MenuItem>
-            <MenuItem value="CVT">CVT</MenuItem>
-            <MenuItem value="DCT">DCT</MenuItem>
-            <MenuItem value="Sport AT">Sport AT</MenuItem>
             <MenuItem value="Unspecified">Unspecified</MenuItem>
           </Select>
         </FormControl>
@@ -478,8 +459,12 @@ const VehicleSearch = (props: Props) => {
             onChange={(e) => setDriveType(e.target.value)}
             inputProps={{ placeholder: "Select Drive Type" }}
           >
-            <MenuItem value="Front Wheel Drive">Front Wheel Drive </MenuItem>
-            <MenuItem value="Rear Wheel Drive">Rear Wheel Drive</MenuItem>
+            <MenuItem value="2 Wheel Drive (Front)">
+              2 Wheel Drive (Front)
+            </MenuItem>
+            <MenuItem value="2 Wheel Drive (Rear)">
+              2 Wheel Drive (Rear)
+            </MenuItem>
             <MenuItem value="All Wheel Drive">All Wheel Drive</MenuItem>
             <MenuItem value="4x4">4x4</MenuItem>
           </Select>
@@ -564,6 +549,23 @@ const VehicleSearch = (props: Props) => {
                 </MenuItem>
               );
             })}
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid item md={2} sm={3} xs={12}>
+        <FormControl fullWidth sx={{ mb: 4 }} size="small">
+          <InputLabel htmlFor="registered-select">Registered</InputLabel>
+          <Select
+            fullWidth
+            id="registered"
+            labelId="registered-select"
+            label="Registered"
+            value={registered}
+            onChange={(e) => setRegistered(e.target.value)}
+            inputProps={{ placeholder: "Select Registered" }}
+          >
+            <MenuItem value="yes">Yes</MenuItem>
+            <MenuItem value="no">No</MenuItem>
           </Select>
         </FormControl>
       </Grid>
