@@ -38,7 +38,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@redux/index";
 import { addVehicle } from "@src/store/apps/vendor/vehicle/single";
 import toast from "react-hot-toast";
-import { uuid } from "uuidv4";
+import { generateEntryNoString } from "@core/utils/random-string";
 
 const steps = [
   {
@@ -136,7 +136,7 @@ const VehicleListingWizard: React.FC<any> = () => {
   const [creatingListing, setCreatingListing] = useState<string>("");
 
   const vehicleData = {
-    entryNo: uuid(),
+    entryNo: generateEntryNoString(7),
     ...basicData,
     ...imagesData,
     ...driveTrainData,
