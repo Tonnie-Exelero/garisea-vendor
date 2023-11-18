@@ -104,19 +104,43 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
   ].value;
 
   // ** States
-  const [condition, setCondition] = useState<string>(initialIconSelected);
-  const [brandId, setBrandId] = useState<string>("");
-  const [modelId, setModelId] = useState<string>("");
-  const [trim, setTrim] = useState<string>("");
-  const [yearOfManufacture, setYearOfManufacture] = useState<string>("");
+  const [condition, setCondition] = useState<string>(
+    window.localStorage.getItem("condition") || initialIconSelected
+  );
+  const [brandId, setBrandId] = useState<string>(
+    window.localStorage.getItem("brandId") || ""
+  );
+  const [modelId, setModelId] = useState<string>(
+    window.localStorage.getItem("modelId") || ""
+  );
+  const [trim, setTrim] = useState<string>(
+    window.localStorage.getItem("trim") || ""
+  );
+  const [yearOfManufacture, setYearOfManufacture] = useState<string>(
+    window.localStorage.getItem("yearOfManufacture") || ""
+  );
   const [yearOfFirstRegistration, setYearOfFirstRegistration] =
-    useState<string>("");
-  const [registered, setRegistered] = useState<string>("");
-  const [registrationNo, setRegistrationNo] = useState<string>("");
-  const [mileage, setMileage] = useState<number>();
-  const [mileageMetric, setMileageMetric] = useState<string>("");
-  const [viewingLocation, setViewingLocation] = useState<string>("");
-  const [vehicleOriginCountry, setVehicleOriginCountry] = useState<string>("");
+    useState<string>(
+      window.localStorage.getItem("yearOfFirstRegistration") || ""
+    );
+  const [registered, setRegistered] = useState<string>(
+    window.localStorage.getItem("registered") || ""
+  );
+  const [registrationNo, setRegistrationNo] = useState<string>(
+    window.localStorage.getItem("registrationNo") || ""
+  );
+  const [mileage, setMileage] = useState<number>(
+    Number(window.localStorage.getItem("mileage")) || 0
+  );
+  const [mileageMetric, setMileageMetric] = useState<string>(
+    window.localStorage.getItem("mileageMetric") || ""
+  );
+  const [viewingLocation, setViewingLocation] = useState<string>(
+    window.localStorage.getItem("viewingLocation") || ""
+  );
+  const [vehicleOriginCountry, setVehicleOriginCountry] = useState<string>(
+    window.localStorage.getItem("vehicleOriginCountry") || ""
+  );
   const [newItem, setNewItem] = useState<string>("");
   const [itemType, setItemType] = useState<string>("");
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -215,8 +239,10 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
   const handleRadioChange = (prop: string | ChangeEvent<HTMLInputElement>) => {
     if (typeof prop === "string") {
       setCondition(prop);
+      saveDraft("condition", prop);
     } else {
       setCondition((prop.target as HTMLInputElement).value);
+      saveDraft("condition", (prop.target as HTMLInputElement).value);
     }
   };
 
@@ -228,6 +254,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
     } = event;
 
     setRegistered(value);
+    saveDraft("registered", value);
   };
 
   const handleBrandSelect = useCallback(
@@ -236,6 +263,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
         target: { value },
       } = event;
       setBrandId(value);
+      saveDraft("brandId", value);
 
       // Fetch Models by Brand ID
       const { data } = await apolloClient.query({
@@ -253,6 +281,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
 
   const handleMetricSelect = (metric: string) => {
     setMileageMetric(metric);
+    saveDraft("mileageMetric", metric);
   };
 
   const confirmData = () => {
@@ -316,6 +345,9 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
     setItemType("Model");
     setOpenDialog(true);
   };
+
+  const saveDraft = (name: string, value: any) =>
+    window.localStorage.setItem(name, value);
 
   return (
     <>
@@ -403,7 +435,10 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
               labelId="model-select"
               label="Model"
               value={modelId}
-              onChange={(e) => setModelId(e.target.value)}
+              onChange={(e) => {
+                setModelId(e.target.value);
+                saveDraft("modelId", e.target.value);
+              }}
               inputProps={{ placeholder: "Select Model" }}
               disabled={brandId !== "" ? false : true}
             >
@@ -466,6 +501,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
             type="text"
             value={trim}
             onChange={(e) => setTrim(e.target.value)}
+            onBlur={(e) => saveDraft("trim", e.target.value)}
             placeholder="e.g. LWB Premium"
             sx={{ mb: 4 }}
           />
@@ -479,6 +515,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
             type="text"
             value={yearOfManufacture}
             onChange={(e) => setYearOfManufacture(e.target.value)}
+            onBlur={(e) => saveDraft("yearOfManufacture", e.target.value)}
             placeholder="e.g. 08/2023"
             sx={{ mb: 4 }}
           />
@@ -492,6 +529,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
             type="text"
             value={yearOfFirstRegistration}
             onChange={(e) => setYearOfFirstRegistration(e.target.value)}
+            onBlur={(e) => saveDraft("yearOfFirstRegistration", e.target.value)}
             placeholder="e.g. 09/2023"
             sx={{ mb: 4 }}
           />
@@ -506,6 +544,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
             label="Mileage"
             value={mileage}
             onChange={(e) => setMileage(Number(e.target.value))}
+            onBlur={(e) => saveDraft("mileage", Number(e.target.value))}
             InputProps={{
               endAdornment: (
                 <InputAdornment
@@ -542,6 +581,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
             type="text"
             value={viewingLocation}
             onChange={(e) => setViewingLocation(e.target.value)}
+            onBlur={(e) => saveDraft("viewingLocation", e.target.value)}
             placeholder="e.g. Galleria Mall, Langata Rd, Nairobi"
             sx={{ mb: 4 }}
           />
@@ -555,7 +595,10 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
               id="origin-country"
               label="Country of Origin"
               labelId="origin-country"
-              onChange={(e) => setVehicleOriginCountry(e.target.value)}
+              onChange={(e) => {
+                setVehicleOriginCountry(e.target.value);
+                saveDraft("vehicleOriginCountry", e.target.value);
+              }}
               inputProps={{ placeholder: "e.g. Japan" }}
             >
               {mainCountries.map((country, index) => {
@@ -605,6 +648,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
               type="text"
               value={registrationNo}
               onChange={(e) => setRegistrationNo(e.target.value)}
+              onBlur={(e) => saveDraft("registrationNo", e.target.value)}
               placeholder="e.g. KDL 999L"
               sx={{ mb: 4 }}
             />

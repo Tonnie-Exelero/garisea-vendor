@@ -31,13 +31,27 @@ const StepOptics: React.FC<StepOpticsProps> = (props) => {
   const { handleOpticsData, nextStep } = props;
 
   // ** State
-  const [exteriorColor, setExteriorColor] = useState<string>("");
-  const [interiorColor, setInteriorColor] = useState<string>("");
-  const [bodyType, setBodyType] = useState<string>("");
-  const [upholstery, setUpholstery] = useState<string>("");
-  const [seats, setSeats] = useState<number>();
-  const [doors, setDoors] = useState<number>();
-  const [steering, setSteering] = useState<string>("RHD");
+  const [exteriorColor, setExteriorColor] = useState<string>(
+    window.localStorage.getItem("exteriorColor") || ""
+  );
+  const [interiorColor, setInteriorColor] = useState<string>(
+    window.localStorage.getItem("interiorColor") || ""
+  );
+  const [bodyType, setBodyType] = useState<string>(
+    window.localStorage.getItem("bodyType") || ""
+  );
+  const [upholstery, setUpholstery] = useState<string>(
+    window.localStorage.getItem("upholstery") || ""
+  );
+  const [seats, setSeats] = useState<number>(
+    Number(window.localStorage.getItem("seats")) || 0
+  );
+  const [doors, setDoors] = useState<number>(
+    Number(window.localStorage.getItem("doors")) || 0
+  );
+  const [steering, setSteering] = useState<string>(
+    window.localStorage.getItem("steering") || "RHD"
+  );
 
   const opticsData = {
     exteriorColor,
@@ -54,6 +68,9 @@ const StepOptics: React.FC<StepOpticsProps> = (props) => {
     nextStep(true);
   };
 
+  const saveDraft = (name: string, value: any) =>
+    window.localStorage.setItem(name, value);
+
   return (
     <>
       <Grid container spacing={5}>
@@ -66,6 +83,7 @@ const StepOptics: React.FC<StepOpticsProps> = (props) => {
             type="text"
             value={exteriorColor}
             onChange={(e) => setExteriorColor(e.target.value)}
+            onBlur={(e) => saveDraft("exteriorColor", e.target.value)}
             placeholder="e.g. White"
             sx={{ mb: 4 }}
           />
@@ -79,6 +97,7 @@ const StepOptics: React.FC<StepOpticsProps> = (props) => {
             type="text"
             value={interiorColor}
             onChange={(e) => setInteriorColor(e.target.value)}
+            onBlur={(e) => saveDraft("interiorColor", e.target.value)}
             placeholder="e.g. Beige"
             sx={{ mb: 4 }}
           />
@@ -92,7 +111,10 @@ const StepOptics: React.FC<StepOpticsProps> = (props) => {
               labelId="upholstery-select"
               label="Upholstery"
               value={upholstery}
-              onChange={(e) => setUpholstery(e.target.value)}
+              onChange={(e) => {
+                setUpholstery(e.target.value);
+                saveDraft("upholstery", e.target.value);
+              }}
               inputProps={{ placeholder: "Select Upholstery" }}
             >
               <MenuItem value="Leather">Leather</MenuItem>
@@ -113,7 +135,10 @@ const StepOptics: React.FC<StepOpticsProps> = (props) => {
               labelId="body-type-select"
               label="Body Type"
               value={bodyType}
-              onChange={(e) => setBodyType(e.target.value)}
+              onChange={(e) => {
+                setBodyType(e.target.value);
+                saveDraft("bodyType", e.target.value);
+              }}
               inputProps={{ placeholder: "Select Body Type" }}
             >
               {vehicleBodyTypes.map((type, index) => (
@@ -134,6 +159,7 @@ const StepOptics: React.FC<StepOpticsProps> = (props) => {
             label="Seats Number"
             value={seats}
             onChange={(e) => setSeats(Number(e.target.value))}
+            onBlur={(e) => saveDraft("seats", Number(e.target.value))}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">seats</InputAdornment>
@@ -152,6 +178,7 @@ const StepOptics: React.FC<StepOpticsProps> = (props) => {
             label="Doors Number"
             value={doors}
             onChange={(e) => setDoors(Number(e.target.value))}
+            onBlur={(e) => saveDraft("doors", Number(e.target.value))}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">doors</InputAdornment>
@@ -177,7 +204,10 @@ const StepOptics: React.FC<StepOpticsProps> = (props) => {
               name="steering-group"
               aria-labelledby="steering-radio"
               value={steering}
-              onChange={(e) => setSteering(e.target.value)}
+              onChange={(e) => {
+                setSteering(e.target.value);
+                saveDraft("steering", e.target.value);
+              }}
             >
               <FormControlLabel control={<Radio />} value="RHD" label="RHD" />
               <FormControlLabel control={<Radio />} value="LHD" label="LHD" />

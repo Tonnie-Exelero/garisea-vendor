@@ -13,6 +13,9 @@ module.exports = {
   },
   trailingSlash: true,
   reactStrictMode: false,
+  images: {
+    domains: ["b4kebskkfsllp01c.public.blob.vercel-storage.com"],
+  },
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
