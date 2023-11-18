@@ -40,6 +40,8 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
 
   const handleImages = (images: string) => {
     setImageUrls(images);
+    setThumbnail(images.split(",")[0]);
+    setUploaded(true);
     saveDraft("imageUrls", images);
   };
 
