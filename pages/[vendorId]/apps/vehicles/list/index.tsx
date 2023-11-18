@@ -146,11 +146,12 @@ const currency = "KES";
 
 // ** renders client column
 const renderClient = (row: VehicleRowType) => {
-  if (row.node.images) {
-    const firstImage = row.node.images.split(",")[0];
-
+  if (row.node.thumbnail) {
     return (
-      <CustomAvatar src={firstImage} sx={{ mr: 3, width: 32, height: 32 }} />
+      <CustomAvatar
+        src={row.node.thumbnail}
+        sx={{ mr: 3, width: 32, height: 32 }}
+      />
     );
   } else {
     const fullName = row.node.brand.name + " " + row.node.model.name;
