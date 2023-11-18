@@ -32,10 +32,9 @@ export const featuresArray = [
 export const availablePaymentModes = [
   "Cash",
   "Cheque",
-  "Post-dated Cheques",
   "Hire Purchase",
-  "Bank Transfer",
-  "Mobile Money",
+  "Bank Finance",
+  "Trade-In",
 ];
 
 export const vehicleBodyTypes = [
