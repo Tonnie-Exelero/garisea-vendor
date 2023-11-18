@@ -10,10 +10,12 @@ import {
   CREATE_VEHICLE,
   UPDATE_VEHICLE,
   UPDATE_VEHICLE_STATUS,
+  UPDATE_VEHICLE_VERIFIED,
   UPDATE_VEHICLE_SLUG,
   UPDATE_VEHICLE_RESERVED,
   UPDATE_VEHICLE_SOLD,
   UPDATE_VEHICLE_IMAGES,
+  UPDATE_VEHICLE_THUMBNAIL,
   UPDATE_VEHICLE_PUPLISHED_AT,
   UPDATE_VEHICLE_IMPRESSIONS,
   UPDATE_VEHICLE_DETAIL_EXPANDS,
@@ -22,7 +24,6 @@ import {
   UPDATE_VEHICLE_SPECIFICATIONS,
   UPDATE_VEHICLE_EXTRA_INFO,
   DELETE_VEHICLE,
-  UPDATE_VEHICLE_VERIFIED,
 } from "@api/vendor/vehicle";
 
 // ** Others
@@ -76,6 +77,7 @@ const vehicleInitialState = {
   exteriorColor: "",
   upholstery: "",
   images: "",
+  thumbnail: "",
   status: "",
   viewingLocation: "",
   vehicleOriginCountry: "",
@@ -352,6 +354,32 @@ export const editVehicleImages = createAsyncThunk<
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_VEHICLE_IMAGES,
+        variables: { ...vehicleData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Update Vehicle Thumbnail
+export const editVehicleThumbnail = createAsyncThunk<
+  Vehicle,
+  Partial<Vehicle>,
+  {}
+>(
+  "appSingleVehicle/editVehicleThumbnail",
+  async (vehicleData, { rejectWithValue }) => {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_VEHICLE_THUMBNAIL,
         variables: { ...vehicleData },
       });
 
@@ -691,6 +719,11 @@ export const appSingleVehicleSlice = createSlice({
         const { updateVehicleImages }: any = payload;
 
         state.vehicle.images = updateVehicleImages.images;
+      })
+      .addCase(editVehicleThumbnail.fulfilled, (state, { payload }) => {
+        const { updateVehicleThumbnail }: any = payload;
+
+        state.vehicle.thumbnail = updateVehicleThumbnail.thumbnail;
       })
       .addCase(editVehiclePublishedAt.fulfilled, (state, { payload }) => {
         const { updateVehiclePublishedAt }: any = payload;

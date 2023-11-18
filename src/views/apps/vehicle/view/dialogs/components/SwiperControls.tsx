@@ -27,7 +27,10 @@ import { useKeenSlider } from "keen-slider/react";
 // ** API/Redux
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@src/store";
-import { editVehicleImages } from "@src/store/apps/vendor/vehicle/single";
+import {
+  editVehicleImages,
+  editVehicleThumbnail,
+} from "@src/store/apps/vendor/vehicle/single";
 
 // ** Types
 import { VehicleNode } from "src/types/apps/vehicleTypes";
@@ -46,12 +49,13 @@ const SwiperControls: React.FC<any> = ({
   vehicle: VehicleNode;
   handleImagesDialogToggle: () => void;
 }) => {
-  const { id, images } = vehicle;
+  const { id, images, thumbnail } = vehicle;
 
   // ** States
   const [vImages, setVImages] = useState<string[]>(
     images ? images.split(",") : []
   );
+  const [vThumbnail, setVThumbnail] = useState<string>(thumbnail);
   const [deleting, setDeleting] = useState<string>("");
   const [loaded, setLoaded] = useState<boolean>(false);
   const [openAddSection, setOpenAddSection] = useState<boolean>(false);
@@ -114,6 +118,25 @@ const SwiperControls: React.FC<any> = ({
     setDeleting("complete");
   };
 
+  const handleUpdateThumbnail = async (image: string) => {
+    setVThumbnail(image);
+
+    const vehicleData = {
+      id,
+      thumbnail: image,
+    };
+
+    const resultAction: any = await dispatch(
+      editVehicleThumbnail({ ...vehicleData })
+    );
+
+    if (editVehicleThumbnail.fulfilled.match(resultAction)) {
+      toast.success(`Thumbnail updated successfully!`);
+    } else {
+      toast.error(`Error updating thumbnail image: ${resultAction.error}`);
+    }
+  };
+
   const handleUpdateVehicleImageDelete = async (images: string[]) => {
     const vehicleData = {
       id,
@@ -155,7 +178,7 @@ const SwiperControls: React.FC<any> = ({
                       sx={{
                         position: "absolute",
                         top: 0,
-                        right: 0,
+                        right: -10,
                       }}
                     >
                       <Icon fontSize={30} icon="bx:x" />
@@ -171,6 +194,27 @@ const SwiperControls: React.FC<any> = ({
                       height: "70vh",
                     }}
                   />
+
+                  <Tooltip title="Set image as thumbnail" placement="top">
+                    <IconButton
+                      onClick={() => handleUpdateThumbnail(image)}
+                      color="inherit"
+                      sx={{
+                        position: "absolute",
+                        bottom: 100,
+                        right: -14,
+                      }}
+                    >
+                      <Icon
+                        fontSize={40}
+                        icon={
+                          image === vThumbnail
+                            ? "bx:checkbox-checked"
+                            : "bx:checkbox"
+                        }
+                      />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="Add more images" placement="top">
                     <IconButton
                       onClick={handleAddImagesSection}
@@ -178,7 +222,7 @@ const SwiperControls: React.FC<any> = ({
                       sx={{
                         position: "absolute",
                         bottom: 50,
-                        right: 0,
+                        right: -10,
                       }}
                     >
                       <Icon fontSize={30} icon="bx:bxs-image-add" />
@@ -191,7 +235,7 @@ const SwiperControls: React.FC<any> = ({
                       sx={{
                         position: "absolute",
                         bottom: 4,
-                        right: 4,
+                        right: -10,
                       }}
                     >
                       {deleting === "ongoing" && (

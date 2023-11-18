@@ -64,6 +64,7 @@ const vehiclesInitialState = {
         exteriorColor: "",
         upholstery: "",
         images: "",
+        thumbnail: "",
         status: "",
         viewingLocation: "",
         vehicleOriginCountry: "",

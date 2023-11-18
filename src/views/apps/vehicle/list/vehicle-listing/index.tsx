@@ -152,6 +152,43 @@ const VehicleListingWizard: React.FC<any> = () => {
     interested: 0,
   };
 
+  const dataVars = [
+    "condition",
+    "registered",
+    "vendorId",
+    "brandId",
+    "modelId",
+    "mileage",
+    "mileageMetric",
+    "trim",
+    "yearOfManufacture",
+    "yearOfFirstRegistration",
+    "registrationNo",
+    "viewingLocation",
+    "vehicleOriginCountry",
+    "engineType",
+    "engineCapacity",
+    "fuelType",
+    "transmissionType",
+    "driveType",
+    "vinNo",
+    "features",
+    "extraInfo",
+    "imageUrls",
+    "thumbnail",
+    "exteriorColor",
+    "interiorColor",
+    "bodyType",
+    "upholstery",
+    "seats",
+    "doors",
+    "steering",
+    "listingPrice",
+    "discountedPrice",
+    "offerType",
+    "paymentModes",
+  ];
+
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
 
@@ -244,6 +281,8 @@ const VehicleListingWizard: React.FC<any> = () => {
       setCreatingListing("complete");
 
       toast.success(`Vehicle listing created successfully!`);
+
+      dataVars.forEach((item) => window.localStorage.removeItem(item));
     } else {
       toast.error(`Error creating vehicle: ${resultAction.error}`);
     }

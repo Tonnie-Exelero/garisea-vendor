@@ -198,6 +198,7 @@ model Vehicle {
   exteriorColor           String?
   upholstery              String?
   images                  String?
+  thumbnail               String?
   status                  String?
   viewingLocation         String?
   vehicleOriginCountry    String?

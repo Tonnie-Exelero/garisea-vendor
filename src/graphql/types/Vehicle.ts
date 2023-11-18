@@ -25,6 +25,7 @@ export const Vehicle = builder.prismaObject("Vehicle", {
     exteriorColor: t.exposeString("exteriorColor", { nullable: true }),
     upholstery: t.exposeString("upholstery", { nullable: true }),
     images: t.exposeString("images", { nullable: true }),
+    thumbnail: t.exposeString("thumbnail", { nullable: true }),
     status: t.exposeString("status", { nullable: true }),
     viewingLocation: t.exposeString("viewingLocation", { nullable: true }),
     vehicleOriginCountry: t.exposeString("vehicleOriginCountry", {
@@ -150,26 +151,26 @@ builder.queryFields((t) => ({
     type: Vehicle,
     nullable: true,
     args: {
-      vendorId: t.arg.string({ required: true }),
+      vendorId: t.arg.string(),
     },
     resolve: async (_query, _parent, args, _info): Promise<any | undefined> => {
       const active = await prisma.vehicle.count({
         where: {
-          vendorId: args.vendorId,
+          ...(args.vendorId && { vendorId: args.vendorId }),
           status: "active",
         },
       });
 
       const pending = await prisma.vehicle.count({
         where: {
-          vendorId: args.vendorId,
+          ...(args.vendorId && { vendorId: args.vendorId }),
           status: "pending",
         },
       });
 
       const declined = await prisma.vehicle.count({
         where: {
-          vendorId: args.vendorId,
+          ...(args.vendorId && { vendorId: args.vendorId }),
           status: "declined",
         },
       });
@@ -689,6 +690,7 @@ builder.mutationFields((t) => ({
       exteriorColor: t.arg.string(),
       upholstery: t.arg.string(),
       images: t.arg.string(),
+      thumbnail: t.arg.string(),
       status: t.arg.string(),
       viewingLocation: t.arg.string(),
       vehicleOriginCountry: t.arg.string(),
@@ -736,6 +738,7 @@ builder.mutationFields((t) => ({
         exteriorColor,
         upholstery,
         images,
+        thumbnail,
         status,
         viewingLocation,
         vehicleOriginCountry,
@@ -785,6 +788,7 @@ builder.mutationFields((t) => ({
           exteriorColor,
           upholstery,
           images,
+          thumbnail,
           status,
           viewingLocation,
           vehicleOriginCountry,
@@ -1072,6 +1076,26 @@ builder.mutationFields((t) => ({
         },
         data: {
           images: images ? images : undefined,
+        },
+      });
+    },
+  }),
+  updateVehicleThumbnail: t.prismaField({
+    type: Vehicle,
+    args: {
+      id: t.arg.string({ required: true }),
+      thumbnail: t.arg.string(),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { id, thumbnail } = args;
+
+      return await prisma.vehicle.update({
+        ...query,
+        where: {
+          id,
+        },
+        data: {
+          thumbnail: thumbnail ? thumbnail : undefined,
         },
       });
     },

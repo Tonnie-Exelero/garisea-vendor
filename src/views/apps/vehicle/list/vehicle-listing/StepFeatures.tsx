@@ -28,8 +28,12 @@ const StepFeatures: React.FC<StepFeaturesProps> = (props) => {
   const { handleFeaturesData, nextStep } = props;
 
   // ** State
-  const [features, setFeatures] = useState<string[]>([]);
-  const [extraInfo, setExtraInfo] = useState<string>("");
+  const [features, setFeatures] = useState<string[]>(
+    window.localStorage.getItem("features")?.split(",") || []
+  );
+  const [extraInfo, setExtraInfo] = useState<string>(
+    window.localStorage.getItem("extraInfo") || ""
+  );
   const [newFeature, setNewFeature] = useState<string>("");
   const [showTextField, setShowTextField] = useState<boolean>(false);
 
@@ -41,8 +45,11 @@ const StepFeatures: React.FC<StepFeaturesProps> = (props) => {
   const handleFeatureSelect = (value: string) => {
     if (features.some((feat) => feat === value)) {
       const updatedList = features.filter((feat) => feat !== value);
+
+      saveDraft("features", updatedList.toString());
       return setFeatures(updatedList);
     }
+    saveDraft("features", features.toString());
     return setFeatures((prev) => [...prev, value]);
   };
 
@@ -50,6 +57,7 @@ const StepFeatures: React.FC<StepFeaturesProps> = (props) => {
     setShowTextField(false);
     setNewFeature("");
 
+    saveDraft("features", features.toString());
     return setFeatures((prev) => (prev ? [...prev, value] : [value]));
   };
 
@@ -57,6 +65,9 @@ const StepFeatures: React.FC<StepFeaturesProps> = (props) => {
     handleFeaturesData(featuresData);
     nextStep(true);
   };
+
+  const saveDraft = (name: string, value: any) =>
+    window.localStorage.setItem(name, value);
 
   return (
     <>
@@ -127,6 +138,7 @@ const StepFeatures: React.FC<StepFeaturesProps> = (props) => {
             type="text"
             value={extraInfo}
             onChange={(e) => setExtraInfo(e.target.value)}
+            onBlur={(e) => saveDraft("extraInfo", e.target.value)}
             placeholder="Add any extra info about the vehicle"
           />
         </Grid>

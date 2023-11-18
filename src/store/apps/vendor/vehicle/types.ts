@@ -23,6 +23,7 @@ export interface Vehicle {
   exteriorColor: string;
   upholstery: string;
   images: string;
+  thumbnail: string;
   status: string;
   viewingLocation: string;
   vehicleOriginCountry: string;

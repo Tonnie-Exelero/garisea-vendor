@@ -91,6 +91,7 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
     listingPrice,
     discountedPrice,
     images,
+    thumbnail,
     status,
     viewingLocation,
     vehicleOriginCountry,
@@ -180,9 +181,9 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                   flexDirection: "column",
                 }}
               >
-                {images ? (
+                {thumbnail ? (
                   <CustomAvatar
-                    src={vehicleImages[0]}
+                    src={thumbnail}
                     variant="rounded"
                     alt={brand.name + " " + model.name}
                     onClick={handleImagesDialogToggle}

@@ -32,11 +32,19 @@ const StepPrice: React.FC<StepPriceProps> = (props) => {
   const { handlePriceData, nextStep } = props;
 
   // ** State
-  const [listingPrice, setListingPrice] = useState<number>();
-  const [discountedPrice, setDiscountedPrice] = useState<number>();
+  const [listingPrice, setListingPrice] = useState<number>(
+    Number(window.localStorage.getItem("listingPrice")) || 0
+  );
+  const [discountedPrice, setDiscountedPrice] = useState<number>(
+    Number(window.localStorage.getItem("discountedPrice")) || 0
+  );
   const [percentageDiscount, setPercentageDiscount] = useState<number>();
-  const [offerType, setOfferType] = useState<string>("");
-  const [paymentModes, setPaymentModes] = useState<string[]>([]);
+  const [offerType, setOfferType] = useState<string>(
+    window.localStorage.getItem("offerType") || ""
+  );
+  const [paymentModes, setPaymentModes] = useState<string[]>(
+    window.localStorage.getItem("paymentModes")?.split(",") || []
+  );
 
   const priceData = {
     listingPrice,
@@ -56,6 +64,7 @@ const StepPrice: React.FC<StepPriceProps> = (props) => {
       target: { value },
     } = event;
     setPaymentModes(typeof value === "string" ? value.split(",") : value);
+    saveDraft("paymentModes", value.toString());
   };
 
   const handleDiscountedPriceChange = (event: any) => {
@@ -73,12 +82,16 @@ const StepPrice: React.FC<StepPriceProps> = (props) => {
     }
 
     setDiscountedPrice(Number(value));
+    saveDraft("discountedPrice", Number(value));
   };
 
   const confirmData = () => {
     handlePriceData(priceData);
     nextStep(true);
   };
+
+  const saveDraft = (name: string, value: any) =>
+    window.localStorage.setItem(name, value);
 
   return (
     <>
@@ -93,6 +106,7 @@ const StepPrice: React.FC<StepPriceProps> = (props) => {
             label="Listing Price"
             value={listingPrice}
             onChange={(e) => setListingPrice(Number(e.target.value))}
+            onBlur={(e) => saveDraft("listingPrice", e.target.value)}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">{currency}</InputAdornment>
@@ -132,7 +146,10 @@ const StepPrice: React.FC<StepPriceProps> = (props) => {
               labelId="select-offer-type"
               label="Offer Type"
               value={offerType}
-              onChange={(e) => setOfferType(e.target.value)}
+              onChange={(e) => {
+                setOfferType(e.target.value);
+                saveDraft("offerType", e.target.value);
+              }}
               inputProps={{ placeholder: "Select Offer Type" }}
             >
               <MenuItem value="early-bird">Early Bird</MenuItem>

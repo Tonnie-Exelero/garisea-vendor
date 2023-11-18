@@ -52,6 +52,7 @@ export const GET_VEHICLES = gql`
           exteriorColor
           upholstery
           images
+          thumbnail
           status
           viewingLocation
           vehicleOriginCountry
@@ -138,6 +139,7 @@ export const GET_VEHICLE_BY_ID = gql`
       exteriorColor
       upholstery
       images
+      thumbnail
       status
       viewingLocation
       vehicleOriginCountry
@@ -215,6 +217,7 @@ export const GET_VEHICLE_BY_ENTRY_NO = gql`
       exteriorColor
       upholstery
       images
+      thumbnail
       status
       viewingLocation
       vehicleOriginCountry
@@ -292,6 +295,7 @@ export const GET_VEHICLE_BY_SLUG = gql`
       exteriorColor
       upholstery
       images
+      thumbnail
       status
       viewingLocation
       vehicleOriginCountry
@@ -386,6 +390,7 @@ export const GET_VEHICLES_BY_VENDOR_ID = gql`
           exteriorColor
           upholstery
           images
+          thumbnail
           status
           viewingLocation
           vehicleOriginCountry
@@ -424,7 +429,7 @@ export const GET_VEHICLES_BY_VENDOR_ID = gql`
 `;
 
 export const GET_VEHICLES_STATS_BY_VENDOR_ID = gql`
-  query GetVehiclesStatsByVendorId($vendorId: String!) {
+  query GetVehiclesStatsByVendorId($vendorId: String) {
     vehiclesCount(vendorId: $vendorId) {
       vehicleVerified
     }
@@ -561,6 +566,7 @@ export const GET_FILTERED_VEHICLES = gql`
           exteriorColor
           upholstery
           images
+          thumbnail
           status
           viewingLocation
           vehicleOriginCountry
@@ -630,6 +636,7 @@ export const CREATE_VEHICLE = gql`
     $exteriorColor: String
     $upholstery: String
     $images: String
+    $thumbnail: String
     $status: String
     $viewingLocation: String
     $vehicleOriginCountry: String
@@ -676,6 +683,7 @@ export const CREATE_VEHICLE = gql`
       exteriorColor: $exteriorColor
       upholstery: $upholstery
       images: $images
+      thumbnail: $thumbnail
       status: $status
       viewingLocation: $viewingLocation
       vehicleOriginCountry: $vehicleOriginCountry
@@ -748,6 +756,7 @@ export const CREATE_VEHICLE = gql`
       exteriorColor
       upholstery
       images
+      thumbnail
       status
       viewingLocation
       vehicleOriginCountry
@@ -903,6 +912,7 @@ export const UPDATE_VEHICLE = gql`
       exteriorColor
       upholstery
       images
+      thumbnail
       status
       viewingLocation
       vehicleOriginCountry
@@ -981,6 +991,15 @@ export const UPDATE_VEHICLE_IMAGES = gql`
     updateVehicleImages(id: $id, images: $images) {
       id
       images
+    }
+  }
+`;
+
+export const UPDATE_VEHICLE_THUMBNAIL = gql`
+  mutation UpdateVehicleThumbnail($id: String!, $thumbnail: String) {
+    updateVehicleThumbnail(id: $id, thumbnail: $thumbnail) {
+      id
+      thumbnail
     }
   }
 `;
@@ -1104,6 +1123,7 @@ export const UPDATE_VEHICLE_BASIC = gql`
       exteriorColor
       upholstery
       images
+      thumbnail
       status
       viewingLocation
       vehicleOriginCountry
@@ -1209,6 +1229,7 @@ export const UPDATE_VEHICLE_SPECIFICATIONS = gql`
       exteriorColor
       upholstery
       images
+      thumbnail
       status
       viewingLocation
       vehicleOriginCountry
@@ -1300,6 +1321,7 @@ export const UPDATE_VEHICLE_EXTRA_INFO = gql`
       exteriorColor
       upholstery
       images
+      thumbnail
       status
       viewingLocation
       vehicleOriginCountry

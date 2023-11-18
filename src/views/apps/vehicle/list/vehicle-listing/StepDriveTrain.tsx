@@ -24,12 +24,24 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
   const { handleDriveTrainData, nextStep } = props;
 
   // ** States
-  const [engineType, setEngineType] = useState<string>("");
-  const [engineCapacity, setEngineCapacity] = useState<number>();
-  const [fuelType, setFuelType] = useState<string>("");
-  const [transmissionType, setTransmissionType] = useState<string>("");
-  const [driveType, setDriveType] = useState<string>("");
-  const [vinNo, setVinNo] = useState<string>("");
+  const [engineType, setEngineType] = useState<string>(
+    window.localStorage.getItem("engineType") || ""
+  );
+  const [engineCapacity, setEngineCapacity] = useState<number>(
+    Number(window.localStorage.getItem("engineCapacity")) || 0
+  );
+  const [fuelType, setFuelType] = useState<string>(
+    window.localStorage.getItem("fuelType") || ""
+  );
+  const [transmissionType, setTransmissionType] = useState<string>(
+    window.localStorage.getItem("transmissionType") || ""
+  );
+  const [driveType, setDriveType] = useState<string>(
+    window.localStorage.getItem("driveType") || ""
+  );
+  const [vinNo, setVinNo] = useState<string>(
+    window.localStorage.getItem("vinNo") || ""
+  );
 
   const driveTrainData = {
     engineType,
@@ -45,6 +57,9 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
     nextStep(true);
   };
 
+  const saveDraft = (name: string, value: any) =>
+    window.localStorage.setItem(name, value);
+
   return (
     <>
       <Grid container spacing={5}>
@@ -56,7 +71,10 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
             label="Engine Type"
             type="text"
             value={engineType}
-            onChange={(e) => setEngineType(e.target.value)}
+            onChange={(e) => {
+              setEngineType(e.target.value);
+              saveDraft("engineType", e.target.value);
+            }}
             placeholder="e.g. V6 BiTurbo"
             sx={{ mb: 4 }}
           />
@@ -71,6 +89,7 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
             label="Engine Capacity"
             value={engineCapacity}
             onChange={(e) => setEngineCapacity(Number(e.target.value))}
+            onBlur={(e) => saveDraft("engineCapacity", Number(e.target.value))}
             InputProps={{
               endAdornment: <InputAdornment position="end">cc</InputAdornment>,
             }}
@@ -86,7 +105,10 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
               labelId="fuel-type-select"
               label="Fuel Type"
               value={fuelType}
-              onChange={(e) => setFuelType(e.target.value)}
+              onChange={(e) => {
+                setFuelType(e.target.value);
+                saveDraft("fuelType", e.target.value);
+              }}
               inputProps={{ placeholder: "Select Fuel Type" }}
             >
               <MenuItem value="Petrol/Gasoline">Petrol/Gasoline</MenuItem>
@@ -108,13 +130,14 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
               labelId="transmission-type-select"
               label="Transmission Type"
               value={transmissionType}
-              onChange={(e) => setTransmissionType(e.target.value)}
+              onChange={(e) => {
+                setTransmissionType(e.target.value);
+                saveDraft("transmissionType", e.target.value);
+              }}
               inputProps={{ placeholder: "Select Transmission Type" }}
             >
               <MenuItem value="Automatic">Automatic</MenuItem>
-              <MenuItem value="Semi-Automatic">
-                Semi-Automatic (Tiptronic)
-              </MenuItem>
+              <MenuItem value="Semi-Automatic">Semi-Automatic</MenuItem>
               <MenuItem value="Manual">Manual</MenuItem>
               <MenuItem value="Unspecified">Unspecified</MenuItem>
             </Select>
@@ -129,7 +152,10 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
               labelId="drive-type-select"
               label="Drive Type"
               value={driveType}
-              onChange={(e) => setDriveType(e.target.value)}
+              onChange={(e) => {
+                setDriveType(e.target.value);
+                saveDraft("driveType", e.target.value);
+              }}
               inputProps={{ placeholder: "Select Drive Type" }}
             >
               <MenuItem value="2 Wheel Drive (Front)">
@@ -139,7 +165,7 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
                 2 Wheel Drive (Rear)
               </MenuItem>
               <MenuItem value="All Wheel Drive">All Wheel Drive</MenuItem>
-              <MenuItem value="4x4">4x4/4WD</MenuItem>
+              <MenuItem value="4x4">4x4</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -152,6 +178,7 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
             type="text"
             value={vinNo}
             onChange={(e) => setVinNo(e.target.value)}
+            onBlur={(e) => saveDraft("vinNo", e.target.value)}
             placeholder="e.g. 1GNEK13ZX3R298984"
             sx={{ mb: 4 }}
           />
