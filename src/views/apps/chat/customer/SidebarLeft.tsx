@@ -34,6 +34,7 @@ import apolloClient from "@src/lib/apollo";
 import { GET_MESSAGES } from "@src/api/shared/vendorCustomerMessage";
 import { fetchActiveCustomerById } from "@src/store/apps/shared/vendorCustomerContact/single/activeCustomer";
 import { fetchVendorCustomerMessages } from "@src/store/apps/shared/vendorCustomerMessage";
+import { encryptData } from "@core/utils/encryption";
 
 const ScrollWrapper = ({
   children,
@@ -100,8 +101,10 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
           const { data } = await apolloClient.query({
             query: GET_MESSAGES,
             variables: {
-              vendorId: authedVendor.id,
-              customerId: customer.node.customer.id,
+              pl: encryptData({
+                vendorId: authedVendor.id,
+                customerId: customer.node.customer.id,
+              }),
               last: 1,
             },
           });

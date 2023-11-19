@@ -25,6 +25,7 @@ import Icon from "src/@core/components/icon";
 // ** API
 import apolloClient from "@src/lib/apollo";
 import { GET_ORGANIZATION_NAME } from "@src/api/vendor/organization";
+import { encryptData } from "@core/utils/encryption";
 
 // ** Styled Components
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -70,7 +71,7 @@ const StepOrganizationInfo = (props: Props) => {
       const { data } = await apolloClient.query({
         query: GET_ORGANIZATION_NAME,
         variables: {
-          name: value,
+          pl: encryptData({ name: value }),
         },
         fetchPolicy: "no-cache",
       });

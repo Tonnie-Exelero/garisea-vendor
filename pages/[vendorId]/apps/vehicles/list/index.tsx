@@ -82,6 +82,7 @@ import toast from "react-hot-toast";
 import { idleTimer } from "@src/configs/idleOrReload";
 import { AbilityContext } from "src/layouts/components/acl/Can";
 import { removeFile } from "@core/utils/file-manager";
+import { encryptData } from "@core/utils/encryption";
 
 const PAGE_SIZE = 20;
 
@@ -422,7 +423,7 @@ const VehiclesList = (props: Partial<Props>) => {
     const { data } = await apolloClient.query({
       query: GET_VEHICLES_STATS_BY_VENDOR_ID,
       variables: {
-        vendorId,
+        pl: encryptData({ vendorId }),
       },
       fetchPolicy: "no-cache",
     });
@@ -447,9 +448,11 @@ const VehiclesList = (props: Partial<Props>) => {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_VEHICLES,
         variables: {
-          vendorId,
-          status: newValue,
-          ...(expanded !== false && { ...vehiclesSearchParams }),
+          pl: encryptData({
+            vendorId,
+            status: newValue,
+            ...(expanded !== false && { ...vehiclesSearchParams }),
+          }),
           first: 20,
         },
         fetchPolicy: "no-cache",
@@ -474,9 +477,11 @@ const VehiclesList = (props: Partial<Props>) => {
     const { data } = await apolloClient.query({
       query: GET_FILTERED_VEHICLES,
       variables: {
-        vendorId,
-        status: tabValue,
-        ...(expanded !== false && { ...vehiclesSearchParams }),
+        pl: encryptData({
+          vendorId,
+          status: tabValue,
+          ...(expanded !== false && { ...vehiclesSearchParams }),
+        }),
         first: PAGE_SIZE,
       },
       fetchPolicy: "no-cache",
@@ -822,8 +827,7 @@ export const getServerSideProps: any = async ({ params }: any) => {
   const { data, loading, error } = await apolloClient.query({
     query: GET_FILTERED_VEHICLES,
     variables: {
-      vendorId,
-      status: "active",
+      pl: encryptData({ vendorId, status: "active" }),
       first: PAGE_SIZE,
     },
     fetchPolicy: "no-cache",
