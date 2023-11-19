@@ -359,8 +359,6 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
   const saveDraft = (name: string, value: any) =>
     window.localStorage.setItem(name, value);
 
-  console.log(modelId);
-
   return (
     <>
       <Grid container spacing={5}>
