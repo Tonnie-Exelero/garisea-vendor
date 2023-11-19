@@ -78,6 +78,9 @@ model Vendor {
   VendorCustomerMessage VendorCustomerMessage[]
   VendorReview          VendorReview[]
   FeaturedVendor        FeaturedVendor[]
+  FeaturedVehicle       FeaturedVehicle[]
+  MainCarousel          MainCarousel[]
+  Banner                Banner[]
 }
 
 model Customer {
@@ -337,6 +340,7 @@ model FeaturedVendor {
   updatedAt         DateTime @updatedAt @map(name: "updated_at")
   vendor            Vendor?  @relation(fields: [vendorId], references: [id])
   vendorId          String?
+  status            String?
   image             String?
   text              String?
   page              String?
@@ -352,8 +356,11 @@ model FeaturedVehicle {
   id                String   @id @default(cuid())
   createdAt         DateTime @default(now()) @map(name: "created_at")
   updatedAt         DateTime @updatedAt @map(name: "updated_at")
+  vendor            Vendor?  @relation(fields: [vendorId], references: [id])
+  vendorId          String?
   vehicle           Vehicle? @relation(fields: [vehicleId], references: [id])
   vehicleId         String?
+  status            String?
   page              String?
   position          String?
   rank              Int?     @unique
@@ -367,6 +374,9 @@ model MainCarousel {
   id                String   @id @default(cuid())
   createdAt         DateTime @default(now()) @map(name: "created_at")
   updatedAt         DateTime @updatedAt @map(name: "updated_at")
+  vendor            Vendor?  @relation(fields: [vendorId], references: [id])
+  vendorId          String?
+  status            String?
   type              String?
   title             String?
   image             String?
@@ -384,6 +394,9 @@ model Banner {
   id                String   @id @default(cuid())
   createdAt         DateTime @default(now()) @map(name: "created_at")
   updatedAt         DateTime @updatedAt @map(name: "updated_at")
+  vendor            Vendor?  @relation(fields: [vendorId], references: [id])
+  vendorId          String?
+  status            String?
   type              String?
   title             String?
   link              String?

@@ -43,11 +43,11 @@ const StepOptics: React.FC<StepOpticsProps> = (props) => {
   const [upholstery, setUpholstery] = useState<string>(
     window.localStorage.getItem("upholstery") || ""
   );
-  const [seats, setSeats] = useState<number>(
-    Number(window.localStorage.getItem("seats")) || 0
+  const [seats, setSeats] = useState<number | null>(
+    Number(window.localStorage.getItem("seats")) || null
   );
-  const [doors, setDoors] = useState<number>(
-    Number(window.localStorage.getItem("doors")) || 0
+  const [doors, setDoors] = useState<number | null>(
+    Number(window.localStorage.getItem("doors")) || null
   );
   const [steering, setSteering] = useState<string>(
     window.localStorage.getItem("steering") || "RHD"
