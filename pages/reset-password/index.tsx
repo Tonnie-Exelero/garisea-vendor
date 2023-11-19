@@ -327,14 +327,6 @@ const ResetPassword = (props: Props) => {
                         Saved!
                       </Typography>
                     )}
-                    <Button
-                      type="reset"
-                      variant="outlined"
-                      color="secondary"
-                      onClick={() => reset()}
-                    >
-                      Reset
-                    </Button>
                   </Box>
                 </Grid>
               </Grid>

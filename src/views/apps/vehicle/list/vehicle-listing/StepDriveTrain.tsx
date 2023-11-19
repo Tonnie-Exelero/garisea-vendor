@@ -27,8 +27,8 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
   const [engineType, setEngineType] = useState<string>(
     window.localStorage.getItem("engineType") || ""
   );
-  const [engineCapacity, setEngineCapacity] = useState<number>(
-    Number(window.localStorage.getItem("engineCapacity")) || 0
+  const [engineCapacity, setEngineCapacity] = useState<number | null>(
+    Number(window.localStorage.getItem("engineCapacity")) || null
   );
   const [fuelType, setFuelType] = useState<string>(
     window.localStorage.getItem("fuelType") || ""

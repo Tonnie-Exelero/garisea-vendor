@@ -137,7 +137,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
   const handleInputCoverImageChange = async (file: ChangeEvent) => {
     setUploadingCoverImage(true);
 
-    const newFile = await uploadFile(file, 1200, 210);
+    const newFile = await uploadFile(file);
 
     newFile && handleUpdateCoverImage(newFile.url);
     newFile && setOCoverImage(newFile.url);
@@ -168,7 +168,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
   const handleInputLogoChange = async (file: ChangeEvent) => {
     setUploadingLogo(true);
 
-    const newFile = await uploadFile(file, 200, 200);
+    const newFile = await uploadFile(file);
 
     newFile && handleUpdateLogo(newFile.url);
     newFile && setOLogo(newFile.url);
@@ -583,7 +583,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                                       hidden
                                       type="file"
                                       value={inputValue}
-                                      accept="image/png, image/jpeg, image/svg"
+                                      accept="image/*"
                                       onChange={handleInputCoverImageChange}
                                       id="upload-coverimage"
                                     />
