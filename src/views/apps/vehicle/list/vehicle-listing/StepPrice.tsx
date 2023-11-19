@@ -32,11 +32,11 @@ const StepPrice: React.FC<StepPriceProps> = (props) => {
   const { handlePriceData, nextStep } = props;
 
   // ** State
-  const [listingPrice, setListingPrice] = useState<number>(
-    Number(window.localStorage.getItem("listingPrice")) || 0
+  const [listingPrice, setListingPrice] = useState<number | null>(
+    Number(window.localStorage.getItem("listingPrice")) || null
   );
-  const [discountedPrice, setDiscountedPrice] = useState<number>(
-    Number(window.localStorage.getItem("discountedPrice")) || 0
+  const [discountedPrice, setDiscountedPrice] = useState<number | null>(
+    Number(window.localStorage.getItem("discountedPrice")) || null
   );
   const [percentageDiscount, setPercentageDiscount] = useState<number>();
   const [offerType, setOfferType] = useState<string>(
@@ -73,7 +73,7 @@ const StepPrice: React.FC<StepPriceProps> = (props) => {
     } = event;
     let percDiscount: number;
 
-    if (listingPrice !== undefined) {
+    if (listingPrice !== null) {
       const prePerc = Number(value) / listingPrice;
 
       percDiscount = prePerc * 100;

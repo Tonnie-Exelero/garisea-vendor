@@ -129,8 +129,8 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
   const [registrationNo, setRegistrationNo] = useState<string>(
     window.localStorage.getItem("registrationNo") || ""
   );
-  const [mileage, setMileage] = useState<number>(
-    Number(window.localStorage.getItem("mileage")) || 0
+  const [mileage, setMileage] = useState<number | null>(
+    Number(window.localStorage.getItem("mileage")) || null
   );
   const [mileageMetric, setMileageMetric] = useState<string>(
     window.localStorage.getItem("mileageMetric") || ""
@@ -161,6 +161,8 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
 
   useEffect(() => {
     dispatch(fetchBrands({ first: 100 }));
+
+    brandId && handleFetchModelsByBrandId(brandId);
 
     setVBrands(brands);
   }, [dispatch, brands]);
@@ -257,6 +259,22 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
     saveDraft("registered", value);
   };
 
+  const handleFetchModelsByBrandId = useCallback(
+    async (brandId: string) => {
+      // Fetch Models by Brand ID
+      const { data } = await apolloClient.query({
+        query: GET_MODELS_BY_BRAND_ID,
+        variables: { brandId, first: 100 },
+        fetchPolicy: "no-cache",
+      });
+
+      const { modelsByBrandId }: any = data;
+
+      setVModels(modelsByBrandId);
+    },
+    [vModels, isLoadingModels]
+  );
+
   const handleBrandSelect = useCallback(
     async (event: SelectChangeEvent) => {
       const {
@@ -266,15 +284,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
       saveDraft("brandId", value);
 
       // Fetch Models by Brand ID
-      const { data } = await apolloClient.query({
-        query: GET_MODELS_BY_BRAND_ID,
-        variables: { brandId: value, first: 100 },
-        fetchPolicy: "no-cache",
-      });
-
-      const { modelsByBrandId }: any = data;
-
-      setVModels(modelsByBrandId);
+      handleFetchModelsByBrandId(value);
     },
     [dispatch, brandId]
   );
@@ -348,6 +358,8 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
 
   const saveDraft = (name: string, value: any) =>
     window.localStorage.setItem(name, value);
+
+  console.log(modelId);
 
   return (
     <>
