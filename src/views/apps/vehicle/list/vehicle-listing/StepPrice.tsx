@@ -71,18 +71,26 @@ const StepPrice: React.FC<StepPriceProps> = (props) => {
     const {
       target: { value },
     } = event;
-    let percDiscount: number;
 
-    if (listingPrice !== null) {
-      const prePerc = Number(value) / listingPrice;
+    if (
+      listingPrice !== null &&
+      listingPrice !== Number(value) &&
+      listingPrice > Number(value) &&
+      Number(value) > 0
+    ) {
+      let percDiscount: number;
 
-      percDiscount = prePerc * 100;
+      if (listingPrice !== null) {
+        const prePerc = Number(value) / listingPrice;
 
-      setPercentageDiscount(Number((100 - percDiscount).toFixed(2)));
+        percDiscount = prePerc * 100;
+
+        setPercentageDiscount(Number((100 - percDiscount).toFixed(2)));
+      }
+
+      setDiscountedPrice(Number(value));
+      saveDraft("discountedPrice", Number(value));
     }
-
-    setDiscountedPrice(Number(value));
-    saveDraft("discountedPrice", Number(value));
   };
 
   const confirmData = () => {
@@ -125,14 +133,22 @@ const StepPrice: React.FC<StepPriceProps> = (props) => {
             placeholder="e.g. 850,000"
             label="Discounted Price"
             value={discountedPrice}
-            onChange={handleDiscountedPriceChange}
+            onChange={(e) => setDiscountedPrice(Number(e.target.value))}
+            onBlur={handleDiscountedPriceChange}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">{currency}</InputAdornment>
               ),
             }}
             sx={{ mb: 4 }}
+            disabled={listingPrice === null}
           />
+          {(Number(listingPrice) < Number(discountedPrice) ||
+            Number(listingPrice) === Number(discountedPrice)) && (
+            <Typography variant="body2" color="error" sx={{ mb: 2 }}>
+              Discounted Price should be less than Listing Price
+            </Typography>
+          )}
           <Typography variant="body2" color="primary">
             {percentageDiscount}% discount
           </Typography>
