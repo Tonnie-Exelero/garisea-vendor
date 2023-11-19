@@ -17,6 +17,7 @@ import {
 
 // ** Others
 import { Organization } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state
 const organizationInitialState = {
@@ -41,10 +42,12 @@ export const fetchOrganizationById = createAsyncThunk<
   { id: string },
   {}
 >("appOrganization/fetchOrganizationById", async (id, { rejectWithValue }) => {
+  const encryptedData = encryptData(id);
+
   try {
     const { data } = await apolloClient.query({
       query: GET_ORGANIZATION_BY_ID,
-      variables: { ...id },
+      variables: { pl: encryptedData },
     });
 
     return data;
@@ -62,10 +65,12 @@ export const fetchOrganizationById = createAsyncThunk<
 export const fetchOrganizationByName = createAsyncThunk<Organization, any, {}>(
   "appOrganization/fetchOrganizationByName",
   async (name, { rejectWithValue }) => {
+    const encryptedData = encryptData(name);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_ORGANIZATION_BY_NAME,
-        variables: { ...name },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -84,10 +89,12 @@ export const fetchOrganizationByName = createAsyncThunk<Organization, any, {}>(
 export const addOrganization = createAsyncThunk<Organization, any, {}>(
   "appOrganization/addOrganization",
   async (organizationData, { rejectWithValue }) => {
+    const encryptedData = encryptData(organizationData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_ORGANIZATION,
-        variables: { ...organizationData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -106,10 +113,12 @@ export const addOrganization = createAsyncThunk<Organization, any, {}>(
 export const editOrganization = createAsyncThunk<Organization, any, {}>(
   "appOrganization/editOrganization",
   async (organizationData, { rejectWithValue }) => {
+    const encryptedData = encryptData(organizationData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_ORGANIZATION,
-        variables: { ...organizationData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -128,10 +137,12 @@ export const editOrganization = createAsyncThunk<Organization, any, {}>(
 export const editCoverImage = createAsyncThunk<Organization, any, {}>(
   "appOrganization/editCoverImage",
   async (organizationData, { rejectWithValue }) => {
+    const encryptedData = encryptData(organizationData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_COVER_IMAGE,
-        variables: { ...organizationData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -150,10 +161,12 @@ export const editCoverImage = createAsyncThunk<Organization, any, {}>(
 export const editLogo = createAsyncThunk<Organization, any, {}>(
   "appOrganization/editLogo",
   async (organizationData, { rejectWithValue }) => {
+    const encryptedData = encryptData(organizationData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_LOGO,
-        variables: { ...organizationData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -172,10 +185,12 @@ export const editLogo = createAsyncThunk<Organization, any, {}>(
 export const editCertificate = createAsyncThunk<Organization, any, {}>(
   "appOrganization/editCertificate",
   async (organizationData, { rejectWithValue }) => {
+    const encryptedData = encryptData(organizationData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_CERTIFICATE,
-        variables: { ...organizationData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -194,10 +209,12 @@ export const editCertificate = createAsyncThunk<Organization, any, {}>(
 export const editKRAPin = createAsyncThunk<Organization, any, {}>(
   "appOrganization/editKRAPin",
   async (organizationData, { rejectWithValue }) => {
+    const encryptedData = encryptData(organizationData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_KRA_PIN,
-        variables: { ...organizationData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -216,10 +233,12 @@ export const editKRAPin = createAsyncThunk<Organization, any, {}>(
 export const removeOrganization = createAsyncThunk<Organization, any, {}>(
   "appOrganization/removeOrganization",
   async (organizationData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: organizationData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_ORGANIZATION,
-        variables: { id: organizationData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;

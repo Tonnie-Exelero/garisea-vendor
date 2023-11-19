@@ -7,6 +7,7 @@ import { GET_MESSAGES } from "@api/shared/adminVendorMessage";
 
 // ** Others
 import { AdminVendorMessage } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const adminVendorMessagesInitialState = {
@@ -61,10 +62,22 @@ export const fetchAdminVendorMessages = createAsyncThunk<
 >(
   "appAdminVendorMessages/fetchAdminVendorMessages",
   async (adminVendorMessageData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = adminVendorMessageData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_MESSAGES,
-        variables: adminVendorMessageData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -87,10 +100,22 @@ export const fetchMoreAdminVendorMessages = createAsyncThunk<
 >(
   "appAdminVendorMessages/fetchMoreAdminVendorMessages",
   async (adminVendorMessageData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = adminVendorMessageData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_MESSAGES,
-        variables: adminVendorMessageData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

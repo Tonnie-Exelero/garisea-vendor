@@ -16,6 +16,7 @@ import {
   VehicleReviewCount,
   VehicleReviewStarsAvg,
 } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const vehicleReviewsInitialState = {
@@ -87,10 +88,22 @@ interface VehicleReviewsState {
 export const fetchVehicleReviews = createAsyncThunk<VehicleReview, any, {}>(
   "appVehicleReviews/fetchVehicleReviews",
   async (vehicleReviewData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = vehicleReviewData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_VEHICLE_REVIEWS,
-        variables: vehicleReviewData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -109,10 +122,22 @@ export const fetchVehicleReviews = createAsyncThunk<VehicleReview, any, {}>(
 export const fetchVehicleByIdReviews = createAsyncThunk<VehicleReview, any, {}>(
   "appVehicleReviews/fetchVehicleByIdReviews",
   async (vehicleReviewData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = vehicleReviewData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_VEHICLE_BY_ID_REVIEWS,
-        variables: vehicleReviewData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -147,10 +172,22 @@ export const fetchVehicleReviewsStarsAvg = createAsyncThunk<
 >(
   "appVehicleReviews/fetchVehicleReviewsStarsAvg",
   async (vehicleReviewData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = vehicleReviewData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_VEHICLE_REVIEWS_STARS_AVG,
-        variables: vehicleReviewData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

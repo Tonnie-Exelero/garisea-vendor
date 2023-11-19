@@ -11,6 +11,7 @@ import {
 
 // ** Others
 import { AdminVendorContact } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const adminVendorContactInitialState = {
@@ -40,10 +41,12 @@ export const addAdminVendorContact = createAsyncThunk<
 >(
   "appAdminVendorContact/addAdminVendorContact",
   async (adminVendorContactData, { rejectWithValue }) => {
+    const encryptedData = encryptData(adminVendorContactData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_CONTACT,
-        variables: { ...adminVendorContactData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -66,10 +69,12 @@ export const editAdminVendorContact = createAsyncThunk<
 >(
   "appAdminVendorContact/editAdminVendorContact",
   async (adminVendorContactData, { rejectWithValue }) => {
+    const encryptedData = encryptData(adminVendorContactData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_CONTACT,
-        variables: { ...adminVendorContactData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -92,10 +97,12 @@ export const removeAdminVendorContact = createAsyncThunk<
 >(
   "appAdminVendorContact/removeAdminVendorContact",
   async (adminVendorContactData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: adminVendorContactData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_CONTACT,
-        variables: { id: adminVendorContactData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;

@@ -13,6 +13,7 @@ import {
 
 // ** Others
 import { Brand } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 export const brandInitialState = {
@@ -27,10 +28,12 @@ export const brandInitialState = {
 export const fetchBrandById = createAsyncThunk<Brand, { id: string }, {}>(
   "appBrand/fetchBrandById",
   async (id, { rejectWithValue }) => {
+    const encryptedData = encryptData(id);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_BRAND_BY_ID,
-        variables: { ...id },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -49,10 +52,12 @@ export const fetchBrandById = createAsyncThunk<Brand, { id: string }, {}>(
 export const fetchBrandBySlug = createAsyncThunk<Brand, { slug: string }, {}>(
   "appBrand/fetchBrandBySlug",
   async (slug, { rejectWithValue }) => {
+    const encryptedData = encryptData(slug);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_BRAND_BY_SLUG,
-        variables: { ...slug },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -71,10 +76,12 @@ export const fetchBrandBySlug = createAsyncThunk<Brand, { slug: string }, {}>(
 export const addBrand = createAsyncThunk<Brand, Partial<Brand>, {}>(
   "appBrand/addBrand",
   async (brandData, { rejectWithValue }) => {
+    const encryptedData = encryptData(brandData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_BRAND,
-        variables: { ...brandData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -93,10 +100,12 @@ export const addBrand = createAsyncThunk<Brand, Partial<Brand>, {}>(
 export const editBrand = createAsyncThunk<Brand, Partial<Brand>, {}>(
   "appBrand/editBrand",
   async (brandData, { rejectWithValue }) => {
+    const encryptedData = encryptData(brandData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_BRAND,
-        variables: { ...brandData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -115,10 +124,12 @@ export const editBrand = createAsyncThunk<Brand, Partial<Brand>, {}>(
 export const removeBrand = createAsyncThunk<Brand, Partial<Brand>, {}>(
   "appBrand/removeBrand",
   async (brandData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: brandData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_BRAND,
-        variables: { id: brandData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;

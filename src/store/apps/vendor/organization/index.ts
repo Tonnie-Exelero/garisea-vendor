@@ -10,6 +10,7 @@ import {
 
 // ** Others
 import { Organization } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state
 const organizationsInitialState = {
@@ -60,10 +61,22 @@ interface OrganizationsState {
 export const fetchOrganizations = createAsyncThunk<Organization, any, {}>(
   "appOrganizations/fetchOrganizations",
   async (organizationData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = organizationData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_ORGANIZATIONS,
-        variables: organizationData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -86,10 +99,22 @@ export const fetchFilteredOrganizations = createAsyncThunk<
 >(
   "appOrganizations/fetchFilteredOrganizations",
   async (organizationData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = organizationData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_ORGANIZATIONS,
-        variables: organizationData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

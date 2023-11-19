@@ -7,6 +7,7 @@ import { GET_CUSTOMER_BY_ID } from "@api/frontend/customer";
 
 // ** Others
 import { Customer } from "../../../frontend/customer/types";
+import { encryptData } from "@core/utils/encryption";
 
 // ** Customer initial state
 const customerInitialState = {
@@ -34,10 +35,12 @@ export const fetchActiveCustomerById = createAsyncThunk<
 >(
   "appVendorCustomerContact/fetchActiveCustomerById",
   async (id, { rejectWithValue }) => {
+    const encryptedData = encryptData(id);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_CUSTOMER_BY_ID,
-        variables: { ...id },
+        variables: { pl: encryptedData },
       });
 
       return data;

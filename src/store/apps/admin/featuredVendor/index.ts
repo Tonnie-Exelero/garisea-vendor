@@ -10,6 +10,7 @@ import {
 
 // ** Others
 import { FeaturedVendor } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const featuredVendorsInitialState = {
@@ -18,6 +19,7 @@ const featuredVendorsInitialState = {
       cursor: "",
       node: {
         id: "",
+        status: "",
         vendor: {
           id: "",
           storeLink: "",
@@ -74,10 +76,22 @@ interface FeaturedVendorsState {
 export const fetchFeaturedVendors = createAsyncThunk<FeaturedVendor, any, {}>(
   "appFeaturedVendors/fetchFeaturedVendors",
   async (featuredVendorData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = featuredVendorData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FEATURED_VENDORS,
-        variables: featuredVendorData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -100,10 +114,22 @@ export const fetchFilteredFeaturedVendors = createAsyncThunk<
 >(
   "appFeaturedVendors/fetchFilteredFeaturedVendors",
   async (featuredVendorData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = featuredVendorData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_FEATURED_VENDORS,
-        variables: featuredVendorData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

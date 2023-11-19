@@ -12,6 +12,7 @@ import {
 
 // ** Others
 import { VendorCustomerMessage } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const vendorCustomerMessageInitialState = {
@@ -41,10 +42,12 @@ export const addVendorCustomerMessage = createAsyncThunk<
 >(
   "appVendorCustomerMessage/addVendorCustomerMessage",
   async (vendorCustomerMessageData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorCustomerMessageData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_MESSAGE,
-        variables: { ...vendorCustomerMessageData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -67,10 +70,12 @@ export const editVendorCustomerMessage = createAsyncThunk<
 >(
   "appVendorCustomerMessage/editVendorCustomerMessage",
   async (vendorCustomerMessageData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorCustomerMessageData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_MESSAGE,
-        variables: { ...vendorCustomerMessageData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -93,10 +98,12 @@ export const editVendorCustomerMessageSeen = createAsyncThunk<
 >(
   "appVendorCustomerMessage/editVendorCustomerMessageSeen",
   async (vendorCustomerMessageData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorCustomerMessageData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_MESSAGE_SEEN,
-        variables: { ...vendorCustomerMessageData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -119,10 +126,12 @@ export const removeVendorCustomerMessage = createAsyncThunk<
 >(
   "appVendorCustomerMessage/removeVendorCustomerMessage",
   async (vendorCustomerMessageData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: vendorCustomerMessageData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_MESSAGE,
-        variables: { id: vendorCustomerMessageData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;

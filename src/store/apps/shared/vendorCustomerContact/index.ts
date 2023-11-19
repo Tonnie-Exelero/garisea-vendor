@@ -10,6 +10,7 @@ import {
 
 // ** Others
 import { VendorCustomerContact } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const vendorCustomerContactsInitialState = {
@@ -81,10 +82,22 @@ export const fetchVendorCustomerContacts = createAsyncThunk<
 >(
   "appVendorCustomerContacts/fetchVendorCustomerContacts",
   async (vendorCustomerContactData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = vendorCustomerContactData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_CONTACTS,
-        variables: vendorCustomerContactData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -107,10 +120,22 @@ export const fetchVendorCustomerContactsByIds = createAsyncThunk<
 >(
   "appVendorCustomerContacts/fetchVendorCustomerContactsByIds",
   async (vendorCustomerContactData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = vendorCustomerContactData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_CONTACTS_BY_IDS,
-        variables: vendorCustomerContactData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

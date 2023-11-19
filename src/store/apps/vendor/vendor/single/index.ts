@@ -23,6 +23,7 @@ import {
 
 // ** Others
 import { Vendor } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // ** Vendor initial state
 const vendorInitialState = {
@@ -65,10 +66,12 @@ const vendorInitialState = {
 export const fetchVendorById = createAsyncThunk<Vendor, { id: string }, {}>(
   "appVendor/fetchVendorById",
   async (id, { rejectWithValue }) => {
+    const encryptedData = encryptData(id);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_VENDOR_BY_ID,
-        variables: { ...id },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -89,10 +92,12 @@ export const fetchVendorByEmail = createAsyncThunk<
   { email: string },
   {}
 >("appVendor/fetchVendorByEmail", async (email, { rejectWithValue }) => {
+  const encryptedData = encryptData(email);
+
   try {
     const { data } = await apolloClient.query({
       query: GET_VENDOR_BY_EMAIL,
-      variables: { ...email },
+      variables: { pl: encryptedData },
     });
 
     return data;
@@ -114,10 +119,12 @@ export const fetchVendorByStoreLink = createAsyncThunk<
 >(
   "appVendor/fetchVendorByStoreLink",
   async (storeLink, { rejectWithValue }) => {
+    const encryptedData = encryptData(storeLink);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_VENDOR_BY_STORE_LINK,
-        variables: { ...storeLink },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -136,10 +143,12 @@ export const fetchVendorByStoreLink = createAsyncThunk<
 export const addVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
   "appVendor/addVendor",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_VENDOR,
-        variables: { ...vendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -158,10 +167,12 @@ export const addVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
 export const editVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
   "appVendor/editVendor",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_VENDOR,
-        variables: { ...vendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -180,10 +191,12 @@ export const editVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
 export const editPassword = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
   "appVendor/editPassword",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_PASSWORD,
-        variables: { ...vendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -202,10 +215,12 @@ export const editPassword = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
 export const editStatus = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
   "appVendor/editStatus",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_VENDOR_STATUS,
-        variables: { ...vendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -224,10 +239,12 @@ export const editStatus = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
 export const editIdentification = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
   "appVendor/editIdentification",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_VENDOR_IDENTIFICATION,
-        variables: { ...vendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -246,10 +263,12 @@ export const editIdentification = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
 export const editEmailVerified = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
   "appVendor/editEmailVerified",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_EMAIL_VERIFIED,
-        variables: { ...vendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -268,10 +287,12 @@ export const editEmailVerified = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
 export const editVendorVerified = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
   "appVendor/editVendorVerified",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_VENDOR_VERIFIED,
-        variables: { ...vendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -290,10 +311,12 @@ export const editVendorVerified = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
 export const editAddedOrganization = createAsyncThunk<Vendor, any, {}>(
   "appVendor/editAddedOrganization",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_ADDED_ORGANIZATION,
-        variables: { ...vendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -312,10 +335,12 @@ export const editAddedOrganization = createAsyncThunk<Vendor, any, {}>(
 export const editImage = createAsyncThunk<Vendor, any, {}>(
   "appVendor/editImage",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_IMAGE,
-        variables: { ...vendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -334,10 +359,12 @@ export const editImage = createAsyncThunk<Vendor, any, {}>(
 export const editImpressions = createAsyncThunk<Vendor, any, {}>(
   "appVendor/editImpressions",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_VENDOR_IMPRESSIONS,
-        variables: { ...vendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -356,10 +383,12 @@ export const editImpressions = createAsyncThunk<Vendor, any, {}>(
 export const editPageOpened = createAsyncThunk<Vendor, any, {}>(
   "appVendor/editPageOpened",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_VENDOR_PAGE_OPENED,
-        variables: { ...vendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -378,10 +407,12 @@ export const editPageOpened = createAsyncThunk<Vendor, any, {}>(
 export const removeVendor = createAsyncThunk<Vendor, Partial<Vendor>, {}>(
   "appVendor/removeVendor",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: vendorData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_VENDOR,
-        variables: { id: vendorData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;

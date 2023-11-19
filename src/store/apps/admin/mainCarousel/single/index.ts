@@ -7,6 +7,7 @@ import {
   GET_MAIN_CAROUSEL_BY_ID,
   CREATE_MAIN_CAROUSEL,
   UPDATE_MAIN_CAROUSEL,
+  UPDATE_MAIN_CAROUSEL_STATUS,
   UPDATE_MAIN_CAROUSEL_IMPRESSIONS,
   UPDATE_MAIN_CAROUSEL_CLICKS,
   DELETE_MAIN_CAROUSEL,
@@ -14,10 +15,21 @@ import {
 
 // ** Others
 import { MainCarousel } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const mainCarouselInitialState = {
   id: "",
+  vendor: {
+    firstName: "",
+    lastName: "",
+    storeLink: "",
+    organization: {
+      nicename: "",
+      name: "",
+    },
+  },
+  status: "",
   type: "",
   title: "",
   image: "",
@@ -37,10 +49,12 @@ export const fetchMainCarouselById = createAsyncThunk<
   { id: string },
   {}
 >("appMainCarousel/fetchMainCarouselById", async (id, { rejectWithValue }) => {
+  const encryptedData = encryptData(id);
+
   try {
     const { data } = await apolloClient.query({
       query: GET_MAIN_CAROUSEL_BY_ID,
-      variables: { ...id },
+      variables: { pl: encryptedData },
     });
 
     return data;
@@ -62,10 +76,12 @@ export const addMainCarousel = createAsyncThunk<
 >(
   "appMainCarousel/addMainCarousel",
   async (mainCarouselData, { rejectWithValue }) => {
+    const encryptedData = encryptData(mainCarouselData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_MAIN_CAROUSEL,
-        variables: { ...mainCarouselData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -88,10 +104,36 @@ export const editMainCarousel = createAsyncThunk<
 >(
   "appMainCarousel/editMainCarousel",
   async (mainCarouselData, { rejectWithValue }) => {
+    const encryptedData = encryptData(mainCarouselData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_MAIN_CAROUSEL,
-        variables: { ...mainCarouselData },
+        variables: { pl: encryptedData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Update Status
+export const editStatus = createAsyncThunk<MainCarousel, any, {}>(
+  "appMainCarousel/editStatus",
+  async (mainCarouselData, { rejectWithValue }) => {
+    const encryptedData = encryptData(mainCarouselData);
+
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_MAIN_CAROUSEL_STATUS,
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -110,10 +152,12 @@ export const editMainCarousel = createAsyncThunk<
 export const editImpressions = createAsyncThunk<MainCarousel, any, {}>(
   "appMainCarousel/editImpressions",
   async (mainCarouselData, { rejectWithValue }) => {
+    const encryptedData = encryptData(mainCarouselData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_MAIN_CAROUSEL_IMPRESSIONS,
-        variables: { ...mainCarouselData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -132,10 +176,12 @@ export const editImpressions = createAsyncThunk<MainCarousel, any, {}>(
 export const editClicks = createAsyncThunk<MainCarousel, any, {}>(
   "appMainCarousel/editClicks",
   async (mainCarouselData, { rejectWithValue }) => {
+    const encryptedData = encryptData(mainCarouselData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_MAIN_CAROUSEL_CLICKS,
-        variables: { ...mainCarouselData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -158,10 +204,12 @@ export const removeMainCarousel = createAsyncThunk<
 >(
   "appMainCarousel/removeMainCarousel",
   async (mainCarouselData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: mainCarouselData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_MAIN_CAROUSEL,
-        variables: { id: mainCarouselData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -211,6 +259,11 @@ export const appMainCarouselSlice = createSlice({
         const { updateMainCarousel }: any = payload;
 
         state.mainCarousel = { ...updateMainCarousel };
+      })
+      .addCase(editStatus.fulfilled, (state, { payload }) => {
+        const { updateMainCarouselStatus }: any = payload;
+
+        state.mainCarousel.status = updateMainCarouselStatus.status;
       })
       .addCase(editImpressions.fulfilled, (state, { payload }) => {
         const { updateMainCarouselImpressions }: any = payload;

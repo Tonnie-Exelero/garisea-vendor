@@ -3,13 +3,11 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // ** API
 import apolloClient from "@lib/apollo";
-import {
-  GET_BANNERS,
-  GET_FILTERED_BANNERS,
-} from "@api/admin/banner";
+import { GET_BANNERS, GET_FILTERED_BANNERS } from "@api/admin/banner";
 
 // ** Others
 import { Banner } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const bannersInitialState = {
@@ -18,6 +16,16 @@ const bannersInitialState = {
       cursor: "",
       node: {
         id: "",
+        vendor: {
+          firstName: "",
+          lastName: "",
+          storeLink: "",
+          organization: {
+            nicename: "",
+            name: "",
+          },
+        },
+        status: "",
         type: "",
         title: "",
         link: "",
@@ -59,10 +67,22 @@ interface BannersState {
 export const fetchBanners = createAsyncThunk<Banner, any, {}>(
   "appBanners/fetchBanners",
   async (bannerData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = bannerData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_BANNERS,
-        variables: bannerData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -78,17 +98,25 @@ export const fetchBanners = createAsyncThunk<Banner, any, {}>(
 );
 
 // ** Fetch Filtered Banners
-export const fetchFilteredBanners = createAsyncThunk<
-  Banner,
-  any,
-  {}
->(
+export const fetchFilteredBanners = createAsyncThunk<Banner, any, {}>(
   "appBanners/fetchFilteredBanners",
   async (bannerData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = bannerData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_BANNERS,
-        variables: bannerData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

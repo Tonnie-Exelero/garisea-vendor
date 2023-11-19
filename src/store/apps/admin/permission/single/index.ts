@@ -11,6 +11,7 @@ import {
 
 // ** Others
 import { Permission } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const permissionInitialState = {
@@ -29,10 +30,12 @@ export const addPermission = createAsyncThunk<
 >(
   "appPermission/addPermission",
   async (permissionData, { rejectWithValue }) => {
+    const encryptedData = encryptData(permissionData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_PERMISSION,
-        variables: { ...permissionData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -55,10 +58,12 @@ export const editPermission = createAsyncThunk<
 >(
   "appPermission/editPermission",
   async (permissionData, { rejectWithValue }) => {
+    const encryptedData = encryptData(permissionData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_PERMISSION,
-        variables: { ...permissionData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -81,10 +86,12 @@ export const removePermission = createAsyncThunk<
 >(
   "appPermission/removePermission",
   async (permissionData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: permissionData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_PERMISSION,
-        variables: { id: permissionData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;

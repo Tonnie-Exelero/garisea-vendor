@@ -7,6 +7,7 @@ import { GET_MESSAGES } from "@api/shared/vendorCustomerMessage";
 
 // ** Others
 import { VendorCustomerMessage } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const vendorCustomerMessagesInitialState = {
@@ -64,10 +65,22 @@ export const fetchVendorCustomerMessages = createAsyncThunk<
 >(
   "appVendorCustomerMessages/fetchVendorCustomerMessages",
   async (vendorCustomerMessageData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = vendorCustomerMessageData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_MESSAGES,
-        variables: vendorCustomerMessageData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

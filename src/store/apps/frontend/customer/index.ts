@@ -11,6 +11,7 @@ import {
 
 // ** Others
 import { Customer } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state
 const customersInitialState = {
@@ -62,10 +63,22 @@ interface CustomersState {
 export const fetchCustomers = createAsyncThunk<Customer, any, {}>(
   "appCustomers/fetchCustomers",
   async (customerData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = customerData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_CUSTOMERS,
-        variables: customerData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -84,10 +97,22 @@ export const fetchCustomers = createAsyncThunk<Customer, any, {}>(
 export const fetchCustomersByStatus = createAsyncThunk<Customer, any, {}>(
   "appCustomers/fetchCustomersByStatus",
   async (customerData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = customerData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_CUSTOMERS_BY_STATUS,
-        variables: customerData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -106,10 +131,22 @@ export const fetchCustomersByStatus = createAsyncThunk<Customer, any, {}>(
 export const fetchFilteredCustomers = createAsyncThunk<Customer, any, {}>(
   "appCustomers/fetchFilteredCustomers",
   async (customerData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = customerData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_CUSTOMERS,
-        variables: customerData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

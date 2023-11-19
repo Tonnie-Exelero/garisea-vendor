@@ -12,6 +12,7 @@ import {
 
 // ** Others
 import { Model } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const modelInitialState = {
@@ -29,10 +30,12 @@ const modelInitialState = {
 export const fetchModelById = createAsyncThunk<Model, { id: string }, {}>(
   "appModel/fetchModelById",
   async (id, { rejectWithValue }) => {
+    const encryptedData = encryptData(id);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_MODEL_BY_ID,
-        variables: { ...id },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -51,10 +54,12 @@ export const fetchModelById = createAsyncThunk<Model, { id: string }, {}>(
 export const addModel = createAsyncThunk<Model, Partial<Model>, {}>(
   "appModel/addModel",
   async (modelData, { rejectWithValue }) => {
+    const encryptedData = encryptData(modelData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_MODEL,
-        variables: { ...modelData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -73,10 +78,12 @@ export const addModel = createAsyncThunk<Model, Partial<Model>, {}>(
 export const editModel = createAsyncThunk<Model, Partial<Model>, {}>(
   "appModel/editModel",
   async (modelData, { rejectWithValue }) => {
+    const encryptedData = encryptData(modelData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_MODEL,
-        variables: { ...modelData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -95,10 +102,12 @@ export const editModel = createAsyncThunk<Model, Partial<Model>, {}>(
 export const removeModel = createAsyncThunk<Model, Partial<Model>, {}>(
   "appModel/removeModel",
   async (modelData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: modelData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_MODEL,
-        variables: { id: modelData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;

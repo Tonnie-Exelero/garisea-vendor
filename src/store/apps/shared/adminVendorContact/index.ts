@@ -10,6 +10,7 @@ import {
 
 // ** Others
 import { AdminVendorContact } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const adminVendorContactsInitialState = {
@@ -67,10 +68,22 @@ export const fetchAdminVendorContacts = createAsyncThunk<
 >(
   "appAdminVendorContacts/fetchAdminVendorContacts",
   async (adminVendorContactData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = adminVendorContactData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_CONTACTS,
-        variables: adminVendorContactData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -93,10 +106,22 @@ export const fetchAdminVendorContactsByIds = createAsyncThunk<
 >(
   "appAdminVendorContacts/fetchAdminVendorContactsByIds",
   async (adminVendorContactData, { rejectWithValue }) => {
+    const { first, last, after, before, ...rest } = adminVendorContactData;
+    const encryptedData = rest && encryptData(rest);
+    const pagination = {
+      ...(first && { first }),
+      ...(last && { last }),
+      ...(after && { after }),
+      ...(before && { before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_CONTACTS_BY_IDS,
-        variables: adminVendorContactData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

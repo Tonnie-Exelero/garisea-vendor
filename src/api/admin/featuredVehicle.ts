@@ -40,6 +40,7 @@ export const GET_FEATURED_VEHICLES = gql`
             yearOfManufacture
             yearOfFirstRegistration
             images
+            thumbnail
             status
           }
           page
@@ -102,6 +103,7 @@ export const GET_FILTERED_FEATURED_VEHICLES = gql`
             yearOfManufacture
             yearOfFirstRegistration
             images
+            thumbnail
             status
           }
           page
@@ -149,6 +151,7 @@ export const GET_FEATURED_VEHICLE_BY_ID = gql`
         yearOfManufacture
         yearOfFirstRegistration
         images
+        thumbnail
         status
       }
       page
@@ -187,6 +190,7 @@ export const CREATE_FEATURED_VEHICLE = gql`
         yearOfManufacture
         yearOfFirstRegistration
         images
+        thumbnail
         status
       }
       page
@@ -225,6 +229,7 @@ export const UPDATE_FEATURED_VEHICLE = gql`
         yearOfManufacture
         yearOfFirstRegistration
         images
+        thumbnail
         status
       }
       page
