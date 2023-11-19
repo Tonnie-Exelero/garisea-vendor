@@ -1194,6 +1194,8 @@ builder.mutationFields((t) => ({
       registered: t.arg.string(),
       registrationNo: t.arg.string(),
       condition: t.arg.string(),
+      viewingLocation: t.arg.string(),
+      vehicleOriginCountry: t.arg.string(),
       mileage: t.arg.int(),
       mileageMetric: t.arg.string(),
       listingPrice: t.arg.int(),
@@ -1212,6 +1214,8 @@ builder.mutationFields((t) => ({
         registered,
         registrationNo,
         condition,
+        viewingLocation,
+        vehicleOriginCountry,
         mileage,
         mileageMetric,
         listingPrice,
@@ -1243,6 +1247,10 @@ builder.mutationFields((t) => ({
           registered: registered ? registered : undefined,
           registrationNo: registrationNo ? registrationNo : undefined,
           condition: condition ? condition : undefined,
+          viewingLocation: viewingLocation ? viewingLocation : undefined,
+          vehicleOriginCountry: vehicleOriginCountry
+            ? vehicleOriginCountry
+            : undefined,
           mileage: mileage ? mileage : undefined,
           mileageMetric: mileageMetric ? mileageMetric : undefined,
           listingPrice: listingPrice ? listingPrice : undefined,

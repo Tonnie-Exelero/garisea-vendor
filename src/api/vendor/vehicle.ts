@@ -1053,6 +1053,8 @@ export const UPDATE_VEHICLE_BASIC = gql`
     $registered: String
     $registrationNo: String
     $condition: String
+    $viewingLocation: String
+    $vehicleOriginCountry: String
     $mileage: Int
     $mileageMetric: String
     $listingPrice: Int
@@ -1070,6 +1072,8 @@ export const UPDATE_VEHICLE_BASIC = gql`
       yearOfFirstRegistration: $yearOfFirstRegistration
       registered: $registered
       registrationNo: $registrationNo
+      viewingLocation: $viewingLocation
+      vehicleOriginCountry: $vehicleOriginCountry
       condition: $condition
       mileage: $mileage
       mileageMetric: $mileageMetric
