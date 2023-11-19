@@ -1,5 +1,6 @@
 import prisma from "@src/lib/prisma";
 import { builder } from "../builder";
+import { decryptData } from "@core/utils/encryption";
 
 export const AdminVendorContact = builder.prismaObject("AdminVendorContact", {
   fields: (t) => ({
@@ -7,6 +8,8 @@ export const AdminVendorContact = builder.prismaObject("AdminVendorContact", {
     user: t.relation("user", { nullable: true }),
     vendor: t.relation("vendor", { nullable: true }),
     latestMessageTime: t.exposeString("latestMessageTime", { nullable: true }),
+    pl: t.exposeString("pl", { nullable: true }),
+    dt: t.exposeString("dt", { nullable: true }),
   }),
 });
 
@@ -15,52 +18,76 @@ builder.queryFields((t) => ({
     type: AdminVendorContact,
     cursor: "id",
     args: {
-      vendorId: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
-      const { vendorId } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { vendorId } = payload;
 
       return await prisma.adminVendorContact.findMany({
         ...query,
         where: {
           vendorId,
         },
+        include: {
+          user: true,
+          vendor: true,
+        },
         orderBy: {
           latestMessageTime: "desc",
         },
       });
     },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.adminVendorContact.count({
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { vendorId } = payload;
+
+      return await prisma.adminVendorContact.count({
         ...connection,
         where: {
-          vendorId: args.vendorId,
+          vendorId,
         },
-      }),
+      });
+    },
   }),
   contactsByAdminVendorIds: t.prismaConnection({
     type: AdminVendorContact,
     cursor: "id",
     args: {
-      vendorId: t.arg.string({ required: true }),
-      userId: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.adminVendorContact.findMany({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { userId, vendorId }: any = payload;
+
+      return await prisma.adminVendorContact.findMany({
         ...query,
         where: {
-          vendorId: args.vendorId,
-          userId: args.userId,
+          vendorId,
+          userId,
         },
-      }),
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.adminVendorContact.count({
+        include: {
+          user: true,
+          vendor: true,
+        },
+      });
+    },
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { userId, vendorId }: any = payload;
+
+      return await prisma.adminVendorContact.count({
         ...connection,
         where: {
-          vendorId: args.vendorId,
-          userId: args.userId,
+          vendorId,
+          userId,
         },
-      }),
+      });
+    },
   }),
 }));
 
@@ -68,12 +95,12 @@ builder.mutationFields((t) => ({
   createAdminVendorContact: t.prismaField({
     type: AdminVendorContact,
     args: {
-      vendorId: t.arg.string({ required: true }),
-      userId: t.arg.string({ required: true }),
-      latestMessageTime: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { userId, vendorId, latestMessageTime } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { userId, vendorId, latestMessageTime } = payload;
 
       return await prisma.adminVendorContact.create({
         ...query,
@@ -88,33 +115,44 @@ builder.mutationFields((t) => ({
   updateAdminVendorContact: t.prismaField({
     type: AdminVendorContact,
     args: {
-      id: t.arg.string({ required: true }),
-      latestMessageTime: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.adminVendorContact.update({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, latestMessageTime } = payload;
+
+      return await prisma.adminVendorContact.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
-          latestMessageTime: args.latestMessageTime
-            ? args.latestMessageTime
-            : undefined,
+          latestMessageTime: latestMessageTime ? latestMessageTime : undefined,
         },
-      }),
+        include: {
+          user: true,
+          vendor: true,
+        },
+      });
+    },
   }),
   deleteAdminVendorContact: t.prismaField({
     type: AdminVendorContact,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.adminVendorContact.delete({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.adminVendorContact.delete({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
 }));

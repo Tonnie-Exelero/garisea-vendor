@@ -1,5 +1,6 @@
 import prisma from "@lib/prisma";
 import { builder } from "../builder";
+import { decryptData } from "@core/utils/encryption";
 
 export const VendorReview = builder.prismaObject("VendorReview", {
   fields: (t) => ({
@@ -12,6 +13,8 @@ export const VendorReview = builder.prismaObject("VendorReview", {
     count: t.exposeString("count", { nullable: true }),
     rating: t.exposeString("rating", { nullable: true }),
     publishedAt: t.exposeString("publishedAt", { nullable: true }),
+    pl: t.exposeString("pl", { nullable: true }),
+    dt: t.exposeString("dt", { nullable: true }),
   }),
 });
 
@@ -20,54 +23,84 @@ builder.queryFields((t) => ({
     type: VendorReview,
     cursor: "id",
     args: {
-      status: t.arg.string(),
+      pl: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
+      const payload = args && args.pl && decryptData(args.pl);
+
       return await prisma.vendorReview.findMany({
         ...query,
-        where: {
-          ...(args.status && { status: args.status }),
+        ...(payload && {
+          where: {
+            ...(payload.status && {
+              status: payload.status,
+            }),
+          },
+        }),
+        include: {
+          vendor: true,
+          customer: true,
         },
         orderBy: {
           publishedAt: "desc",
         },
       });
     },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.vendorReview.count({
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
+      return await prisma.vendorReview.count({
         ...connection,
-        where: {
-          ...(args.status && { status: args.status }),
-        },
-      }),
+        ...(payload && {
+          where: {
+            ...(payload.status && {
+              status: payload.status,
+            }),
+          },
+        }),
+      });
+    },
   }),
   vendorByIdReviews: t.prismaConnection({
     type: VendorReview,
     cursor: "id",
     args: {
-      vendorId: t.arg.string({ required: true }),
-      status: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { vendorId } = payload;
+
       return await prisma.vendorReview.findMany({
         ...query,
         where: {
-          vendorId: args.vendorId,
-          ...(args.status && { status: args.status }),
+          vendorId,
+          ...(payload.status && { status: payload.status }),
+        },
+        include: {
+          vendor: true,
+          customer: true,
         },
         orderBy: {
           publishedAt: "desc",
         },
       });
     },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.vendorReview.count({
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { vendorId } = payload;
+
+      return await prisma.vendorReview.count({
         ...connection,
         where: {
-          vendorId: args.vendorId,
-          ...(args.status && { status: args.status }),
+          vendorId,
+          ...(payload.status && { status: payload.status }),
         },
-      }),
+      });
+    },
   }),
   vendorReviewsCount: t.prismaField({
     type: VendorReview,
@@ -107,15 +140,18 @@ builder.queryFields((t) => ({
     type: VendorReview,
     nullable: true,
     args: {
-      vendorId: t.arg.string({ required: true }),
-      status: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (_query, _parent, args, _info): Promise<any | undefined> => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { vendorId, status } = payload;
+
       const aggregation = await prisma.vendorReview.aggregate({
         _avg: { stars: true },
         where: {
-          vendorId: args.vendorId,
-          status: args.status,
+          vendorId,
+          status,
         },
       });
 
@@ -130,15 +166,18 @@ builder.queryFields((t) => ({
     type: VendorReview,
     nullable: true,
     args: {
-      status: t.arg.string({ required: true }),
-      limit: t.arg.int(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (_query, _parent, args, _info): Promise<any | undefined> => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { status } = payload;
+
       const group = await prisma.vendorReview.groupBy({
         by: ["vendorId"],
-        ...(args.limit && { take: args.limit }),
+        ...(payload.limit && { take: payload.limit }),
         where: {
-          status: args.status,
+          status,
         },
         _avg: { stars: true },
         _count: { vendorId: true },
@@ -151,8 +190,9 @@ builder.queryFields((t) => ({
       const groupedData = group.map((item) => {
         return {
           vendorId: item.vendorId,
-          stars: item._avg.stars,
-          count: item._count.vendorId,
+          stars: item._avg?.stars,
+          // @ts-ignore
+          count: item._count?.vendorId,
         };
       });
 
@@ -165,15 +205,24 @@ builder.queryFields((t) => ({
     type: VendorReview,
     nullable: true,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.vendorReview.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.vendorReview.findUnique({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+        include: {
+          vendor: true,
+          customer: true,
+        },
+      });
+    },
   }),
 }));
 
@@ -181,16 +230,13 @@ builder.mutationFields((t) => ({
   createVendorReview: t.prismaField({
     type: VendorReview,
     args: {
-      vendorId: t.arg.string({ required: true }),
-      customerId: t.arg.string({ required: true }),
-      stars: t.arg.int({ required: false }),
-      comment: t.arg.string({ required: false }),
-      status: t.arg.string({ required: false }),
-      publishedAt: t.arg.string({ required: false }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
       const { vendorId, customerId, stars, comment, status, publishedAt } =
-        args;
+        payload;
 
       return await prisma.vendorReview.create({
         ...query,
@@ -208,50 +254,70 @@ builder.mutationFields((t) => ({
   updateVendorReview: t.prismaField({
     type: VendorReview,
     args: {
-      id: t.arg.string({ required: true }),
-      stars: t.arg.int({ required: false }),
-      comment: t.arg.string({ required: false }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.vendorReview.update({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, stars, comment } = payload;
+
+      return await prisma.vendorReview.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
-          stars: args.stars ? args.stars : undefined,
-          comment: args.comment ? args.comment : undefined,
+          stars: stars ? stars : undefined,
+          comment: comment ? comment : undefined,
         },
-      }),
+        include: {
+          vendor: true,
+          customer: true,
+        },
+      });
+    },
   }),
   updateVendorReviewStatus: t.prismaField({
     type: VendorReview,
     args: {
-      id: t.arg.string({ required: true }),
-      status: t.arg.string({ required: false }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.vendorReview.update({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, status } = payload;
+
+      return await prisma.vendorReview.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
-          status: args.status ? args.status : undefined,
+          status: status ? status : undefined,
         },
-      }),
+        include: {
+          vendor: true,
+          customer: true,
+        },
+      });
+    },
   }),
   deleteVendorReview: t.prismaField({
     type: VendorReview,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.vendorReview.delete({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.vendorReview.delete({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
 }));

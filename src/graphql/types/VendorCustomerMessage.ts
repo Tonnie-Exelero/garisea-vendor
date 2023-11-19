@@ -1,5 +1,6 @@
 import prisma from "@lib/prisma";
 import { builder } from "../builder";
+import { decryptData } from "@core/utils/encryption";
 
 export const VendorCustomerMessage = builder.prismaObject(
   "VendorCustomerMessage",
@@ -15,6 +16,8 @@ export const VendorCustomerMessage = builder.prismaObject(
       timeSent: t.exposeString("timeSent", { nullable: true }),
       isSent: t.exposeBoolean("isSent", { nullable: true }),
       isSeen: t.exposeBoolean("isSeen", { nullable: true }),
+      pl: t.exposeString("pl", { nullable: true }),
+      dt: t.exposeString("dt", { nullable: true }),
     }),
   }
 );
@@ -24,78 +27,103 @@ builder.queryFields((t) => ({
     type: VendorCustomerMessage,
     cursor: "id",
     args: {
-      vendorId: t.arg.string({ required: true }),
-      customerId: t.arg.string({ required: true }),
-      vehicleId: t.arg.string(),
-      senderId: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
-      const { vendorId, customerId, vehicleId, senderId } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { vendorId, customerId } = payload;
 
       return await prisma.vendorCustomerMessage.findMany({
         ...query,
         where: {
           vendorId,
           customerId,
-          ...(vehicleId && { vehicleId }),
-          ...(senderId && { senderId }),
+          ...(payload.vehicleId && { vehicleId: payload.vehicleId }),
+          ...(payload.senderId && { senderId: payload.senderId }),
+        },
+        include: {
+          vendor: true,
+          customer: true,
+          vehicle: true,
         },
         orderBy: {
           timeSent: "asc",
         },
       });
     },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.vendorCustomerMessage.count({
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { vendorId, customerId } = payload;
+
+      return await prisma.vendorCustomerMessage.count({
         ...connection,
         where: {
-          vendorId: args.vendorId,
-          customerId: args.customerId,
-          ...(args.vehicleId && { vehicleId: args.vehicleId }),
-          ...(args.senderId && { senderId: args.senderId }),
+          vendorId,
+          customerId,
+          ...(payload.vehicleId && { vehicleId: payload.vehicleId }),
+          ...(payload.senderId && { senderId: payload.senderId }),
           isSeen: false,
         },
-      }),
+      });
+    },
   }),
   customerMessages: t.prismaConnection({
     type: VendorCustomerMessage,
     cursor: "id",
     args: {
-      customerId: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
-      const { customerId } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { customerId } = payload;
 
       return await prisma.vendorCustomerMessage.findMany({
         ...query,
         where: {
           customerId,
         },
+        include: {
+          vendor: true,
+          customer: true,
+          vehicle: true,
+        },
         orderBy: {
           timeSent: "asc",
         },
       });
     },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.vendorCustomerMessage.count({
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { customerId } = payload;
+
+      return await prisma.vendorCustomerMessage.count({
         ...connection,
         where: {
-          customerId: args.customerId,
+          customerId,
           isSeen: false,
         },
-      }),
+      });
+    },
   }),
   newMessagesCount: t.prismaField({
     type: VendorCustomerMessage,
     nullable: true,
     args: {
-      customerId: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (_query, _parent, args, _info): Promise<any | undefined> => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { customerId } = payload;
+
       const newMessages = await prisma.vendorCustomerMessage.count({
         where: {
-          customerId: args.customerId,
-          senderId: { not: args.customerId },
+          customerId,
+          senderId: { not: customerId },
           isSeen: false,
         },
       });
@@ -111,17 +139,11 @@ builder.mutationFields((t) => ({
   createVendorCustomerMessage: t.prismaField({
     type: VendorCustomerMessage,
     args: {
-      vendorId: t.arg.string({ required: true }),
-      customerId: t.arg.string({ required: true }),
-      vehicleId: t.arg.string({ required: false }),
-      senderId: t.arg.string({ required: true }),
-      type: t.arg.string({ required: false }),
-      message: t.arg.string({ required: true }),
-      timeSent: t.arg.string({ required: true }),
-      isSent: t.arg.boolean({ required: false }),
-      isSeen: t.arg.boolean({ required: false }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
       const {
         vendorId,
         customerId,
@@ -132,7 +154,7 @@ builder.mutationFields((t) => ({
         timeSent,
         isSent,
         isSeen,
-      } = args;
+      } = payload;
 
       return await prisma.vendorCustomerMessage.create({
         ...query,
@@ -155,48 +177,71 @@ builder.mutationFields((t) => ({
   updateVendorCustomerMessage: t.prismaField({
     type: VendorCustomerMessage,
     args: {
-      id: t.arg.string({ required: true }),
-      message: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.vendorCustomerMessage.update({
+    resolve: async (query, _parent, args, _ctx): Promise<any | undefined> => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, message } = payload;
+
+      return await prisma.vendorCustomerMessage.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
-          message: args.message ? args.message : undefined,
+          message: message ? message : undefined,
         },
-      }),
+        include: {
+          vendor: true,
+          customer: true,
+          vehicle: true,
+        },
+      });
+    },
   }),
   updateVendorCustomerMessageSeen: t.prismaField({
     type: VendorCustomerMessage,
     args: {
-      id: t.arg.string({ required: true }),
-      isSeen: t.arg.boolean(),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.vendorCustomerMessage.update({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, isSeen } = payload;
+
+      return await prisma.vendorCustomerMessage.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
-          isSeen: args.isSeen ? args.isSeen : undefined,
+          isSeen: isSeen ? isSeen : undefined,
         },
-      }),
+        include: {
+          vendor: true,
+          customer: true,
+          vehicle: true,
+        },
+      });
+    },
   }),
   deleteVendorCustomerMessage: t.prismaField({
     type: VendorCustomerMessage,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.vendorCustomerMessage.delete({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.vendorCustomerMessage.delete({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
 }));

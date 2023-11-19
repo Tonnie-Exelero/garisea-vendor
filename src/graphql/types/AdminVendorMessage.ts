@@ -1,5 +1,6 @@
 import prisma from "@src/lib/prisma";
 import { builder } from "../builder";
+import { decryptData } from "@core/utils/encryption";
 
 export const AdminVendorMessage = builder.prismaObject("AdminVendorMessage", {
   fields: (t) => ({
@@ -12,6 +13,8 @@ export const AdminVendorMessage = builder.prismaObject("AdminVendorMessage", {
     timeSent: t.exposeString("timeSent", { nullable: true }),
     isSent: t.exposeBoolean("isSent", { nullable: true }),
     isSeen: t.exposeBoolean("isSeen", { nullable: true }),
+    pl: t.exposeString("pl", { nullable: true }),
+    dt: t.exposeString("dt", { nullable: true }),
   }),
 });
 
@@ -20,11 +23,12 @@ builder.queryFields((t) => ({
     type: AdminVendorMessage,
     cursor: "id",
     args: {
-      userId: t.arg.string({ required: true }),
-      vendorId: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
-      const { userId, vendorId } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { userId, vendorId } = payload;
 
       return await prisma.adminVendorMessage.findMany({
         ...query,
@@ -32,20 +36,29 @@ builder.queryFields((t) => ({
           userId,
           vendorId,
         },
+        include: {
+          user: true,
+          vendor: true,
+        },
         orderBy: {
           timeSent: "asc",
         },
       });
     },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.adminVendorMessage.count({
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { userId, vendorId } = payload;
+
+      return await prisma.adminVendorMessage.count({
         ...connection,
         where: {
-          userId: args.userId,
-          vendorId: args.vendorId,
+          userId,
+          vendorId,
           isSeen: false,
         },
-      }),
+      });
+    },
   }),
 }));
 
@@ -53,16 +66,11 @@ builder.mutationFields((t) => ({
   createAdminVendorMessage: t.prismaField({
     type: AdminVendorMessage,
     args: {
-      userId: t.arg.string({ required: true }),
-      vendorId: t.arg.string({ required: true }),
-      senderId: t.arg.string({ required: true }),
-      type: t.arg.string({ required: false }),
-      message: t.arg.string({ required: true }),
-      timeSent: t.arg.string({ required: true }),
-      isSent: t.arg.boolean({ required: false }),
-      isSeen: t.arg.boolean({ required: false }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
       const {
         userId,
         vendorId,
@@ -72,7 +80,7 @@ builder.mutationFields((t) => ({
         timeSent,
         isSent,
         isSeen,
-      } = args;
+      } = payload;
 
       return await prisma.adminVendorMessage.create({
         ...query,
@@ -92,48 +100,65 @@ builder.mutationFields((t) => ({
   updateAdminVendorMessage: t.prismaField({
     type: AdminVendorMessage,
     args: {
-      id: t.arg.string({ required: true }),
-      message: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.adminVendorMessage.update({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, message } = payload;
+
+      return await prisma.adminVendorMessage.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
-          message: args.message ? args.message : undefined,
+          message: message ? message : undefined,
         },
-      }),
+        include: {
+          user: true,
+          vendor: true,
+        },
+      });
+    },
   }),
   updateAdminVendorMessageSeen: t.prismaField({
     type: AdminVendorMessage,
     args: {
-      id: t.arg.string({ required: true }),
-      isSeen: t.arg.boolean(),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.adminVendorMessage.update({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, isSeen } = payload;
+
+      return await prisma.adminVendorMessage.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
-          isSeen: args.isSeen ? args.isSeen : undefined,
+          isSeen: isSeen ? isSeen : undefined,
         },
-      }),
+      });
+    },
   }),
   deleteAdminVendorMessage: t.prismaField({
     type: AdminVendorMessage,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.adminVendorMessage.delete({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.adminVendorMessage.delete({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
 }));
