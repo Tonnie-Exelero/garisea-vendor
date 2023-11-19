@@ -106,7 +106,7 @@ const BasicEditDialog: React.FC<BasicEditDialogProps> = ({
   useEffect(() => {
     dispatch(fetchVendors({ first: 100 }));
     dispatch(fetchBrands({ first: 100 }));
-    dispatch(fetchModelsByBrand({ brandId }));
+    dispatch(fetchModelsByBrand({ brandId, first: 100 }));
 
     if (vListingPrice !== undefined && vDiscountedPrice !== undefined) {
       const prePerc = vDiscountedPrice / vListingPrice;
