@@ -36,6 +36,7 @@ export const GET_VENDORS = gql`
             address2
             city
             country
+            coverImage
             logo
             certificate
             kraPin
@@ -105,6 +106,7 @@ export const GET_VENDORS_BY_STATUS = gql`
             address2
             city
             country
+            coverImage
             logo
             certificate
             kraPin
@@ -158,6 +160,7 @@ export const GET_FILTERED_VENDORS = gql`
             address2
             city
             country
+            coverImage
             logo
             certificate
             kraPin
@@ -208,6 +211,7 @@ export const GET_VENDOR_BY_ID = gql`
         address2
         city
         country
+        coverImage
         logo
         certificate
         kraPin
@@ -249,6 +253,7 @@ export const GET_VENDOR_BY_EMAIL = gql`
         address2
         city
         country
+        coverImage
         logo
         certificate
         kraPin
@@ -290,6 +295,7 @@ export const GET_VENDOR_BY_STORE_LINK = gql`
         address2
         city
         country
+        coverImage
         logo
         certificate
         kraPin
@@ -393,6 +399,7 @@ export const CREATE_VENDOR = gql`
         address2
         city
         country
+        coverImage
         logo
         certificate
         kraPin
@@ -460,6 +467,7 @@ export const UPDATE_VENDOR = gql`
         address2
         city
         country
+        coverImage
         logo
         certificate
         kraPin
@@ -501,6 +509,7 @@ export const UPDATE_PASSWORD = gql`
         address2
         city
         country
+        coverImage
         logo
         certificate
         kraPin
@@ -578,6 +587,7 @@ export const UPDATE_EMAIL_VERIFIED = gql`
         address2
         city
         country
+        coverImage
         logo
         certificate
         kraPin
@@ -624,6 +634,7 @@ export const UPDATE_ADDED_ORGANIZATION = gql`
         address2
         city
         country
+        coverImage
         logo
         certificate
         kraPin
