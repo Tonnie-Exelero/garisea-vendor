@@ -35,14 +35,14 @@ export const GET_CUSTOMERS = gql`
 
 export const GET_CUSTOMERS_BY_STATUS = gql`
   query GetCustomersByStatus(
-    $status: String!
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     customersByStatus(
-      status: $status
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -79,8 +79,20 @@ export const GET_CUSTOMERS_BY_STATUS = gql`
 `;
 
 export const GET_FILTERED_CUSTOMERS = gql`
-  query GetFilteredCustomers($filter: String!) {
-    customersFiltered(filter: $filter) {
+  query GetFilteredCustomers(
+    $pl: String!
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
+    customersFiltered(
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
       edges {
         cursor
         node {
@@ -112,8 +124,8 @@ export const GET_FILTERED_CUSTOMERS = gql`
 `;
 
 export const GET_CUSTOMER_BY_ID = gql`
-  query GetCustomerById($id: String!) {
-    customerById(id: $id) {
+  query GetCustomerById($pl: String!) {
+    customerById(pl: $pl) {
       id
       firstName
       lastName
@@ -133,8 +145,8 @@ export const GET_CUSTOMER_BY_ID = gql`
 `;
 
 export const GET_CUSTOMER_BY_EMAIL = gql`
-  query GetCustomerByEmail($email: String!) {
-    customerByEmail(email: $email) {
+  query GetCustomerByEmail($pl: String!) {
+    customerByEmail(pl: $pl) {
       id
       firstName
       lastName
@@ -154,36 +166,8 @@ export const GET_CUSTOMER_BY_EMAIL = gql`
 `;
 
 export const CREATE_CUSTOMER = gql`
-  mutation CreateCustomer(
-    $firstName: String
-    $lastName: String
-    $username: String!
-    $email: String!
-    $password: String
-    $phone: String
-    $image: String
-    $language: String
-    $status: String
-    $address: String
-    $city: String
-    $country: String
-    $emailVerified: String
-  ) {
-    createCustomer(
-      firstName: $firstName
-      lastName: $lastName
-      username: $username
-      email: $email
-      password: $password
-      phone: $phone
-      image: $image
-      language: $language
-      status: $status
-      address: $address
-      city: $city
-      country: $country
-      emailVerified: $emailVerified
-    ) {
+  mutation CreateCustomer($pl: String!) {
+    createCustomer(pl: $pl) {
       id
       firstName
       lastName
@@ -203,32 +187,8 @@ export const CREATE_CUSTOMER = gql`
 `;
 
 export const UPDATE_CUSTOMER = gql`
-  mutation UpdateCustomer(
-    $id: String!
-    $firstName: String
-    $lastName: String
-    $username: String
-    $phone: String
-    $image: String
-    $language: String
-    $status: String
-    $address: String
-    $city: String
-    $country: String
-  ) {
-    updateCustomer(
-      id: $id
-      firstName: $firstName
-      lastName: $lastName
-      username: $username
-      phone: $phone
-      image: $image
-      language: $language
-      status: $status
-      address: $address
-      city: $city
-      country: $country
-    ) {
+  mutation UpdateCustomer($pl: String!) {
+    updateCustomer(pl: $pl) {
       id
       firstName
       lastName
@@ -248,18 +208,17 @@ export const UPDATE_CUSTOMER = gql`
 `;
 
 export const UPDATE_PASSWORD = gql`
-  mutation UpdateCustomerPassword($id: String!, $password: String!) {
-    updateCustomerPassword(id: $id, password: $password) {
+  mutation UpdateCustomerPassword($pl: String!) {
+    updateCustomerPassword(pl: $pl) {
       id
       firstName
-      lastName
     }
   }
 `;
 
 export const UPDATE_IMAGE = gql`
-  mutation UpdateImage($id: String!, $image: String!) {
-    updateCustomerImage(id: $id, image: $image) {
+  mutation UpdateImage($pl: String!) {
+    updateCustomerImage(pl: $pl) {
       id
       image
     }
@@ -267,30 +226,18 @@ export const UPDATE_IMAGE = gql`
 `;
 
 export const UPDATE_EMAIL_VERIFIED = gql`
-  mutation UpdateCustomerEmailVerified(
-    $id: String!
-    $emailVerified: String!
-    $status: String!
-  ) {
-    updateCustomerEmailVerified(
-      id: $id
-      emailVerified: $emailVerified
-      status: $status
-    ) {
+  mutation UpdateCustomerEmailVerified($pl: String!) {
+    updateCustomerEmailVerified(pl: $pl) {
       id
-      firstName
-      lastName
-      email
+      emailVerified
     }
   }
 `;
 
 export const DELETE_CUSTOMER = gql`
-  mutation DeleteCustomer($id: String!) {
-    deleteCustomer(id: $id) {
+  mutation DeleteCustomer($pl: String!) {
+    deleteCustomer(pl: $pl) {
       id
-      firstName
-      lastName
     }
   }
 `;

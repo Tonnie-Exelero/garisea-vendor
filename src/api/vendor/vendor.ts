@@ -10,8 +10,6 @@ export const GET_VENDORS = gql`
           firstName
           lastName
           username
-          email
-          phone
           image
           storeLink
           language
@@ -56,18 +54,14 @@ export const GET_VENDORS = gql`
 
 export const GET_VENDORS_BY_STATUS = gql`
   query GetVendorsByStatus(
-    $status: String!
-    $hasVehicles: String
-    $orderBy: String
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     vendorsByStatus(
-      status: $status
-      hasVehicles: $hasVehicles
-      orderBy: $orderBy
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -125,8 +119,20 @@ export const GET_VENDORS_BY_STATUS = gql`
 `;
 
 export const GET_FILTERED_VENDORS = gql`
-  query GetFilteredVendors($filter: String!) {
-    vendorsFiltered(filter: $filter) {
+  query GetFilteredVendors(
+    $pl: String!
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
+    vendorsFiltered(
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
       edges {
         cursor
         node {
@@ -179,8 +185,8 @@ export const GET_FILTERED_VENDORS = gql`
 `;
 
 export const GET_VENDOR_BY_ID = gql`
-  query GetVendorById($id: String!) {
-    vendorById(id: $id) {
+  query GetVendorById($pl: String!) {
+    vendorById(pl: $pl) {
       id
       firstName
       lastName
@@ -221,8 +227,8 @@ export const GET_VENDOR_BY_ID = gql`
 `;
 
 export const GET_VENDOR_BY_EMAIL = gql`
-  query GetVendorByEmail($email: String!) {
-    vendorByEmail(email: $email) {
+  query GetVendorByEmail($pl: String!) {
+    vendorByEmail(pl: $pl) {
       id
       firstName
       lastName
@@ -263,8 +269,8 @@ export const GET_VENDOR_BY_EMAIL = gql`
 `;
 
 export const GET_VENDOR_BY_STORE_LINK = gql`
-  query GetVendorByStoreLink($storeLink: String!) {
-    vendorByStoreLink(storeLink: $storeLink) {
+  query GetVendorByStoreLink($pl: String!) {
+    vendorByStoreLink(pl: $pl) {
       id
       firstName
       lastName
@@ -305,24 +311,24 @@ export const GET_VENDOR_BY_STORE_LINK = gql`
 `;
 
 export const GET_VENDOR_EMAIL = gql`
-  query GetVendorEmail($email: String!) {
-    vendorCheckEmail(email: $email) {
+  query GetVendorEmail($pl: String!) {
+    vendorCheckEmail(pl: $pl) {
       email
     }
   }
 `;
 
 export const GET_VENDOR_STORE_LINK = gql`
-  query GetVendorStoreLink($storeLink: String!) {
-    vendorStoreLink(storeLink: $storeLink) {
+  query GetVendorStoreLink($pl: String!) {
+    vendorStoreLink(pl: $pl) {
       storeLink
     }
   }
 `;
 
 export const GET_VENDOR_ANALYTICS = gql`
-  query GetVendorAnalytics($id: String!) {
-    vendorById(id: $id) {
+  query GetVendorAnalytics($pl: String!) {
+    vendorById(pl: $pl) {
       id
       impressions
       pageOpened
@@ -331,44 +337,8 @@ export const GET_VENDOR_ANALYTICS = gql`
 `;
 
 export const CREATE_VENDOR = gql`
-  mutation CreateVendor(
-    $firstName: String
-    $lastName: String
-    $username: String
-    $email: String!
-    $password: String
-    $phone: String
-    $image: String
-    $storeLink: String
-    $language: String
-    $status: String
-    $address: String
-    $city: String
-    $country: String
-    $emailVerified: String
-    $vendorVerified: String
-    $addedOrganization: String
-    $organizationId: String
-  ) {
-    createVendor(
-      firstName: $firstName
-      lastName: $lastName
-      username: $username
-      email: $email
-      password: $password
-      phone: $phone
-      image: $image
-      storeLink: $storeLink
-      language: $language
-      status: $status
-      address: $address
-      city: $city
-      country: $country
-      emailVerified: $emailVerified
-      vendorVerified: $vendorVerified
-      addedOrganization: $addedOrganization
-      organizationId: $organizationId
-    ) {
+  mutation CreateVendor($pl: String!) {
+    createVendor(pl: $pl) {
       id
       firstName
       lastName
@@ -409,34 +379,8 @@ export const CREATE_VENDOR = gql`
 `;
 
 export const UPDATE_VENDOR = gql`
-  mutation UpdateVendor(
-    $id: String!
-    $firstName: String
-    $lastName: String
-    $username: String
-    $phone: String
-    $image: String
-    $language: String
-    $status: String
-    $address: String
-    $city: String
-    $country: String
-    $organizationId: String
-  ) {
-    updateVendor(
-      id: $id
-      firstName: $firstName
-      lastName: $lastName
-      username: $username
-      phone: $phone
-      image: $image
-      language: $language
-      status: $status
-      address: $address
-      city: $city
-      country: $country
-      organizationId: $organizationId
-    ) {
+  mutation UpdateVendor($pl: String!) {
+    updateVendor(pl: $pl) {
       id
       firstName
       lastName
@@ -477,50 +421,17 @@ export const UPDATE_VENDOR = gql`
 `;
 
 export const UPDATE_PASSWORD = gql`
-  mutation UpdateVendorPassword($id: String!, $password: String!) {
-    updateVendorPassword(id: $id, password: $password) {
+  mutation UpdateVendorPassword($pl: String!) {
+    updateVendorPassword(pl: $pl) {
       id
       firstName
-      lastName
-      username
-      email
-      phone
-      image
-      storeLink
-      language
-      status
-      address
-      city
-      country
-      emailVerified
-      vendorVerified
-      addedOrganization
-      identification
-      onlineStatus
-      impressions
-      pageOpened
-      organization {
-        id
-        name
-        nicename
-        email
-        phone
-        address
-        address2
-        city
-        country
-        coverImage
-        logo
-        certificate
-        kraPin
-      }
     }
   }
 `;
 
 export const UPDATE_IMAGE = gql`
-  mutation UpdateImage($id: String!, $image: String!) {
-    updateVendorImage(id: $id, image: $image) {
+  mutation UpdateImage($pl: String!) {
+    updateVendorImage(pl: $pl) {
       id
       image
     }
@@ -528,8 +439,8 @@ export const UPDATE_IMAGE = gql`
 `;
 
 export const UPDATE_VENDOR_STATUS = gql`
-  mutation UpdateVendorStatus($id: String!, $status: String!) {
-    updateVendorStatus(id: $id, status: $status) {
+  mutation UpdateVendorStatus($pl: String!) {
+    updateVendorStatus(pl: $pl) {
       id
       status
     }
@@ -537,8 +448,8 @@ export const UPDATE_VENDOR_STATUS = gql`
 `;
 
 export const UPDATE_VENDOR_IDENTIFICATION = gql`
-  mutation UpdateVendorIdentification($id: String!, $identification: String!) {
-    updateVendorIdentification(id: $id, identification: $identification) {
+  mutation UpdateVendorIdentification($pl: String!) {
+    updateVendorIdentification(pl: $pl) {
       id
       identification
     }
@@ -546,8 +457,8 @@ export const UPDATE_VENDOR_IDENTIFICATION = gql`
 `;
 
 export const UPDATE_VENDOR_VERIFIED = gql`
-  mutation UpdateVendorVerified($id: String!, $vendorVerified: String!) {
-    updateVendorVerified(id: $id, vendorVerified: $vendorVerified) {
+  mutation UpdateVendorVerified($pl: String!) {
+    updateVendorVerified(pl: $pl) {
       id
       vendorVerified
     }
@@ -555,97 +466,25 @@ export const UPDATE_VENDOR_VERIFIED = gql`
 `;
 
 export const UPDATE_EMAIL_VERIFIED = gql`
-  mutation UpdateVendorEmailVerified($id: String!, $emailVerified: String!) {
-    updateVendorEmailVerified(id: $id, emailVerified: $emailVerified) {
+  mutation UpdateVendorEmailVerified($pl: String!) {
+    updateVendorEmailVerified(pl: $pl) {
       id
-      firstName
-      lastName
-      username
-      email
-      phone
-      image
-      storeLink
-      language
-      status
-      address
-      city
-      country
       emailVerified
-      vendorVerified
-      addedOrganization
-      identification
-      onlineStatus
-      impressions
-      pageOpened
-      organization {
-        id
-        name
-        nicename
-        email
-        phone
-        address
-        address2
-        city
-        country
-        coverImage
-        logo
-        certificate
-        kraPin
-      }
     }
   }
 `;
 export const UPDATE_ADDED_ORGANIZATION = gql`
-  mutation UpdateVendorAddedOrganization(
-    $id: String!
-    $addedOrganization: String!
-  ) {
-    updateVendorAddedOrganization(
-      id: $id
-      addedOrganization: $addedOrganization
-    ) {
+  mutation UpdateVendorAddedOrganization($pl: String!) {
+    updateVendorAddedOrganization(pl: $pl) {
       id
-      firstName
-      lastName
-      username
-      email
-      phone
-      image
-      storeLink
-      language
-      status
-      address
-      city
-      country
-      emailVerified
-      vendorVerified
       addedOrganization
-      identification
-      onlineStatus
-      impressions
-      pageOpened
-      organization {
-        id
-        name
-        nicename
-        email
-        phone
-        address
-        address2
-        city
-        country
-        coverImage
-        logo
-        certificate
-        kraPin
-      }
     }
   }
 `;
 
 export const UPDATE_VENDOR_IMPRESSIONS = gql`
-  mutation UpdateVendorImpressions($id: String!, $impressions: Int) {
-    updateVendorImpressions(id: $id, impressions: $impressions) {
+  mutation UpdateVendorImpressions($pl: String!) {
+    updateVendorImpressions(pl: $pl) {
       id
       impressions
     }
@@ -653,8 +492,8 @@ export const UPDATE_VENDOR_IMPRESSIONS = gql`
 `;
 
 export const UPDATE_VENDOR_PAGE_OPENED = gql`
-  mutation UpdateVehiclePageOpened($id: String!, $pageOpened: Int) {
-    updateVendorPageOpened(id: $id, pageOpened: $pageOpened) {
+  mutation UpdateVehiclePageOpened($pl: String!) {
+    updateVendorPageOpened(pl: $pl) {
       id
       pageOpened
     }
@@ -662,11 +501,9 @@ export const UPDATE_VENDOR_PAGE_OPENED = gql`
 `;
 
 export const DELETE_VENDOR = gql`
-  mutation DeleteVendor($id: String!) {
-    deleteVendor(id: $id) {
+  mutation DeleteVendor($pl: String!) {
+    deleteVendor(pl: $pl) {
       id
-      firstName
-      lastName
     }
   }
 `;

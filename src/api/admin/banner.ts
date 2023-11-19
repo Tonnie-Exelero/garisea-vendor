@@ -1,8 +1,20 @@
 import { gql } from "@apollo/client";
 
 export const GET_BANNERS = gql`
-  query GetBanners($first: Int, $last: Int, $after: ID, $before: ID) {
-    banners(first: $first, last: $last, after: $after, before: $before) {
+  query GetBanners(
+    $pl: String
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
+    banners(
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
       edges {
         cursor
         node {
@@ -33,18 +45,18 @@ export const GET_BANNERS = gql`
 
 export const GET_FILTERED_BANNERS = gql`
   query GetFilteredBanners(
-    $type: String
-    $title: String
-    $link: String
-    $page: String
-    $position: String
+    $pl: String!
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
   ) {
     bannersFiltered(
-      type: $type
-      title: $title
-      link: $link
-      page: $page
-      position: $position
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
     ) {
       edges {
         cursor
@@ -75,8 +87,8 @@ export const GET_FILTERED_BANNERS = gql`
 `;
 
 export const GET_BANNER_BY_ID = gql`
-  query GetBannerById($id: String!) {
-    bannerById(id: $id) {
+  query GetBannerById($pl: String!) {
+    bannerById(pl: $pl) {
       id
       type
       title
@@ -94,32 +106,8 @@ export const GET_BANNER_BY_ID = gql`
 `;
 
 export const CREATE_BANNER = gql`
-  mutation CreateBanner(
-    $type: String
-    $title: String
-    $link: String
-    $image: String
-    $page: String
-    $position: String
-    $rank: Int
-    $impressions: Int
-    $clicks: Int
-    $targetImpressions: Int
-    $targetClicks: Int
-  ) {
-    createBanner(
-      type: $type
-      title: $title
-      link: $link
-      image: $image
-      page: $page
-      position: $position
-      rank: $rank
-      impressions: $impressions
-      clicks: $clicks
-      targetImpressions: $targetImpressions
-      targetClicks: $targetClicks
-    ) {
+  mutation CreateBanner($pl: String) {
+    createBanner(pl: $pl) {
       id
       type
       title
@@ -137,34 +125,8 @@ export const CREATE_BANNER = gql`
 `;
 
 export const UPDATE_BANNER = gql`
-  mutation UpdateBanner(
-    $id: String!
-    $type: String
-    $title: String
-    $link: String
-    $image: String
-    $page: String
-    $position: String
-    $rank: Int
-    $impressions: Int
-    $clicks: Int
-    $targetImpressions: Int
-    $targetClicks: Int
-  ) {
-    updateBanner(
-      id: $id
-      type: $type
-      title: $title
-      link: $link
-      image: $image
-      page: $page
-      position: $position
-      rank: $rank
-      impressions: $impressions
-      clicks: $clicks
-      targetImpressions: $targetImpressions
-      targetClicks: $targetClicks
-    ) {
+  mutation UpdateBanner($pl: String!) {
+    updateBanner(pl: $pl) {
       id
       type
       title
@@ -181,9 +143,18 @@ export const UPDATE_BANNER = gql`
   }
 `;
 
+export const UPDATE_BANNER_STATUS = gql`
+  mutation UpdateBannerStatus($pl: String!) {
+    updateBannerStatus(pl: $pl) {
+      id
+      status
+    }
+  }
+`;
+
 export const UPDATE_BANNER_IMPRESSIONS = gql`
-  mutation UpdateBannerImpressions($id: String!, $impressions: Int) {
-    updateBannerImpressions(id: $id, impressions: $impressions) {
+  mutation UpdateBannerImpressions($pl: String!) {
+    updateBannerImpressions(pl: $pl) {
       id
       impressions
     }
@@ -191,8 +162,8 @@ export const UPDATE_BANNER_IMPRESSIONS = gql`
 `;
 
 export const UPDATE_BANNER_CLICKS = gql`
-  mutation UpdateBannerClicks($id: String!, $clicks: Int) {
-    updateBannerClicks(id: $id, clicks: $clicks) {
+  mutation UpdateBannerClicks($pl: String!) {
+    updateBannerClicks(pl: $pl) {
       id
       clicks
     }
@@ -200,8 +171,8 @@ export const UPDATE_BANNER_CLICKS = gql`
 `;
 
 export const DELETE_BANNER = gql`
-  mutation DeleteBanner($id: String!) {
-    deleteBanner(id: $id) {
+  mutation DeleteBanner($pl: String!) {
+    deleteBanner(pl: $pl) {
       id
     }
   }

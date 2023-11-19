@@ -2,14 +2,14 @@ import { gql } from "@apollo/client";
 
 export const GET_CONTACTS = gql`
   query GetContacts(
-    $vendorId: String!
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     adminVendorContacts(
-      vendorId: $vendorId
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -49,16 +49,14 @@ export const GET_CONTACTS = gql`
 
 export const GET_CONTACTS_BY_IDS = gql`
   query GetContactsByIds(
-    $userId: String!
-    $vendorId: String!
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     contactsByAdminVendorIds(
-      userId: $userId
-      vendorId: $vendorId
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -97,16 +95,8 @@ export const GET_CONTACTS_BY_IDS = gql`
 `;
 
 export const CREATE_CONTACT = gql`
-  mutation CreateContact(
-    $userId: String!
-    $vendorId: String!
-    $latestMessageTime: String!
-  ) {
-    createAdminVendorContact(
-      userId: $userId
-      vendorId: $vendorId
-      latestMessageTime: $latestMessageTime
-    ) {
+  mutation CreateContact($pl: String!) {
+    createAdminVendorContact(pl: $pl) {
       id
       user {
         id
@@ -128,8 +118,8 @@ export const CREATE_CONTACT = gql`
 `;
 
 export const UPDATE_CONTACT = gql`
-  mutation UpdateContact($id: String!, $latestMessageTime: String!) {
-    updateAdminVendorContact(id: $id, latestMessageTime: $latestMessageTime) {
+  mutation UpdateContact($pl: String!) {
+    updateAdminVendorContact(pl: $pl) {
       id
       user {
         id
@@ -151,8 +141,8 @@ export const UPDATE_CONTACT = gql`
 `;
 
 export const DELETE_CONTACT = gql`
-  mutation DeleteContact($id: String!) {
-    deleteAdminVendorContact(id: $id) {
+  mutation DeleteContact($pl: String!) {
+    deleteAdminVendorContact(pl: $pl) {
       id
     }
   }

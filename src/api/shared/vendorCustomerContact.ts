@@ -2,16 +2,14 @@ import { gql } from "@apollo/client";
 
 export const GET_CONTACTS = gql`
   query GetContacts(
-    $vendorId: String
-    $customerId: String
+    $pl: String
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     vendorCustomerContacts(
-      vendorId: $vendorId
-      customerId: $customerId
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -56,18 +54,14 @@ export const GET_CONTACTS = gql`
 
 export const GET_CONTACTS_BY_IDS = gql`
   query GetContactsByIds(
-    $vendorId: String!
-    $customerId: String!
-    $vehicleId: String
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     contactsByVendorCustomerVehicleIds(
-      vendorId: $vendorId
-      customerId: $customerId
-      vehicleId: $vehicleId
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -107,18 +101,8 @@ export const GET_CONTACTS_BY_IDS = gql`
 `;
 
 export const CREATE_CONTACT = gql`
-  mutation CreateContact(
-    $vendorId: String!
-    $customerId: String!
-    $vehicleId: String
-    $latestMessageTime: String!
-  ) {
-    createVendorCustomerContact(
-      vendorId: $vendorId
-      customerId: $customerId
-      vehicleId: $vehicleId
-      latestMessageTime: $latestMessageTime
-    ) {
+  mutation CreateContact($pl: String!) {
+    createVendorCustomerContact(pl: $pl) {
       id
       vendor {
         id
@@ -141,11 +125,8 @@ export const CREATE_CONTACT = gql`
 `;
 
 export const UPDATE_CONTACT = gql`
-  mutation UpdateContact($id: String!, $latestMessageTime: String!) {
-    updateVendorCustomerContact(
-      id: $id
-      latestMessageTime: $latestMessageTime
-    ) {
+  mutation UpdateContact($pl: String!) {
+    updateVendorCustomerContact(pl: $pl) {
       id
       vendor {
         id
@@ -168,8 +149,8 @@ export const UPDATE_CONTACT = gql`
 `;
 
 export const DELETE_CONTACT = gql`
-  mutation DeleteContact($id: String!) {
-    deleteVendorCustomerContact(id: $id) {
+  mutation DeleteContact($pl: String!) {
+    deleteVendorCustomerContact(pl: $pl) {
       id
     }
   }

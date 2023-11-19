@@ -25,8 +25,20 @@ export const GET_PERMISSIONS = gql`
 `;
 
 export const GET_FILTERED_PERMISSIONS = gql`
-  query GetFilteredPermissions($filter: String!) {
-    permissionsFiltered(filter: $filter) {
+  query GetFilteredPermissions(
+    $pl: String!
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
+    permissionsFiltered(
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
       edges {
         cursor
         node {
@@ -49,8 +61,8 @@ export const GET_FILTERED_PERMISSIONS = gql`
 `;
 
 export const GET_PERMISSION_BY_ID = gql`
-  query GetPermissionById($id: String!) {
-    permissionById(id: $id) {
+  query GetPermissionById($pl: String!) {
+    permissionById(pl: $pl) {
       id
       name
       slug
@@ -61,18 +73,8 @@ export const GET_PERMISSION_BY_ID = gql`
 `;
 
 export const CREATE_PERMISSION = gql`
-  mutation CreatePermission(
-    $name: String!
-    $slug: String!
-    $description: String!
-    $subjects: String!
-  ) {
-    createPermission(
-      name: $name
-      slug: $slug
-      description: $description
-      subjects: $subjects
-    ) {
+  mutation CreatePermission($pl: String!) {
+    createPermission(pl: $pl) {
       id
       name
       slug
@@ -83,20 +85,8 @@ export const CREATE_PERMISSION = gql`
 `;
 
 export const UPDATE_PERMISSION = gql`
-  mutation UpdatePermission(
-    $id: String!
-    $name: String
-    $slug: String
-    $description: String
-    $subjects: String
-  ) {
-    updatePermission(
-      id: $id
-      name: $name
-      slug: $slug
-      description: $description
-      subjects: $subjects
-    ) {
+  mutation UpdatePermission($pl: String!) {
+    updatePermission(pl: $pl) {
       id
       name
       slug
@@ -107,8 +97,8 @@ export const UPDATE_PERMISSION = gql`
 `;
 
 export const DELETE_PERMISSION = gql`
-  mutation DeletePermission($id: String!) {
-    deletePermission(id: $id) {
+  mutation DeletePermission($pl: String!) {
+    deletePermission(pl: $pl) {
       id
       name
     }

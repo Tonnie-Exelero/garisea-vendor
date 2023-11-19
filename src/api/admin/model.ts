@@ -28,8 +28,20 @@ export const GET_MODELS = gql`
 `;
 
 export const GET_FILTERED_MODELS = gql`
-  query GetFilteredModels($filter: String!) {
-    modelsFiltered(filter: $filter) {
+  query GetFilteredModels(
+    $pl: String!
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
+    modelsFiltered(
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
       edges {
         cursor
         node {
@@ -55,8 +67,8 @@ export const GET_FILTERED_MODELS = gql`
 `;
 
 export const GET_MODEL_BY_ID = gql`
-  query GetModelById($id: String!) {
-    modelById(id: $id) {
+  query GetModelById($pl: String!) {
+    modelById(pl: $pl) {
       id
       name
       slug
@@ -71,14 +83,14 @@ export const GET_MODEL_BY_ID = gql`
 
 export const GET_MODELS_BY_BRAND_ID = gql`
   query GetModels(
-    $brandId: String!
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     modelsByBrandId(
-      brandId: $brandId
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -109,18 +121,8 @@ export const GET_MODELS_BY_BRAND_ID = gql`
 `;
 
 export const CREATE_MODEL = gql`
-  mutation CreateModel(
-    $name: String!
-    $slug: String!
-    $description: String
-    $brandId: String!
-  ) {
-    createModel(
-      name: $name
-      slug: $slug
-      description: $description
-      brandId: $brandId
-    ) {
+  mutation CreateModel($pl: String!) {
+    createModel(pl: $pl) {
       id
       name
       slug
@@ -134,20 +136,8 @@ export const CREATE_MODEL = gql`
 `;
 
 export const UPDATE_MODEL = gql`
-  mutation UpdateModel(
-    $id: String!
-    $name: String
-    $slug: String
-    $description: String
-    $brandId: String
-  ) {
-    updateModel(
-      id: $id
-      name: $name
-      slug: $slug
-      description: $description
-      brandId: $brandId
-    ) {
+  mutation UpdateModel($pl: String!) {
+    updateModel(pl: $pl) {
       id
       name
       slug
@@ -161,8 +151,8 @@ export const UPDATE_MODEL = gql`
 `;
 
 export const DELETE_MODEL = gql`
-  mutation DeleteModel($id: String!) {
-    deleteModel(id: $id) {
+  mutation DeleteModel($pl: String!) {
+    deleteModel(pl: $pl) {
       id
       name
     }
