@@ -62,7 +62,7 @@ const AdminChat = () => {
 
   useEffect(() => {
     dispatch(fetchAdminVendorContacts({ vendorId: authedVendor.id }));
-  }, [dispatch, adminVendorContacts]);
+  }, [dispatch]);
 
   const handleLeftSidebarToggle = () => setLeftSidebarOpen(!leftSidebarOpen);
   const handleUserProfileLeftSidebarToggle = () =>
