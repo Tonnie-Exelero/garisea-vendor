@@ -82,13 +82,12 @@ interface InterestsState {
 export const fetchInterests = createAsyncThunk<Interest, any, {}>(
   "appInterests/fetchInterests",
   async (interestData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = interestData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = interestData && encryptData(interestData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(interestData.first && { first: interestData.first }),
+      ...(interestData.last && { last: interestData.last }),
+      ...(interestData.after && { after: interestData.after }),
+      ...(interestData.before && { before: interestData.before }),
     };
 
     try {

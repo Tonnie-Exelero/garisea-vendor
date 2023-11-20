@@ -99,7 +99,6 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
     sold,
   } = vehicle;
 
-  const vehicleImages = images && images.split(",");
   const year = yearOfFirstRegistration
     ? yearOfFirstRegistration
     : yearOfManufacture;

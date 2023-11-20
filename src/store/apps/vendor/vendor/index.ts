@@ -79,20 +79,17 @@ interface VendorsState {
 export const fetchVendors = createAsyncThunk<Vendor, any, {}>(
   "appVendors/fetchVendors",
   async (vendorData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vendorData;
-    const encryptedData = rest && encryptData(rest);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vendorData.first && { first: vendorData.first }),
+      ...(vendorData.last && { last: vendorData.last }),
+      ...(vendorData.after && { after: vendorData.after }),
+      ...(vendorData.before && { before: vendorData.before }),
     };
 
     try {
       const { data } = await apolloClient.query({
         query: GET_VENDORS,
         variables: {
-          ...(encryptedData && { pl: encryptedData }),
           ...pagination,
         },
       });
@@ -113,13 +110,12 @@ export const fetchVendors = createAsyncThunk<Vendor, any, {}>(
 export const fetchVendorsByStatus = createAsyncThunk<Vendor, any, {}>(
   "appVendors/fetchVendorsByStatus",
   async (vendorData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vendorData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = vendorData && encryptData(vendorData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vendorData.first && { first: vendorData.first }),
+      ...(vendorData.last && { last: vendorData.last }),
+      ...(vendorData.after && { after: vendorData.after }),
+      ...(vendorData.before && { before: vendorData.before }),
     };
 
     try {
@@ -147,13 +143,12 @@ export const fetchVendorsByStatus = createAsyncThunk<Vendor, any, {}>(
 export const fetchFilteredVendors = createAsyncThunk<Vendor, any, {}>(
   "appVendors/fetchFilteredVendors",
   async (vendorData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vendorData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = vendorData && encryptData(vendorData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vendorData.first && { first: vendorData.first }),
+      ...(vendorData.last && { last: vendorData.last }),
+      ...(vendorData.after && { after: vendorData.after }),
+      ...(vendorData.before && { before: vendorData.before }),
     };
 
     try {

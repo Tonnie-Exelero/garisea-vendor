@@ -61,13 +61,12 @@ interface OrganizationsState {
 export const fetchOrganizations = createAsyncThunk<Organization, any, {}>(
   "appOrganizations/fetchOrganizations",
   async (organizationData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = organizationData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = organizationData && encryptData(organizationData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(organizationData.first && { first: organizationData.first }),
+      ...(organizationData.last && { last: organizationData.last }),
+      ...(organizationData.after && { after: organizationData.after }),
+      ...(organizationData.before && { before: organizationData.before }),
     };
 
     try {
@@ -99,13 +98,12 @@ export const fetchFilteredOrganizations = createAsyncThunk<
 >(
   "appOrganizations/fetchFilteredOrganizations",
   async (organizationData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = organizationData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = organizationData && encryptData(organizationData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(organizationData.first && { first: organizationData.first }),
+      ...(organizationData.last && { last: organizationData.last }),
+      ...(organizationData.after && { after: organizationData.after }),
+      ...(organizationData.before && { before: organizationData.before }),
     };
 
     try {

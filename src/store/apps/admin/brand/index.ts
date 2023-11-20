@@ -50,13 +50,12 @@ interface BrandsState {
 export const fetchBrands = createAsyncThunk<Brand, any, {}>(
   "appBrands/fetchBrands",
   async (brandData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = brandData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = brandData && encryptData(brandData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(brandData.first && { first: brandData.first }),
+      ...(brandData.last && { last: brandData.last }),
+      ...(brandData.after && { after: brandData.after }),
+      ...(brandData.before && { before: brandData.before }),
     };
 
     try {
@@ -84,13 +83,12 @@ export const fetchBrands = createAsyncThunk<Brand, any, {}>(
 export const fetchFilteredBrands = createAsyncThunk<Brand, any, {}>(
   "appBrands/fetchFilteredBrands",
   async (brandData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = brandData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = brandData && encryptData(brandData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(brandData.first && { first: brandData.first }),
+      ...(brandData.last && { last: brandData.last }),
+      ...(brandData.after && { after: brandData.after }),
+      ...(brandData.before && { before: brandData.before }),
     };
 
     try {

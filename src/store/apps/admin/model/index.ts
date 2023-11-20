@@ -57,13 +57,12 @@ interface ModelsState {
 export const fetchModels = createAsyncThunk<Model, any, {}>(
   "appModels/fetchModels",
   async (modelData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = modelData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = modelData && encryptData(modelData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(modelData.first && { first: modelData.first }),
+      ...(modelData.last && { last: modelData.last }),
+      ...(modelData.after && { after: modelData.after }),
+      ...(modelData.before && { before: modelData.before }),
     };
 
     try {
@@ -91,13 +90,12 @@ export const fetchModels = createAsyncThunk<Model, any, {}>(
 export const fetchFilteredModels = createAsyncThunk<Model, any, {}>(
   "appModels/fetchFilteredModels",
   async (modelData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = modelData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = modelData && encryptData(modelData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(modelData.first && { first: modelData.first }),
+      ...(modelData.last && { last: modelData.last }),
+      ...(modelData.after && { after: modelData.after }),
+      ...(modelData.before && { before: modelData.before }),
     };
 
     try {
@@ -125,13 +123,12 @@ export const fetchFilteredModels = createAsyncThunk<Model, any, {}>(
 export const fetchModelsByBrand = createAsyncThunk<Model, any, {}>(
   "appModels/fetchModelsByBrand",
   async (modelData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = modelData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = modelData && encryptData(modelData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(modelData.first && { first: modelData.first }),
+      ...(modelData.last && { last: modelData.last }),
+      ...(modelData.after && { after: modelData.after }),
+      ...(modelData.before && { before: modelData.before }),
     };
 
     try {

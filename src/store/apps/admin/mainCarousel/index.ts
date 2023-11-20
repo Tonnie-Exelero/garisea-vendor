@@ -70,13 +70,12 @@ interface MainCarouselsState {
 export const fetchMainCarousels = createAsyncThunk<MainCarousel, any, {}>(
   "appMainCarousels/fetchMainCarousels",
   async (mainCarouselData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = mainCarouselData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = mainCarouselData && encryptData(mainCarouselData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(mainCarouselData.first && { first: mainCarouselData.first }),
+      ...(mainCarouselData.last && { last: mainCarouselData.last }),
+      ...(mainCarouselData.after && { after: mainCarouselData.after }),
+      ...(mainCarouselData.before && { before: mainCarouselData.before }),
     };
 
     try {
@@ -108,13 +107,12 @@ export const fetchFilteredMainCarousels = createAsyncThunk<
 >(
   "appMainCarousels/fetchFilteredMainCarousels",
   async (mainCarouselData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = mainCarouselData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = mainCarouselData && encryptData(mainCarouselData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(mainCarouselData.first && { first: mainCarouselData.first }),
+      ...(mainCarouselData.last && { last: mainCarouselData.last }),
+      ...(mainCarouselData.after && { after: mainCarouselData.after }),
+      ...(mainCarouselData.before && { before: mainCarouselData.before }),
     };
 
     try {

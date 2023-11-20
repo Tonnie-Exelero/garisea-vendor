@@ -88,13 +88,12 @@ interface VehicleReviewsState {
 export const fetchVehicleReviews = createAsyncThunk<VehicleReview, any, {}>(
   "appVehicleReviews/fetchVehicleReviews",
   async (vehicleReviewData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vehicleReviewData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = vehicleReviewData && encryptData(vehicleReviewData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vehicleReviewData.first && { first: vehicleReviewData.first }),
+      ...(vehicleReviewData.last && { last: vehicleReviewData.last }),
+      ...(vehicleReviewData.after && { after: vehicleReviewData.after }),
+      ...(vehicleReviewData.before && { before: vehicleReviewData.before }),
     };
 
     try {
@@ -122,13 +121,12 @@ export const fetchVehicleReviews = createAsyncThunk<VehicleReview, any, {}>(
 export const fetchVehicleByIdReviews = createAsyncThunk<VehicleReview, any, {}>(
   "appVehicleReviews/fetchVehicleByIdReviews",
   async (vehicleReviewData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vehicleReviewData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = vehicleReviewData && encryptData(vehicleReviewData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vehicleReviewData.first && { first: vehicleReviewData.first }),
+      ...(vehicleReviewData.last && { last: vehicleReviewData.last }),
+      ...(vehicleReviewData.after && { after: vehicleReviewData.after }),
+      ...(vehicleReviewData.before && { before: vehicleReviewData.before }),
     };
 
     try {
@@ -172,13 +170,12 @@ export const fetchVehicleReviewsStarsAvg = createAsyncThunk<
 >(
   "appVehicleReviews/fetchVehicleReviewsStarsAvg",
   async (vehicleReviewData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vehicleReviewData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = vehicleReviewData && encryptData(vehicleReviewData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vehicleReviewData.first && { first: vehicleReviewData.first }),
+      ...(vehicleReviewData.last && { last: vehicleReviewData.last }),
+      ...(vehicleReviewData.after && { after: vehicleReviewData.after }),
+      ...(vehicleReviewData.before && { before: vehicleReviewData.before }),
     };
 
     try {

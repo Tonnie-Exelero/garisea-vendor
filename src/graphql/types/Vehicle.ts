@@ -202,66 +202,30 @@ builder.queryFields((t) => ({
       });
     },
   }),
-  vehiclesAdminCount: t.prismaField({
-    type: Vehicle,
-    nullable: true,
-    resolve: async (
-      _query,
-      _parent,
-      _args,
-      _info
-    ): Promise<any | undefined> => {
-      const active = await prisma.vehicle.count({
-        where: {
-          status: "active",
-        },
-      });
-
-      const pending = await prisma.vehicle.count({
-        where: {
-          status: "pending",
-        },
-      });
-
-      const declined = await prisma.vehicle.count({
-        where: {
-          status: "declined",
-        },
-      });
-
-      const stats = { active, pending, declined };
-
-      return {
-        dt: JSON.stringify(stats),
-      };
-    },
-  }),
   vehiclesCount: t.prismaField({
     type: Vehicle,
     nullable: true,
     args: {
-      pl: t.arg.string(),
+      vendorId: t.arg.string(),
     },
     resolve: async (_query, _parent, args, _info): Promise<any | undefined> => {
-      const payload = args && args.pl && decryptData(args.pl);
-
       const active = await prisma.vehicle.count({
         where: {
-          ...(payload && payload.vendorId && { vendorId: payload.vendorId }),
+          ...(args && args.vendorId && { vendorId: args.vendorId }),
           status: "active",
         },
       });
 
       const pending = await prisma.vehicle.count({
         where: {
-          ...(payload && payload.vendorId && { vendorId: payload.vendorId }),
+          ...(args && args.vendorId && { vendorId: args.vendorId }),
           status: "pending",
         },
       });
 
       const declined = await prisma.vehicle.count({
         where: {
-          ...(payload && payload.vendorId && { vendorId: payload.vendorId }),
+          ...(args && args.vendorId && { vendorId: args.vendorId }),
           status: "declined",
         },
       });
@@ -1275,6 +1239,8 @@ builder.mutationFields((t) => ({
         registered,
         registrationNo,
         condition,
+        viewingLocation,
+        vehicleOriginCountry,
         mileage,
         mileageMetric,
         listingPrice,
@@ -1306,6 +1272,10 @@ builder.mutationFields((t) => ({
           registered: registered ? registered : undefined,
           registrationNo: registrationNo ? registrationNo : undefined,
           condition: condition ? condition : undefined,
+          viewingLocation: viewingLocation ? viewingLocation : undefined,
+          vehicleOriginCountry: vehicleOriginCountry
+            ? vehicleOriginCountry
+            : undefined,
           mileage: mileage ? mileage : undefined,
           mileageMetric: mileageMetric ? mileageMetric : undefined,
           listingPrice: listingPrice ? listingPrice : undefined,

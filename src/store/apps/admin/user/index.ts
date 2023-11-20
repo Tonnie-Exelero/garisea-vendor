@@ -67,13 +67,12 @@ interface UsersState {
 export const fetchUsers = createAsyncThunk<User, any, {}>(
   "appUsers/fetchUsers",
   async (userData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = userData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = userData && encryptData(userData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(userData.first && { first: userData.first }),
+      ...(userData.last && { last: userData.last }),
+      ...(userData.after && { after: userData.after }),
+      ...(userData.before && { before: userData.before }),
     };
 
     try {
@@ -101,13 +100,12 @@ export const fetchUsers = createAsyncThunk<User, any, {}>(
 export const fetchFilteredUsers = createAsyncThunk<User, any, {}>(
   "appUsers/fetchFilteredUsers",
   async (userData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = userData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = userData && encryptData(userData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(userData.first && { first: userData.first }),
+      ...(userData.last && { last: userData.last }),
+      ...(userData.after && { after: userData.after }),
+      ...(userData.before && { before: userData.before }),
     };
 
     try {
@@ -135,13 +133,12 @@ export const fetchFilteredUsers = createAsyncThunk<User, any, {}>(
 export const fetchUsersByRole = createAsyncThunk<User, any, {}>(
   "appUsers/fetchUsersByRole",
   async (userData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = userData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = userData && encryptData(userData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(userData.first && { first: userData.first }),
+      ...(userData.last && { last: userData.last }),
+      ...(userData.after && { after: userData.after }),
+      ...(userData.before && { before: userData.before }),
     };
 
     try {
@@ -169,13 +166,12 @@ export const fetchUsersByRole = createAsyncThunk<User, any, {}>(
 export const fetchUsersByStatus = createAsyncThunk<User, any, {}>(
   "appUsers/fetchUsersByStatus",
   async (userData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = userData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = userData && encryptData(userData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(userData.first && { first: userData.first }),
+      ...(userData.last && { last: userData.last }),
+      ...(userData.after && { after: userData.after }),
+      ...(userData.before && { before: userData.before }),
     };
 
     try {

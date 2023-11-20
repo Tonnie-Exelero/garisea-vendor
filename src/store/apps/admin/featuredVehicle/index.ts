@@ -81,13 +81,13 @@ interface FeaturedVehiclesState {
 export const fetchFeaturedVehicles = createAsyncThunk<FeaturedVehicle, any, {}>(
   "appFeaturedVehicles/fetchFeaturedVehicles",
   async (featuredVehicleData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = featuredVehicleData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData =
+      featuredVehicleData && encryptData(featuredVehicleData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(featuredVehicleData.first && { first: featuredVehicleData.first }),
+      ...(featuredVehicleData.last && { last: featuredVehicleData.last }),
+      ...(featuredVehicleData.after && { after: featuredVehicleData.after }),
+      ...(featuredVehicleData.before && { before: featuredVehicleData.before }),
     };
 
     try {
@@ -119,13 +119,13 @@ export const fetchFilteredFeaturedVehicles = createAsyncThunk<
 >(
   "appFeaturedVehicles/fetchFilteredFeaturedVehicles",
   async (featuredVehicleData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = featuredVehicleData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData =
+      featuredVehicleData && encryptData(featuredVehicleData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(featuredVehicleData.first && { first: featuredVehicleData.first }),
+      ...(featuredVehicleData.last && { last: featuredVehicleData.last }),
+      ...(featuredVehicleData.after && { after: featuredVehicleData.after }),
+      ...(featuredVehicleData.before && { before: featuredVehicleData.before }),
     };
 
     try {

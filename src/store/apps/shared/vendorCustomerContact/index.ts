@@ -82,13 +82,21 @@ export const fetchVendorCustomerContacts = createAsyncThunk<
 >(
   "appVendorCustomerContacts/fetchVendorCustomerContacts",
   async (vendorCustomerContactData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vendorCustomerContactData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData =
+      vendorCustomerContactData && encryptData(vendorCustomerContactData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vendorCustomerContactData.first && {
+        first: vendorCustomerContactData.first,
+      }),
+      ...(vendorCustomerContactData.last && {
+        last: vendorCustomerContactData.last,
+      }),
+      ...(vendorCustomerContactData.after && {
+        after: vendorCustomerContactData.after,
+      }),
+      ...(vendorCustomerContactData.before && {
+        before: vendorCustomerContactData.before,
+      }),
     };
 
     try {
@@ -120,13 +128,21 @@ export const fetchVendorCustomerContactsByIds = createAsyncThunk<
 >(
   "appVendorCustomerContacts/fetchVendorCustomerContactsByIds",
   async (vendorCustomerContactData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vendorCustomerContactData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData =
+      vendorCustomerContactData && encryptData(vendorCustomerContactData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vendorCustomerContactData.first && {
+        first: vendorCustomerContactData.first,
+      }),
+      ...(vendorCustomerContactData.last && {
+        last: vendorCustomerContactData.last,
+      }),
+      ...(vendorCustomerContactData.after && {
+        after: vendorCustomerContactData.after,
+      }),
+      ...(vendorCustomerContactData.before && {
+        before: vendorCustomerContactData.before,
+      }),
     };
 
     try {

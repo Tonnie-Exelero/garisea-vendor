@@ -53,13 +53,12 @@ interface PermissionsState {
 export const fetchPermissions = createAsyncThunk<Permission, any, {}>(
   "appPermissions/fetchPermissions",
   async (permissionData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = permissionData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = permissionData && encryptData(permissionData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(permissionData.first && { first: permissionData.first }),
+      ...(permissionData.last && { last: permissionData.last }),
+      ...(permissionData.after && { after: permissionData.after }),
+      ...(permissionData.before && { before: permissionData.before }),
     };
 
     try {
@@ -87,13 +86,12 @@ export const fetchPermissions = createAsyncThunk<Permission, any, {}>(
 export const fetchFilteredPermissions = createAsyncThunk<Permission, any, {}>(
   "appPermissions/fetchFilteredPermissions",
   async (permissionData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = permissionData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = permissionData && encryptData(permissionData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(permissionData.first && { first: permissionData.first }),
+      ...(permissionData.last && { last: permissionData.last }),
+      ...(permissionData.after && { after: permissionData.after }),
+      ...(permissionData.before && { before: permissionData.before }),
     };
 
     try {

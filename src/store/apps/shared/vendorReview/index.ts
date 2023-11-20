@@ -71,13 +71,12 @@ interface VendorReviewsState {
 export const fetchVendorReviews = createAsyncThunk<VendorReview, any, {}>(
   "appVendorReviews/fetchVendorReviews",
   async (vendorReviewData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vendorReviewData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = vendorReviewData && encryptData(vendorReviewData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vendorReviewData.first && { first: vendorReviewData.first }),
+      ...(vendorReviewData.last && { last: vendorReviewData.last }),
+      ...(vendorReviewData.after && { after: vendorReviewData.after }),
+      ...(vendorReviewData.before && { before: vendorReviewData.before }),
     };
 
     try {
@@ -105,13 +104,12 @@ export const fetchVendorReviews = createAsyncThunk<VendorReview, any, {}>(
 export const fetchVendorByIdReviews = createAsyncThunk<VendorReview, any, {}>(
   "appVendorReviews/fetchVendorByIdReviews",
   async (vendorReviewData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vendorReviewData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = vendorReviewData && encryptData(vendorReviewData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vendorReviewData.first && { first: vendorReviewData.first }),
+      ...(vendorReviewData.last && { last: vendorReviewData.last }),
+      ...(vendorReviewData.after && { after: vendorReviewData.after }),
+      ...(vendorReviewData.before && { before: vendorReviewData.before }),
     };
 
     try {
@@ -155,13 +153,12 @@ export const fetchVendorReviewsStarsAvg = createAsyncThunk<
 >(
   "appVendorReviews/fetchVendorReviewsStarsAvg",
   async (vendorReviewData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vendorReviewData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = vendorReviewData && encryptData(vendorReviewData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vendorReviewData.first && { first: vendorReviewData.first }),
+      ...(vendorReviewData.last && { last: vendorReviewData.last }),
+      ...(vendorReviewData.after && { after: vendorReviewData.after }),
+      ...(vendorReviewData.before && { before: vendorReviewData.before }),
     };
 
     try {

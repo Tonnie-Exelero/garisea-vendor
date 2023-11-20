@@ -68,13 +68,12 @@ export const fetchAdminVendorContacts = createAsyncThunk<
 >(
   "appAdminVendorContacts/fetchAdminVendorContacts",
   async (adminVendorContactData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = adminVendorContactData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = adminVendorContactData && encryptData(adminVendorContactData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(adminVendorContactData.first && { first: adminVendorContactData.first }),
+      ...(adminVendorContactData.last && { last: adminVendorContactData.last }),
+      ...(adminVendorContactData.after && { after: adminVendorContactData.after }),
+      ...(adminVendorContactData.before && { before: adminVendorContactData.before }),
     };
 
     try {
@@ -106,13 +105,12 @@ export const fetchAdminVendorContactsByIds = createAsyncThunk<
 >(
   "appAdminVendorContacts/fetchAdminVendorContactsByIds",
   async (adminVendorContactData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = adminVendorContactData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = adminVendorContactData && encryptData(adminVendorContactData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(adminVendorContactData.first && { first: adminVendorContactData.first }),
+      ...(adminVendorContactData.last && { last: adminVendorContactData.last }),
+      ...(adminVendorContactData.after && { after: adminVendorContactData.after }),
+      ...(adminVendorContactData.before && { before: adminVendorContactData.before }),
     };
 
     try {

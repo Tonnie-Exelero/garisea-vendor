@@ -117,6 +117,7 @@ export const fetchVehicleById = createAsyncThunk<Vehicle, { id: string }, {}>(
       const { data } = await apolloClient.query({
         query: GET_VEHICLE_BY_ID,
         variables: { pl: encryptedData },
+        fetchPolicy: "no-cache",
       });
 
       return data;

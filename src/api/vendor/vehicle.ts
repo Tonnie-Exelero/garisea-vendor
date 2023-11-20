@@ -391,17 +391,9 @@ export const GET_VEHICLES_BY_VENDOR_ID = gql`
   }
 `;
 
-export const GET_VEHICLES_STATS_ADMIN = gql`
-  query GetVehiclesStatsByVendorId {
-    vehiclesAdminCount {
-      dt
-    }
-  }
-`;
-
 export const GET_VEHICLES_STATS_BY_VENDOR_ID = gql`
-  query GetVehiclesStatsByVendorId($pl: String) {
-    vehiclesCount(pl: $pl) {
+  query GetVehiclesStatsByVendorId($vendorId: String) {
+    vehiclesCount(vendorId: $vendorId) {
       dt
     }
   }

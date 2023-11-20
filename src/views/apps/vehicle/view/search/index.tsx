@@ -112,7 +112,7 @@ const VehicleSearch = (props: Props) => {
 
   useEffect(() => {
     dispatch(fetchBrands({ first: 100 }));
-  }, [dispatch, brands]);
+  }, [dispatch]);
 
   const handleSearch = () => {
     const searchParams = {

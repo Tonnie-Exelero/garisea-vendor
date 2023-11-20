@@ -64,13 +64,12 @@ interface RolesState {
 export const fetchRoles = createAsyncThunk<Role, any, {}>(
   "appRoles/fetchRoles",
   async (roleData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = roleData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = roleData && encryptData(roleData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(roleData.first && { first: roleData.first }),
+      ...(roleData.last && { last: roleData.last }),
+      ...(roleData.after && { after: roleData.after }),
+      ...(roleData.before && { before: roleData.before }),
     };
 
     try {
@@ -98,13 +97,12 @@ export const fetchRoles = createAsyncThunk<Role, any, {}>(
 export const fetchFilteredRoles = createAsyncThunk<Role, any, {}>(
   "appRoles/fetchFilteredRoles",
   async (roleData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = roleData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = roleData && encryptData(roleData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(roleData.first && { first: roleData.first }),
+      ...(roleData.last && { last: roleData.last }),
+      ...(roleData.after && { after: roleData.after }),
+      ...(roleData.before && { before: roleData.before }),
     };
 
     try {

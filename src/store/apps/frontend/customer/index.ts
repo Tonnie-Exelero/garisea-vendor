@@ -63,13 +63,12 @@ interface CustomersState {
 export const fetchCustomers = createAsyncThunk<Customer, any, {}>(
   "appCustomers/fetchCustomers",
   async (customerData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = customerData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = customerData && encryptData(customerData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(customerData.first && { first: customerData.first }),
+      ...(customerData.last && { last: customerData.last }),
+      ...(customerData.after && { after: customerData.after }),
+      ...(customerData.before && { before: customerData.before }),
     };
 
     try {
@@ -97,13 +96,12 @@ export const fetchCustomers = createAsyncThunk<Customer, any, {}>(
 export const fetchCustomersByStatus = createAsyncThunk<Customer, any, {}>(
   "appCustomers/fetchCustomersByStatus",
   async (customerData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = customerData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = customerData && encryptData(customerData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(customerData.first && { first: customerData.first }),
+      ...(customerData.last && { last: customerData.last }),
+      ...(customerData.after && { after: customerData.after }),
+      ...(customerData.before && { before: customerData.before }),
     };
 
     try {
@@ -131,13 +129,12 @@ export const fetchCustomersByStatus = createAsyncThunk<Customer, any, {}>(
 export const fetchFilteredCustomers = createAsyncThunk<Customer, any, {}>(
   "appCustomers/fetchFilteredCustomers",
   async (customerData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = customerData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = customerData && encryptData(customerData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(customerData.first && { first: customerData.first }),
+      ...(customerData.last && { last: customerData.last }),
+      ...(customerData.after && { after: customerData.after }),
+      ...(customerData.before && { before: customerData.before }),
     };
 
     try {

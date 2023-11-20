@@ -62,13 +62,19 @@ export const fetchAdminVendorMessages = createAsyncThunk<
 >(
   "appAdminVendorMessages/fetchAdminVendorMessages",
   async (adminVendorMessageData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = adminVendorMessageData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData =
+      adminVendorMessageData && encryptData(adminVendorMessageData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(adminVendorMessageData.first && {
+        first: adminVendorMessageData.first,
+      }),
+      ...(adminVendorMessageData.last && { last: adminVendorMessageData.last }),
+      ...(adminVendorMessageData.after && {
+        after: adminVendorMessageData.after,
+      }),
+      ...(adminVendorMessageData.before && {
+        before: adminVendorMessageData.before,
+      }),
     };
 
     try {
@@ -100,13 +106,19 @@ export const fetchMoreAdminVendorMessages = createAsyncThunk<
 >(
   "appAdminVendorMessages/fetchMoreAdminVendorMessages",
   async (adminVendorMessageData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = adminVendorMessageData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData =
+      adminVendorMessageData && encryptData(adminVendorMessageData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(adminVendorMessageData.first && {
+        first: adminVendorMessageData.first,
+      }),
+      ...(adminVendorMessageData.last && { last: adminVendorMessageData.last }),
+      ...(adminVendorMessageData.after && {
+        after: adminVendorMessageData.after,
+      }),
+      ...(adminVendorMessageData.before && {
+        before: adminVendorMessageData.before,
+      }),
     };
 
     try {

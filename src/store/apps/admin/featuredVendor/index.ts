@@ -76,13 +76,12 @@ interface FeaturedVendorsState {
 export const fetchFeaturedVendors = createAsyncThunk<FeaturedVendor, any, {}>(
   "appFeaturedVendors/fetchFeaturedVendors",
   async (featuredVendorData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = featuredVendorData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = featuredVendorData && encryptData(featuredVendorData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(featuredVendorData.first && { first: featuredVendorData.first }),
+      ...(featuredVendorData.last && { last: featuredVendorData.last }),
+      ...(featuredVendorData.after && { after: featuredVendorData.after }),
+      ...(featuredVendorData.before && { before: featuredVendorData.before }),
     };
 
     try {
@@ -114,13 +113,12 @@ export const fetchFilteredFeaturedVendors = createAsyncThunk<
 >(
   "appFeaturedVendors/fetchFilteredFeaturedVendors",
   async (featuredVendorData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = featuredVendorData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = featuredVendorData && encryptData(featuredVendorData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(featuredVendorData.first && { first: featuredVendorData.first }),
+      ...(featuredVendorData.last && { last: featuredVendorData.last }),
+      ...(featuredVendorData.after && { after: featuredVendorData.after }),
+      ...(featuredVendorData.before && { before: featuredVendorData.before }),
     };
 
     try {

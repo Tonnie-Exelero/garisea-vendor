@@ -83,6 +83,7 @@ import { idleTimer } from "@src/configs/idleOrReload";
 import { AbilityContext } from "src/layouts/components/acl/Can";
 import { removeFile } from "@core/utils/file-manager";
 import { encryptData } from "@core/utils/encryption";
+import { GET_VENDORS } from "@src/api/vendor/vendor";
 
 const PAGE_SIZE = 20;
 
@@ -412,27 +413,25 @@ const VehiclesList = (props: Partial<Props>) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const ability = useContext(AbilityContext);
-  const { vendors } = useSelector((state: RootState) => state.vendors);
 
   useEffect(() => {
-    dispatch(fetchVendors({ first: 100 }));
     handleGetVehiclesCount();
-  }, [dispatch, vendors]);
+  }, [vendorId]);
 
   const handleGetVehiclesCount = useCallback(async () => {
     const { data } = await apolloClient.query({
       query: GET_VEHICLES_STATS_BY_VENDOR_ID,
       variables: {
-        pl: encryptData({ vendorId }),
+        vendorId,
       },
       fetchPolicy: "no-cache",
     });
 
     const {
-      vehiclesCount: { vehicleVerified },
+      vehiclesCount: { dt },
     }: any = data;
 
-    setVehiclesCount(JSON.parse(vehicleVerified));
+    setVehiclesCount(JSON.parse(dt));
   }, []);
 
   const handleAccordionChange =

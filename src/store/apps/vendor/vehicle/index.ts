@@ -122,13 +122,12 @@ interface VehiclesState {
 export const fetchVehicles = createAsyncThunk<Vehicle, any, {}>(
   "appVehicles/fetchVehicles",
   async (vehicleData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vehicleData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = vehicleData && encryptData(vehicleData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vehicleData.first && { first: vehicleData.first }),
+      ...(vehicleData.last && { last: vehicleData.last }),
+      ...(vehicleData.after && { after: vehicleData.after }),
+      ...(vehicleData.before && { before: vehicleData.before }),
     };
 
     try {
@@ -156,13 +155,12 @@ export const fetchVehicles = createAsyncThunk<Vehicle, any, {}>(
 export const fetchVehiclesByVendor = createAsyncThunk<Vehicle, any, {}>(
   "appVehicles/fetchVehiclesByVendor",
   async (vehicleData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vehicleData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = vehicleData && encryptData(vehicleData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vehicleData.first && { first: vehicleData.first }),
+      ...(vehicleData.last && { last: vehicleData.last }),
+      ...(vehicleData.after && { after: vehicleData.after }),
+      ...(vehicleData.before && { before: vehicleData.before }),
     };
 
     try {
@@ -190,13 +188,12 @@ export const fetchVehiclesByVendor = createAsyncThunk<Vehicle, any, {}>(
 export const fetchFilteredVehicles = createAsyncThunk<Vehicle, any, {}>(
   "appVehicles/fetchFilteredVehicles",
   async (vehicleData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vehicleData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = vehicleData && encryptData(vehicleData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vehicleData.first && { first: vehicleData.first }),
+      ...(vehicleData.last && { last: vehicleData.last }),
+      ...(vehicleData.after && { after: vehicleData.after }),
+      ...(vehicleData.before && { before: vehicleData.before }),
     };
 
     try {

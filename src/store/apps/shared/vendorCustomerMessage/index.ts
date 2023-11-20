@@ -65,13 +65,21 @@ export const fetchVendorCustomerMessages = createAsyncThunk<
 >(
   "appVendorCustomerMessages/fetchVendorCustomerMessages",
   async (vendorCustomerMessageData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = vendorCustomerMessageData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData =
+      vendorCustomerMessageData && encryptData(vendorCustomerMessageData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(vendorCustomerMessageData.first && {
+        first: vendorCustomerMessageData.first,
+      }),
+      ...(vendorCustomerMessageData.last && {
+        last: vendorCustomerMessageData.last,
+      }),
+      ...(vendorCustomerMessageData.after && {
+        after: vendorCustomerMessageData.after,
+      }),
+      ...(vendorCustomerMessageData.before && {
+        before: vendorCustomerMessageData.before,
+      }),
     };
 
     try {

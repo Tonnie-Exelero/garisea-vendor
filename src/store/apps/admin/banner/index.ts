@@ -67,13 +67,12 @@ interface BannersState {
 export const fetchBanners = createAsyncThunk<Banner, any, {}>(
   "appBanners/fetchBanners",
   async (bannerData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = bannerData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = bannerData && encryptData(bannerData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(bannerData.first && { first: bannerData.first }),
+      ...(bannerData.last && { last: bannerData.last }),
+      ...(bannerData.after && { after: bannerData.after }),
+      ...(bannerData.before && { before: bannerData.before }),
     };
 
     try {
@@ -101,13 +100,12 @@ export const fetchBanners = createAsyncThunk<Banner, any, {}>(
 export const fetchFilteredBanners = createAsyncThunk<Banner, any, {}>(
   "appBanners/fetchFilteredBanners",
   async (bannerData, { rejectWithValue }) => {
-    const { first, last, after, before, ...rest } = bannerData;
-    const encryptedData = rest && encryptData(rest);
+    const encryptedData = bannerData && encryptData(bannerData);
     const pagination = {
-      ...(first && { first }),
-      ...(last && { last }),
-      ...(after && { after }),
-      ...(before && { before }),
+      ...(bannerData.first && { first: bannerData.first }),
+      ...(bannerData.last && { last: bannerData.last }),
+      ...(bannerData.after && { after: bannerData.after }),
+      ...(bannerData.before && { before: bannerData.before }),
     };
 
     try {
