@@ -10,6 +10,7 @@ import {
 
 // ** Others
 import { FeaturedVendor } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const featuredVendorsInitialState = {
@@ -18,6 +19,7 @@ const featuredVendorsInitialState = {
       cursor: "",
       node: {
         id: "",
+        status: "",
         vendor: {
           id: "",
           storeLink: "",
@@ -74,10 +76,21 @@ interface FeaturedVendorsState {
 export const fetchFeaturedVendors = createAsyncThunk<FeaturedVendor, any, {}>(
   "appFeaturedVendors/fetchFeaturedVendors",
   async (featuredVendorData, { rejectWithValue }) => {
+    const encryptedData = featuredVendorData && encryptData(featuredVendorData);
+    const pagination = {
+      ...(featuredVendorData.first && { first: featuredVendorData.first }),
+      ...(featuredVendorData.last && { last: featuredVendorData.last }),
+      ...(featuredVendorData.after && { after: featuredVendorData.after }),
+      ...(featuredVendorData.before && { before: featuredVendorData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FEATURED_VENDORS,
-        variables: featuredVendorData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -100,10 +113,21 @@ export const fetchFilteredFeaturedVendors = createAsyncThunk<
 >(
   "appFeaturedVendors/fetchFilteredFeaturedVendors",
   async (featuredVendorData, { rejectWithValue }) => {
+    const encryptedData = featuredVendorData && encryptData(featuredVendorData);
+    const pagination = {
+      ...(featuredVendorData.first && { first: featuredVendorData.first }),
+      ...(featuredVendorData.last && { last: featuredVendorData.last }),
+      ...(featuredVendorData.after && { after: featuredVendorData.after }),
+      ...(featuredVendorData.before && { before: featuredVendorData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_FEATURED_VENDORS,
-        variables: featuredVendorData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

@@ -15,6 +15,7 @@ import {
 
 // ** Others
 import { Customer } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state
 const customerInitialState = {
@@ -38,10 +39,12 @@ const customerInitialState = {
 export const fetchCustomerById = createAsyncThunk<Customer, { id: string }, {}>(
   "appCustomer/fetchCustomerById",
   async (id, { rejectWithValue }) => {
+    const encryptedData = encryptData(id);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_CUSTOMER_BY_ID,
-        variables: { ...id },
+        variables: { pl: encryptedData },
         fetchPolicy: "no-cache",
       });
 
@@ -63,10 +66,12 @@ export const fetchCustomerByEmail = createAsyncThunk<
   { email: string },
   {}
 >("appCustomer/fetchCustomerByEmail", async (email, { rejectWithValue }) => {
+  const encryptedData = encryptData(email);
+
   try {
     const { data } = await apolloClient.query({
       query: GET_CUSTOMER_BY_EMAIL,
-      variables: { ...email },
+      variables: { pl: encryptedData },
     });
 
     return data;
@@ -84,10 +89,12 @@ export const fetchCustomerByEmail = createAsyncThunk<
 export const addCustomer = createAsyncThunk<Customer, Partial<Customer>, {}>(
   "appCustomer/addCustomer",
   async (customerData, { rejectWithValue }) => {
+    const encryptedData = encryptData(customerData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_CUSTOMER,
-        variables: { ...customerData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -106,10 +113,12 @@ export const addCustomer = createAsyncThunk<Customer, Partial<Customer>, {}>(
 export const editCustomer = createAsyncThunk<Customer, Partial<Customer>, {}>(
   "appCustomer/editCustomer",
   async (customerData, { rejectWithValue }) => {
+    const encryptedData = encryptData(customerData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_CUSTOMER,
-        variables: { ...customerData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -128,10 +137,12 @@ export const editCustomer = createAsyncThunk<Customer, Partial<Customer>, {}>(
 export const editPassword = createAsyncThunk<Customer, Partial<Customer>, {}>(
   "appCustomer/editPassword",
   async (customerData, { rejectWithValue }) => {
+    const encryptedData = encryptData(customerData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_PASSWORD,
-        variables: { ...customerData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -154,10 +165,12 @@ export const editEmailVerified = createAsyncThunk<
 >(
   "appCustomer/editEmailVerified",
   async (customerData, { rejectWithValue }) => {
+    const encryptedData = encryptData(customerData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_EMAIL_VERIFIED,
-        variables: { ...customerData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -176,10 +189,12 @@ export const editEmailVerified = createAsyncThunk<
 export const removeCustomer = createAsyncThunk<Customer, Partial<Customer>, {}>(
   "appCustomer/removeCustomer",
   async (customerData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: customerData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_CUSTOMER,
-        variables: { id: customerData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;

@@ -7,6 +7,7 @@ import { CREATE_ROLE, UPDATE_ROLE, DELETE_ROLE } from "@api/admin/role";
 
 // ** Others
 import { Role } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const roleInitialState = {
@@ -38,10 +39,12 @@ const roleInitialState = {
 export const addRole = createAsyncThunk<Role, Partial<Role>, {}>(
   "appRole/addRole",
   async (roleData, { rejectWithValue }) => {
+    const encryptedData = encryptData(roleData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_ROLE,
-        variables: { ...roleData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -60,10 +63,12 @@ export const addRole = createAsyncThunk<Role, Partial<Role>, {}>(
 export const editRole = createAsyncThunk<Role, Partial<Role>, {}>(
   "appRole/editRole",
   async (roleData, { rejectWithValue }) => {
+    const encryptedData = encryptData(roleData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_ROLE,
-        variables: { ...roleData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -82,10 +87,12 @@ export const editRole = createAsyncThunk<Role, Partial<Role>, {}>(
 export const removeRole = createAsyncThunk<Role, Partial<Role>, {}>(
   "appRole/removeRole",
   async (roleData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: roleData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_ROLE,
-        variables: { id: roleData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;

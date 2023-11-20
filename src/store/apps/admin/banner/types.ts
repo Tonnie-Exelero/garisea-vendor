@@ -1,5 +1,9 @@
+import { Vendor } from "../../vendor/vendor/types";
+
 export interface Banner {
   id: string;
+  vendor: Partial<Vendor>;
+  status: string;
   type: string;
   title: string;
   link: string;

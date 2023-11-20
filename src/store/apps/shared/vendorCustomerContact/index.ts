@@ -10,6 +10,7 @@ import {
 
 // ** Others
 import { VendorCustomerContact } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const vendorCustomerContactsInitialState = {
@@ -81,10 +82,30 @@ export const fetchVendorCustomerContacts = createAsyncThunk<
 >(
   "appVendorCustomerContacts/fetchVendorCustomerContacts",
   async (vendorCustomerContactData, { rejectWithValue }) => {
+    const encryptedData =
+      vendorCustomerContactData && encryptData(vendorCustomerContactData);
+    const pagination = {
+      ...(vendorCustomerContactData.first && {
+        first: vendorCustomerContactData.first,
+      }),
+      ...(vendorCustomerContactData.last && {
+        last: vendorCustomerContactData.last,
+      }),
+      ...(vendorCustomerContactData.after && {
+        after: vendorCustomerContactData.after,
+      }),
+      ...(vendorCustomerContactData.before && {
+        before: vendorCustomerContactData.before,
+      }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_CONTACTS,
-        variables: vendorCustomerContactData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -107,10 +128,30 @@ export const fetchVendorCustomerContactsByIds = createAsyncThunk<
 >(
   "appVendorCustomerContacts/fetchVendorCustomerContactsByIds",
   async (vendorCustomerContactData, { rejectWithValue }) => {
+    const encryptedData =
+      vendorCustomerContactData && encryptData(vendorCustomerContactData);
+    const pagination = {
+      ...(vendorCustomerContactData.first && {
+        first: vendorCustomerContactData.first,
+      }),
+      ...(vendorCustomerContactData.last && {
+        last: vendorCustomerContactData.last,
+      }),
+      ...(vendorCustomerContactData.after && {
+        after: vendorCustomerContactData.after,
+      }),
+      ...(vendorCustomerContactData.before && {
+        before: vendorCustomerContactData.before,
+      }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_CONTACTS_BY_IDS,
-        variables: vendorCustomerContactData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

@@ -3,7 +3,7 @@ import * as jwt from "jsonwebtoken";
 import prisma from "@lib/prisma";
 import { APP_SECRET } from "@graphql/utils/auth";
 import { builder } from "../builder";
-import { encryptData } from "@utils/encryption";
+import { decryptData, encryptData } from "@utils/encryption";
 
 export const Vendor = builder.prismaObject("Vendor", {
   fields: (t) => ({
@@ -30,6 +30,8 @@ export const Vendor = builder.prismaObject("Vendor", {
     organization: t.relation("organization", { nullable: true }),
     impressions: t.exposeInt("impressions", { nullable: true }),
     pageOpened: t.exposeInt("pageOpened", { nullable: true }),
+    pl: t.exposeString("pl", { nullable: true }),
+    dt: t.exposeString("dt", { nullable: true }),
   }),
 });
 
@@ -40,6 +42,9 @@ builder.queryFields((t) => ({
     resolve: async (query, _parent, _args, _ctx, _info) => {
       return await prisma.vendor.findMany({
         ...query,
+        include: {
+          organization: true,
+        },
         orderBy: {
           firstName: "asc",
         },
@@ -52,139 +57,191 @@ builder.queryFields((t) => ({
     type: Vendor,
     cursor: "id",
     args: {
-      status: t.arg.string({ required: true }),
-      hasVehicles: t.arg.string(),
-      orderBy: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
-      const { status, hasVehicles, orderBy } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { status } = payload;
 
       return await prisma.vendor.findMany({
         ...query,
         where: {
           status,
-          ...(hasVehicles === "yes" && {
+          ...(payload.hasVehicles === "yes" && {
             Vehicle: {
               some: {},
             },
           }),
         },
+        include: {
+          organization: true,
+        },
         orderBy: {
-          ...(orderBy === "random" ? { id: "desc" } : { firstName: "asc" }),
+          ...(payload.orderBy === "random"
+            ? { id: "desc" }
+            : { firstName: "asc" }),
         },
       });
     },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.vendor.count({
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { status } = payload;
+
+      return await prisma.vendor.count({
         ...connection,
         where: {
-          status: args.status,
-          ...(args.hasVehicles === "yes" && {
+          status,
+          ...(payload.hasVehicles === "yes" && {
             Vehicle: {
               some: {},
             },
           }),
         },
-      }),
+      });
+    },
   }),
   vendorsFiltered: t.prismaConnection({
     type: Vendor,
     cursor: "id",
     args: {
-      filter: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { filter } = payload;
+
       const where = {
         OR: [
-          { id: { contains: args.filter } },
-          { firstName: { contains: args.filter } },
-          { lastName: { contains: args.filter } },
-          { username: { contains: args.filter } },
-          { email: { contains: args.filter } },
-          { phone: { contains: args.filter } },
-          { city: { contains: args.filter } },
-          { country: { contains: args.filter } },
+          { id: { contains: filter } },
+          { firstName: { contains: filter } },
+          { lastName: { contains: filter } },
+          { username: { contains: filter } },
+          { email: { contains: filter } },
+          { phone: { contains: filter } },
+          { city: { contains: filter } },
+          { country: { contains: filter } },
         ],
       };
 
       return await prisma.vendor.findMany({
         ...query,
-        where,
+        ...(payload && { where }),
+        include: {
+          organization: true,
+        },
         orderBy: {
           firstName: "asc",
         },
       });
     },
     totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { filter } = payload;
+
       const where = {
         OR: [
-          { id: { contains: args.filter } },
-          { firstName: { contains: args.filter } },
-          { lastName: { contains: args.filter } },
-          { username: { contains: args.filter } },
-          { email: { contains: args.filter } },
-          { phone: { contains: args.filter } },
-          { city: { contains: args.filter } },
-          { country: { contains: args.filter } },
+          { id: { contains: filter } },
+          { firstName: { contains: filter } },
+          { lastName: { contains: filter } },
+          { username: { contains: filter } },
+          { email: { contains: filter } },
+          { phone: { contains: filter } },
+          { city: { contains: filter } },
+          { country: { contains: filter } },
         ],
       };
 
-      return await prisma.vendor.count({ ...connection, where });
+      return await prisma.vendor.count({
+        ...connection,
+        ...(payload && { where }),
+      });
     },
   }),
   vendorById: t.prismaField({
     type: Vendor,
     nullable: true,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.vendor.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.vendor.findUnique({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+        include: {
+          organization: true,
+        },
+      });
+    },
   }),
   vendorByEmail: t.prismaField({
     type: Vendor,
     nullable: true,
     args: {
-      email: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.vendor.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { email } = payload;
+
+      return await prisma.vendor.findUnique({
         ...query,
         where: {
-          email: args.email,
+          email,
         },
-      }),
+        include: {
+          organization: true,
+        },
+      });
+    },
   }),
   vendorByStoreLink: t.prismaField({
     type: Vendor,
     nullable: true,
     args: {
-      storeLink: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.vendor.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { storeLink } = payload;
+
+      return await prisma.vendor.findUnique({
         ...query,
         where: {
-          storeLink: args.storeLink,
+          storeLink,
         },
-      }),
+        include: {
+          organization: true,
+        },
+      });
+    },
   }),
   vendorCheckEmail: t.prismaField({
     type: Vendor,
     nullable: true,
     args: {
-      email: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _info): Promise<any | undefined> => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { email } = payload;
+
       const vendor = await prisma.vendor.findUnique({
         ...query,
         where: {
-          email: args.email,
+          email,
         },
       });
 
@@ -205,13 +262,17 @@ builder.queryFields((t) => ({
     type: Vendor,
     nullable: true,
     args: {
-      storeLink: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _info): Promise<any | undefined> => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { storeLink } = payload;
+
       const vendor = await prisma.vendor.findUnique({
         ...query,
         where: {
-          storeLink: args.storeLink,
+          storeLink,
         },
       });
 
@@ -234,11 +295,12 @@ builder.mutationFields((t) => ({
   loginVendor: t.prismaField({
     type: Vendor,
     args: {
-      email: t.arg.string({ required: true }),
-      password: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, ctx): Promise<any | undefined> => {
-      const { email, password } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { email, password } = payload;
       let errMessage: string | null = null;
 
       const vendor = await prisma.vendor.findUnique({
@@ -309,10 +371,12 @@ builder.mutationFields((t) => ({
   logoutVendor: t.prismaField({
     type: Vendor,
     args: {
-      email: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, ctx): Promise<any | undefined> => {
-      const { email } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { email } = payload;
 
       const vendor = await prisma.vendor.findUnique({
         ...query,
@@ -340,25 +404,11 @@ builder.mutationFields((t) => ({
   createVendor: t.prismaField({
     type: "Vendor",
     args: {
-      firstName: t.arg.string(),
-      lastName: t.arg.string(),
-      username: t.arg.string(),
-      email: t.arg.string({ required: true }),
-      password: t.arg.string(),
-      phone: t.arg.string(),
-      status: t.arg.string(),
-      image: t.arg.string(),
-      storeLink: t.arg.string(),
-      language: t.arg.string(),
-      address: t.arg.string(),
-      city: t.arg.string(),
-      country: t.arg.string(),
-      emailVerified: t.arg.string(),
-      vendorVerified: t.arg.string(),
-      addedOrganization: t.arg.string(),
-      organizationId: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
       const {
         firstName,
         lastName,
@@ -377,7 +427,7 @@ builder.mutationFields((t) => ({
         vendorVerified,
         addedOrganization,
         organizationId,
-      } = args;
+      } = payload;
 
       const hashedPassword = password && (await bcrypt.hash(password, 10));
 
@@ -410,21 +460,13 @@ builder.mutationFields((t) => ({
   updateVendor: t.prismaField({
     type: "Vendor",
     args: {
-      id: t.arg.string({ required: true }),
-      firstName: t.arg.string(),
-      lastName: t.arg.string(),
-      username: t.arg.string(),
-      phone: t.arg.string(),
-      status: t.arg.string(),
-      image: t.arg.string(),
-      language: t.arg.string(),
-      address: t.arg.string(),
-      city: t.arg.string(),
-      country: t.arg.string(),
-      organizationId: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
       const {
+        id,
         firstName,
         lastName,
         username,
@@ -436,12 +478,12 @@ builder.mutationFields((t) => ({
         city,
         country,
         organizationId,
-      } = args;
+      } = payload;
 
       return await prisma.vendor.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           firstName: firstName ? firstName : undefined,
@@ -458,27 +500,34 @@ builder.mutationFields((t) => ({
             ? { connect: { id: String(organizationId) || undefined } }
             : undefined,
         },
+        include: {
+          organization: true,
+        },
       });
     },
   }),
   updateVendorPassword: t.prismaField({
     type: "Vendor",
     args: {
-      id: t.arg.string({ required: true }),
-      password: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { password } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, password } = payload;
 
       const hashedPassword = password && (await bcrypt.hash(password, 10));
 
       return await prisma.vendor.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           password: hashedPassword ? hashedPassword : undefined,
+        },
+        include: {
+          organization: true,
         },
       });
     },
@@ -486,19 +535,23 @@ builder.mutationFields((t) => ({
   updateVendorImage: t.prismaField({
     type: "Vendor",
     args: {
-      id: t.arg.string({ required: true }),
-      image: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { image } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, image } = payload;
 
       return await prisma.vendor.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           image: image ? image : undefined,
+        },
+        include: {
+          organization: true,
         },
       });
     },
@@ -506,19 +559,23 @@ builder.mutationFields((t) => ({
   updateVendorStatus: t.prismaField({
     type: "Vendor",
     args: {
-      id: t.arg.string({ required: true }),
-      status: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { status } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, status } = payload;
 
       return await prisma.vendor.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           status: status ? status : undefined,
+        },
+        include: {
+          organization: true,
         },
       });
     },
@@ -526,19 +583,23 @@ builder.mutationFields((t) => ({
   updateVendorIdentification: t.prismaField({
     type: "Vendor",
     args: {
-      id: t.arg.string({ required: true }),
-      identification: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { identification } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, identification } = payload;
 
       return await prisma.vendor.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           identification: identification ? identification : undefined,
+        },
+        include: {
+          organization: true,
         },
       });
     },
@@ -546,19 +607,23 @@ builder.mutationFields((t) => ({
   updateVendorEmailVerified: t.prismaField({
     type: "Vendor",
     args: {
-      id: t.arg.string({ required: true }),
-      emailVerified: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { emailVerified } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, emailVerified } = payload;
 
       return await prisma.vendor.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           emailVerified: emailVerified ? emailVerified : undefined,
+        },
+        include: {
+          organization: true,
         },
       });
     },
@@ -566,19 +631,23 @@ builder.mutationFields((t) => ({
   updateVendorVerified: t.prismaField({
     type: "Vendor",
     args: {
-      id: t.arg.string({ required: true }),
-      vendorVerified: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { vendorVerified } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, vendorVerified } = payload;
 
       return await prisma.vendor.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           vendorVerified: vendorVerified ? vendorVerified : undefined,
+        },
+        include: {
+          organization: true,
         },
       });
     },
@@ -586,19 +655,23 @@ builder.mutationFields((t) => ({
   updateVendorAddedOrganization: t.prismaField({
     type: "Vendor",
     args: {
-      id: t.arg.string({ required: true }),
-      addedOrganization: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { addedOrganization } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, addedOrganization } = payload;
 
       return await prisma.vendor.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           addedOrganization: addedOrganization ? addedOrganization : undefined,
+        },
+        include: {
+          organization: true,
         },
       });
     },
@@ -606,19 +679,23 @@ builder.mutationFields((t) => ({
   updateVendorImpressions: t.prismaField({
     type: Vendor,
     args: {
-      id: t.arg.string({ required: true }),
-      impressions: t.arg.int(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { impressions } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, impressions } = payload;
 
       return await prisma.vendor.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           impressions: impressions ? impressions : undefined,
+        },
+        include: {
+          organization: true,
         },
       });
     },
@@ -626,19 +703,23 @@ builder.mutationFields((t) => ({
   updateVendorPageOpened: t.prismaField({
     type: Vendor,
     args: {
-      id: t.arg.string({ required: true }),
-      pageOpened: t.arg.int(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { pageOpened } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, pageOpened } = payload;
 
       return await prisma.vendor.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           pageOpened: pageOpened ? pageOpened : undefined,
+        },
+        include: {
+          organization: true,
         },
       });
     },
@@ -646,14 +727,19 @@ builder.mutationFields((t) => ({
   deleteVendor: t.prismaField({
     type: "Vendor",
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.vendor.delete({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.vendor.delete({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
 }));

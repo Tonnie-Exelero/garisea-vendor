@@ -7,6 +7,7 @@ import {
   GET_FEATURED_VENDOR_BY_ID,
   CREATE_FEATURED_VENDOR,
   UPDATE_FEATURED_VENDOR,
+  UPDATE_FEATURED_VENDOR_STATUS,
   UPDATE_FEATURED_VENDOR_IMPRESSIONS,
   UPDATE_FEATURED_VENDOR_CLICKS,
   DELETE_FEATURED_VENDOR,
@@ -14,10 +15,12 @@ import {
 
 // ** Others
 import { FeaturedVendor } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const featuredVendorInitialState = {
   id: "",
+  status: "",
   vendor: {
     id: "",
     storeLink: "",
@@ -54,10 +57,12 @@ export const fetchFeaturedVendorById = createAsyncThunk<
 >(
   "appFeaturedVendor/fetchFeaturedVendorById",
   async (id, { rejectWithValue }) => {
+    const encryptedData = encryptData(id);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FEATURED_VENDOR_BY_ID,
-        variables: { ...id },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -80,10 +85,12 @@ export const addFeaturedVendor = createAsyncThunk<
 >(
   "appFeaturedVendor/addFeaturedVendor",
   async (featuredVendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(featuredVendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_FEATURED_VENDOR,
-        variables: { ...featuredVendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -106,10 +113,36 @@ export const editFeaturedVendor = createAsyncThunk<
 >(
   "appFeaturedVendor/editFeaturedVendor",
   async (featuredVendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(featuredVendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_FEATURED_VENDOR,
-        variables: { ...featuredVendorData },
+        variables: { pl: encryptedData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Update Status
+export const editStatus = createAsyncThunk<FeaturedVendor, any, {}>(
+  "appFeaturedVendor/editStatus",
+  async (featuredVendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(featuredVendorData);
+
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_FEATURED_VENDOR_STATUS,
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -128,10 +161,12 @@ export const editFeaturedVendor = createAsyncThunk<
 export const editImpressions = createAsyncThunk<FeaturedVendor, any, {}>(
   "appFeaturedVendor/editImpressions",
   async (featuredVendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(featuredVendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_FEATURED_VENDOR_IMPRESSIONS,
-        variables: { ...featuredVendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -150,10 +185,12 @@ export const editImpressions = createAsyncThunk<FeaturedVendor, any, {}>(
 export const editClicks = createAsyncThunk<FeaturedVendor, any, {}>(
   "appFeaturedVendor/editClicks",
   async (featuredVendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData(featuredVendorData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_FEATURED_VENDOR_CLICKS,
-        variables: { ...featuredVendorData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -176,10 +213,12 @@ export const removeFeaturedVendor = createAsyncThunk<
 >(
   "appFeaturedVendor/removeFeaturedVendor",
   async (featuredVendorData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: featuredVendorData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_FEATURED_VENDOR,
-        variables: { id: featuredVendorData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -229,6 +268,11 @@ export const appFeaturedVendorSlice = createSlice({
         const { updateFeaturedVendor }: any = payload;
 
         state.featuredVendor = { ...updateFeaturedVendor };
+      })
+      .addCase(editStatus.fulfilled, (state, { payload }) => {
+        const { updateFeaturedVendorStatus }: any = payload;
+
+        state.featuredVendor.status = updateFeaturedVendorStatus.status;
       })
       .addCase(editImpressions.fulfilled, (state, { payload }) => {
         const { updateFeaturedVendorImpressions }: any = payload;

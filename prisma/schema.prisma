@@ -38,6 +38,8 @@ model User {
   role               Role?                @relation(fields: [roleId], references: [id])
   roleId             String?
   emailVerified      String?
+  pl                 String?
+  dt                 String?
   AdminVendorContact AdminVendorContact[]
   AdminVendorMessage AdminVendorMessage[]
 
@@ -71,6 +73,8 @@ model Vendor {
   organizationId        String?
   impressions           Int?
   pageOpened            Int?
+  pl                    String?
+  dt                    String?
   Vehicle               Vehicle[]
   AdminVendorContact    AdminVendorContact[]
   VendorCustomerContact VendorCustomerContact[]
@@ -102,6 +106,8 @@ model Customer {
   country               String?
   emailVerified         String?
   onlineStatus          String?
+  pl                    String?
+  dt                    String?
   VendorCustomerContact VendorCustomerContact[]
   VendorCustomerMessage VendorCustomerMessage[]
   VendorReview          VendorReview[]
@@ -125,6 +131,8 @@ model Organization {
   logo        String?
   certificate String?
   kraPin      String?
+  pl          String?
+  dt          String?
   Vendor      Vendor[]
 }
 
@@ -136,6 +144,8 @@ model Permission {
   slug        String   @unique
   description String?
   subjects    String?
+  pl          String?
+  dt          String?
   roles       Role[]
 }
 
@@ -147,6 +157,8 @@ model Role {
   slug        String       @unique
   description String?
   ability     String?
+  pl          String?
+  dt          String?
   permissions Permission[]
   users       User[]
 }
@@ -159,6 +171,8 @@ model Brand {
   slug        String    @unique
   description String?
   image       String?
+  pl          String?
+  dt          String?
   Model       Model[]
   Vehicle     Vehicle[]
 }
@@ -172,6 +186,8 @@ model Model {
   description String?
   brand       Brand?    @relation(fields: [brandId], references: [id])
   brandId     String?
+  pl          String?
+  dt          String?
   Vehicle     Vehicle[]
 }
 
@@ -227,6 +243,8 @@ model Vehicle {
   detailExpands           Int?
   interested              Int?
   vehicleVerified         String?
+  pl                      String?
+  dt                      String?
   VendorCustomerContact   VendorCustomerContact[]
   VendorCustomerMessage   VendorCustomerMessage[]
   VehicleReview           VehicleReview[]
@@ -243,6 +261,8 @@ model AdminVendorContact {
   vendor            Vendor?  @relation(fields: [vendorId], references: [id])
   vendorId          String?
   latestMessageTime String?
+  pl                String?
+  dt                String?
 }
 
 model AdminVendorMessage {
@@ -259,6 +279,8 @@ model AdminVendorMessage {
   timeSent  String?
   isSent    Boolean?
   isSeen    Boolean?
+  pl        String?
+  dt        String?
 }
 
 model VendorCustomerContact {
@@ -272,6 +294,8 @@ model VendorCustomerContact {
   vehicle           Vehicle?  @relation(fields: [vehicleId], references: [id])
   vehicleId         String?
   latestMessageTime String?
+  pl                String?
+  dt                String?
 }
 
 model VendorCustomerMessage {
@@ -290,6 +314,8 @@ model VendorCustomerMessage {
   timeSent   String?
   isSent     Boolean?
   isSeen     Boolean?
+  pl         String?
+  dt         String?
 }
 
 model VendorReview {
@@ -306,6 +332,8 @@ model VendorReview {
   count       String?
   rating      String?
   publishedAt String?
+  pl          String?
+  dt          String?
 }
 
 model VehicleReview {
@@ -322,6 +350,8 @@ model VehicleReview {
   count       String?
   rating      String?
   publishedAt String?
+  pl          String?
+  dt          String?
 }
 
 model Interest {
@@ -332,6 +362,8 @@ model Interest {
   vehicleId  String?
   customer   Customer? @relation(fields: [customerId], references: [id])
   customerId String?
+  pl         String?
+  dt         String?
 }
 
 model FeaturedVendor {
@@ -350,6 +382,8 @@ model FeaturedVendor {
   clicks            Int?
   targetImpressions Int?
   targetClicks      Int?
+  pl                String?
+  dt                String?
 }
 
 model FeaturedVehicle {
@@ -368,6 +402,8 @@ model FeaturedVehicle {
   clicks            Int?
   targetImpressions Int?
   targetClicks      Int?
+  pl                String?
+  dt                String?
 }
 
 model MainCarousel {
@@ -388,6 +424,8 @@ model MainCarousel {
   clicks            Int?
   targetImpressions Int?
   targetClicks      Int?
+  pl                String?
+  dt                String?
 }
 
 model Banner {
@@ -408,4 +446,6 @@ model Banner {
   clicks            Int?
   targetImpressions Int?
   targetClicks      Int?
+  pl                String?
+  dt                String?
 }

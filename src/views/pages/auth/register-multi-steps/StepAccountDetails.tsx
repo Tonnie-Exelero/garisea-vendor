@@ -20,6 +20,7 @@ import {
   GET_VENDOR_EMAIL,
   GET_VENDOR_STORE_LINK,
 } from "@src/api/vendor/vendor";
+import { encryptData } from "@core/utils/encryption";
 
 interface Props {
   handleNext: () => void;
@@ -63,7 +64,7 @@ const StepAccountDetails = (props: Props) => {
       const { data } = await apolloClient.query({
         query: GET_VENDOR_EMAIL,
         variables: {
-          email: value.trim().toLowerCase(),
+          pl: encryptData({ email: value.trim().toLowerCase() }),
         },
         fetchPolicy: "no-cache",
       });
@@ -95,7 +96,7 @@ const StepAccountDetails = (props: Props) => {
       const { data } = await apolloClient.query({
         query: GET_VENDOR_STORE_LINK,
         variables: {
-          storeLink: value.toLowerCase(),
+          pl: encryptData({ storeLink: value.toLowerCase() }),
         },
         fetchPolicy: "no-cache",
       });

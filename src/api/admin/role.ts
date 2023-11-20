@@ -38,8 +38,20 @@ export const GET_ROLES = gql`
 `;
 
 export const GET_FILTERED_ROLES = gql`
-  query GetFilteredRoles($filter: String!) {
-    rolesFiltered(filter: $filter) {
+  query GetFilteredRoles(
+    $pl: String!
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
+    rolesFiltered(
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
       edges {
         cursor
         node {
@@ -75,8 +87,8 @@ export const GET_FILTERED_ROLES = gql`
 `;
 
 export const GET_ROLE_BY_ID = gql`
-  query GetRoleById($id: String!) {
-    roleById(id: $id) {
+  query GetRoleById($pl: String!) {
+    roleById(pl: $pl) {
       id
       name
       slug
@@ -100,18 +112,8 @@ export const GET_ROLE_BY_ID = gql`
 `;
 
 export const CREATE_SUPERADMIN_ROLE = gql`
-  mutation CreateSuperAdminRole(
-    $name: String!
-    $slug: String!
-    $description: String!
-    $ability: String!
-  ) {
-    createSuperAdminRole(
-      name: $name
-      slug: $slug
-      description: $description
-      ability: $ability
-    ) {
+  mutation CreateSuperAdminRole($pl: String!) {
+    createSuperAdminRole(pl: $pl) {
       id
       name
       slug
@@ -122,20 +124,8 @@ export const CREATE_SUPERADMIN_ROLE = gql`
 `;
 
 export const CREATE_ROLE = gql`
-  mutation CreateRole(
-    $name: String!
-    $slug: String!
-    $description: String!
-    $ability: String!
-    $permissions: [String!]!
-  ) {
-    createRole(
-      name: $name
-      slug: $slug
-      description: $description
-      ability: $ability
-      permissions: $permissions
-    ) {
+  mutation CreateRole($pl: String!) {
+    createRole(pl: $pl) {
       id
       name
       slug
@@ -153,22 +143,8 @@ export const CREATE_ROLE = gql`
 `;
 
 export const UPDATE_ROLE = gql`
-  mutation UpdateRole(
-    $id: String!
-    $name: String
-    $slug: String
-    $description: String
-    $ability: String
-    $permissions: [String!]
-  ) {
-    updateRole(
-      id: $id
-      name: $name
-      slug: $slug
-      description: $description
-      ability: $ability
-      permissions: $permissions
-    ) {
+  mutation UpdateRole($pl: String!) {
+    updateRole(pl: $pl) {
       id
       name
       slug
@@ -192,8 +168,8 @@ export const UPDATE_ROLE = gql`
 `;
 
 export const DELETE_ROLE = gql`
-  mutation DeleteRole($id: String!) {
-    deleteRole(id: $id) {
+  mutation DeleteRole($pl: String!) {
+    deleteRole(pl: $pl) {
       id
       name
     }

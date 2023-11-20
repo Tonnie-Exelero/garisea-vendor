@@ -10,6 +10,7 @@ import {
 
 // ** Others
 import { Permission } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const permissionsInitialState = {
@@ -52,10 +53,21 @@ interface PermissionsState {
 export const fetchPermissions = createAsyncThunk<Permission, any, {}>(
   "appPermissions/fetchPermissions",
   async (permissionData, { rejectWithValue }) => {
+    const encryptedData = permissionData && encryptData(permissionData);
+    const pagination = {
+      ...(permissionData.first && { first: permissionData.first }),
+      ...(permissionData.last && { last: permissionData.last }),
+      ...(permissionData.after && { after: permissionData.after }),
+      ...(permissionData.before && { before: permissionData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_PERMISSIONS,
-        variables: permissionData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -74,10 +86,21 @@ export const fetchPermissions = createAsyncThunk<Permission, any, {}>(
 export const fetchFilteredPermissions = createAsyncThunk<Permission, any, {}>(
   "appPermissions/fetchFilteredPermissions",
   async (permissionData, { rejectWithValue }) => {
+    const encryptedData = permissionData && encryptData(permissionData);
+    const pagination = {
+      ...(permissionData.first && { first: permissionData.first }),
+      ...(permissionData.last && { last: permissionData.last }),
+      ...(permissionData.after && { after: permissionData.after }),
+      ...(permissionData.before && { before: permissionData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_PERMISSIONS,
-        variables: permissionData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

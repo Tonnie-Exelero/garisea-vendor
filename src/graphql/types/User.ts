@@ -3,7 +3,7 @@ import * as jwt from "jsonwebtoken";
 import prisma from "@src/lib/prisma";
 import { APP_SECRET } from "@graphql/utils/auth";
 import { builder } from "../builder";
-import { encryptData } from "@core/utils/encryption";
+import { decryptData, encryptData } from "@core/utils/encryption";
 
 export const User = builder.prismaObject("User", {
   fields: (t) => ({
@@ -23,6 +23,8 @@ export const User = builder.prismaObject("User", {
     country: t.exposeString("country", { nullable: true }),
     emailVerified: t.exposeString("emailVerified", { nullable: true }),
     onlineStatus: t.exposeString("onlineStatus", { nullable: true }),
+    pl: t.exposeString("pl", { nullable: true }),
+    dt: t.exposeString("dt", { nullable: true }),
     role: t.relation("role", { nullable: true }),
   }),
 });
@@ -34,6 +36,9 @@ builder.queryFields((t) => ({
     resolve: async (query, _parent, _args, _ctx, _info) => {
       return await prisma.user.findMany({
         ...query,
+        include: {
+          role: true,
+        },
         orderBy: {
           firstName: "asc",
         },
@@ -46,128 +51,178 @@ builder.queryFields((t) => ({
     type: User,
     cursor: "id",
     args: {
-      roleId: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
-      const { roleId } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { roleId } = payload;
 
       return await prisma.user.findMany({
         ...query,
         where: {
           roleId,
         },
-        orderBy: {
-          firstName: "asc",
+        include: {
+          role: true,
         },
-      });
-    },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.user.count({
-        ...connection,
-        where: {
-          roleId: args.roleId,
-        },
-      }),
-  }),
-  usersByStatus: t.prismaConnection({
-    type: User,
-    cursor: "id",
-    args: {
-      status: t.arg.string({ required: true }),
-    },
-    resolve: async (query, _parent, args, _ctx, _info) => {
-      const { status } = args;
-
-      return await prisma.user.findMany({
-        ...query,
-        where: {
-          status,
-        },
-        orderBy: {
-          firstName: "asc",
-        },
-      });
-    },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.user.count({
-        ...connection,
-        where: {
-          status: args.status,
-        },
-      }),
-  }),
-  usersFiltered: t.prismaConnection({
-    type: User,
-    cursor: "id",
-    args: {
-      filter: t.arg.string({ required: true }),
-    },
-    resolve: async (query, _parent, args, _ctx, _info) => {
-      const where = {
-        OR: [
-          { id: { contains: args.filter } },
-          { firstName: { contains: args.filter } },
-          { lastName: { contains: args.filter } },
-          { username: { contains: args.filter } },
-          { email: { contains: args.filter } },
-          { phone: { contains: args.filter } },
-          { city: { contains: args.filter } },
-          { country: { contains: args.filter } },
-        ],
-      };
-
-      return await prisma.user.findMany({
-        ...query,
-        where,
         orderBy: {
           firstName: "asc",
         },
       });
     },
     totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { roleId } = payload;
+
+      return await prisma.user.count({
+        ...connection,
+        where: {
+          roleId,
+        },
+      });
+    },
+  }),
+  usersByStatus: t.prismaConnection({
+    type: User,
+    cursor: "id",
+    args: {
+      pl: t.arg.string({ required: true }),
+    },
+    resolve: async (query, _parent, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { status } = payload;
+
+      return await prisma.user.findMany({
+        ...query,
+        where: {
+          status,
+        },
+        include: {
+          role: true,
+        },
+        orderBy: {
+          firstName: "asc",
+        },
+      });
+    },
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { status } = payload;
+
+      return await prisma.user.count({
+        ...connection,
+        where: {
+          status,
+        },
+      });
+    },
+  }),
+  usersFiltered: t.prismaConnection({
+    type: User,
+    cursor: "id",
+    args: {
+      pl: t.arg.string({ required: true }),
+    },
+    resolve: async (query, _parent, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { filter } = payload;
+
       const where = {
         OR: [
-          { id: { contains: args.filter } },
-          { firstName: { contains: args.filter } },
-          { lastName: { contains: args.filter } },
-          { username: { contains: args.filter } },
-          { email: { contains: args.filter } },
-          { phone: { contains: args.filter } },
-          { city: { contains: args.filter } },
-          { country: { contains: args.filter } },
+          { id: { contains: filter } },
+          { firstName: { contains: filter } },
+          { lastName: { contains: filter } },
+          { username: { contains: filter } },
+          { email: { contains: filter } },
+          { phone: { contains: filter } },
+          { city: { contains: filter } },
+          { country: { contains: filter } },
         ],
       };
 
-      return await prisma.user.count({ ...connection, where });
+      return await prisma.user.findMany({
+        ...query,
+        ...(payload && { where }),
+        include: {
+          role: true,
+        },
+        orderBy: {
+          firstName: "asc",
+        },
+      });
+    },
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { filter } = payload;
+
+      const where = {
+        OR: [
+          { id: { contains: filter } },
+          { firstName: { contains: filter } },
+          { lastName: { contains: filter } },
+          { username: { contains: filter } },
+          { email: { contains: filter } },
+          { phone: { contains: filter } },
+          { city: { contains: filter } },
+          { country: { contains: filter } },
+        ],
+      };
+
+      return await prisma.user.count({
+        ...connection,
+        ...(payload && { where }),
+      });
     },
   }),
   userById: t.prismaField({
     type: User,
     nullable: true,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.user.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.user.findUnique({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+        include: {
+          role: true,
+        },
+      });
+    },
   }),
   userByEmail: t.prismaField({
     type: User,
     nullable: true,
     args: {
-      email: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.user.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { email } = payload;
+
+      return await prisma.user.findUnique({
         ...query,
         where: {
-          email: args.email,
+          email,
         },
-      }),
+        include: {
+          role: true,
+        },
+      });
+    },
   }),
 }));
 
@@ -175,11 +230,12 @@ builder.mutationFields((t) => ({
   loginUser: t.prismaField({
     type: User,
     args: {
-      email: t.arg.string({ required: true }),
-      password: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, ctx): Promise<any | undefined> => {
-      const { email, password } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { email, password } = payload;
       let errMessage: string | null = null;
 
       const user = await prisma.user.findUnique({
@@ -254,10 +310,12 @@ builder.mutationFields((t) => ({
   logoutUser: t.prismaField({
     type: User,
     args: {
-      email: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, ctx): Promise<any | undefined> => {
-      const { email } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { email } = payload;
 
       const user = await prisma.user.findUnique({
         ...query,
@@ -285,22 +343,11 @@ builder.mutationFields((t) => ({
   createUser: t.prismaField({
     type: "User",
     args: {
-      firstName: t.arg.string(),
-      lastName: t.arg.string(),
-      username: t.arg.string({ required: true }),
-      email: t.arg.string({ required: true }),
-      password: t.arg.string(),
-      phone: t.arg.string(),
-      status: t.arg.string(),
-      image: t.arg.string(),
-      language: t.arg.string(),
-      address: t.arg.string(),
-      city: t.arg.string(),
-      country: t.arg.string(),
-      emailVerified: t.arg.string(),
-      roleId: t.arg.id(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
       const {
         firstName,
         lastName,
@@ -316,7 +363,7 @@ builder.mutationFields((t) => ({
         country,
         emailVerified,
         roleId,
-      } = args;
+      } = payload;
 
       const hashedPassword = password && (await bcrypt.hash(password, 10));
 
@@ -344,21 +391,13 @@ builder.mutationFields((t) => ({
   updateUser: t.prismaField({
     type: "User",
     args: {
-      id: t.arg.string({ required: true }),
-      firstName: t.arg.string(),
-      lastName: t.arg.string(),
-      username: t.arg.string(),
-      phone: t.arg.string(),
-      status: t.arg.string(),
-      image: t.arg.string(),
-      language: t.arg.string(),
-      address: t.arg.string(),
-      city: t.arg.string(),
-      country: t.arg.string(),
-      roleId: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
       const {
+        id,
         firstName,
         lastName,
         username,
@@ -370,12 +409,12 @@ builder.mutationFields((t) => ({
         city,
         country,
         roleId,
-      } = args;
+      } = payload;
 
       return await prisma.user.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           firstName: firstName ? firstName : undefined,
@@ -392,27 +431,34 @@ builder.mutationFields((t) => ({
             ? { connect: { id: String(roleId) || undefined } }
             : undefined,
         },
+        include: {
+          role: true,
+        },
       });
     },
   }),
   updatePassword: t.prismaField({
     type: "User",
     args: {
-      id: t.arg.string({ required: true }),
-      password: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { password } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, password } = payload;
 
       const hashedPassword = password && (await bcrypt.hash(password, 10));
 
       return await prisma.user.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           password: hashedPassword ? hashedPassword : undefined,
+        },
+        include: {
+          role: true,
         },
       });
     },
@@ -420,19 +466,23 @@ builder.mutationFields((t) => ({
   updateUserImage: t.prismaField({
     type: "User",
     args: {
-      id: t.arg.string({ required: true }),
-      image: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { image } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, image } = payload;
 
       return await prisma.user.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           image: image ? image : undefined,
+        },
+        include: {
+          role: true,
         },
       });
     },
@@ -440,19 +490,23 @@ builder.mutationFields((t) => ({
   updateUserStatus: t.prismaField({
     type: "User",
     args: {
-      id: t.arg.string({ required: true }),
-      status: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { status } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, status } = payload;
 
       return await prisma.user.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           status: status ? status : undefined,
+        },
+        include: {
+          role: true,
         },
       });
     },
@@ -460,19 +514,23 @@ builder.mutationFields((t) => ({
   updateUserEmailVerified: t.prismaField({
     type: "User",
     args: {
-      id: t.arg.string({ required: true }),
-      emailVerified: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { emailVerified } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, emailVerified } = payload;
 
       return await prisma.user.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           emailVerified: emailVerified ? emailVerified : undefined,
+        },
+        include: {
+          role: true,
         },
       });
     },
@@ -480,14 +538,19 @@ builder.mutationFields((t) => ({
   deleteUser: t.prismaField({
     type: "User",
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.user.delete({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.user.delete({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
 }));

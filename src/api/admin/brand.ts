@@ -2,16 +2,14 @@ import { gql } from "@apollo/client";
 
 export const GET_BRANDS = gql`
   query GetBrands(
-    $hasVehicles: String
-    $orderBy: String
+    $pl: String
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     brands(
-      hasVehicles: $hasVehicles
-      orderBy: $orderBy
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -39,8 +37,20 @@ export const GET_BRANDS = gql`
 `;
 
 export const GET_FILTERED_BRANDS = gql`
-  query GetFilteredBrands($filter: String!) {
-    brandsFiltered(filter: $filter) {
+  query GetFilteredBrands(
+    $pl: String!
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
+    brandsFiltered(
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
       edges {
         cursor
         node {
@@ -63,8 +73,8 @@ export const GET_FILTERED_BRANDS = gql`
 `;
 
 export const GET_BRAND_BY_ID = gql`
-  query GetBrandById($id: String!) {
-    brandById(id: $id) {
+  query GetBrandById($pl: String!) {
+    brandById(pl: $pl) {
       id
       name
       slug
@@ -75,8 +85,8 @@ export const GET_BRAND_BY_ID = gql`
 `;
 
 export const GET_BRAND_BY_SLUG = gql`
-  query GetBrandBySlug($slug: String!) {
-    brandBySlug(slug: $slug) {
+  query GetBrandBySlug($pl: String!) {
+    brandBySlug(pl: $pl) {
       id
       name
       slug
@@ -87,18 +97,8 @@ export const GET_BRAND_BY_SLUG = gql`
 `;
 
 export const CREATE_BRAND = gql`
-  mutation CreateBrand(
-    $name: String!
-    $slug: String!
-    $description: String
-    $image: String
-  ) {
-    createBrand(
-      name: $name
-      slug: $slug
-      description: $description
-      image: $image
-    ) {
+  mutation CreateBrand($pl: String!) {
+    createBrand(pl: $pl) {
       id
       name
       slug
@@ -109,20 +109,8 @@ export const CREATE_BRAND = gql`
 `;
 
 export const UPDATE_BRAND = gql`
-  mutation UpdateBrand(
-    $id: String!
-    $name: String
-    $slug: String
-    $description: String
-    $image: String
-  ) {
-    updateBrand(
-      id: $id
-      name: $name
-      slug: $slug
-      description: $description
-      image: $image
-    ) {
+  mutation UpdateBrand($pl: String!) {
+    updateBrand(pl: $pl) {
       id
       name
       slug
@@ -133,8 +121,8 @@ export const UPDATE_BRAND = gql`
 `;
 
 export const DELETE_BRAND = gql`
-  mutation DeleteBrand($id: String!) {
-    deleteBrand(id: $id) {
+  mutation DeleteBrand($pl: String!) {
+    deleteBrand(pl: $pl) {
       id
       name
     }

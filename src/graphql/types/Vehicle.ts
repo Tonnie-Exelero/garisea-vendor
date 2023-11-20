@@ -1,5 +1,6 @@
 import prisma from "@lib/prisma";
 import { builder } from "../builder";
+import { decryptData } from "@core/utils/encryption";
 
 export const Vehicle = builder.prismaObject("Vehicle", {
   fields: (t) => ({
@@ -57,6 +58,8 @@ export const Vehicle = builder.prismaObject("Vehicle", {
     detailExpands: t.exposeInt("detailExpands", { nullable: true }),
     interested: t.exposeInt("interested", { nullable: true }),
     vehicleVerified: t.exposeString("vehicleVerified", { nullable: true }),
+    pl: t.exposeString("pl", { nullable: true }),
+    dt: t.exposeString("dt", { nullable: true }),
   }),
 });
 
@@ -67,6 +70,11 @@ builder.queryFields((t) => ({
     resolve: async (query, _parent, _args, _ctx, _info) => {
       return await prisma.vehicle.findMany({
         ...query,
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
+        },
         orderBy: {
           createdAt: "desc",
         },
@@ -79,53 +87,90 @@ builder.queryFields((t) => ({
     type: Vehicle,
     nullable: true,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.vehicle.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.vehicle.findUnique({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
+        },
+      });
+    },
   }),
   vehicleByEntryNo: t.prismaField({
     type: Vehicle,
     nullable: true,
     args: {
-      entryNo: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.vehicle.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { entryNo } = payload;
+
+      return await prisma.vehicle.findUnique({
         ...query,
         where: {
-          entryNo: args.entryNo,
+          entryNo,
         },
-      }),
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
+        },
+      });
+    },
   }),
   vehicleBySlug: t.prismaField({
     type: Vehicle,
     nullable: true,
     args: {
-      slug: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.vehicle.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { slug } = payload;
+
+      return await prisma.vehicle.findUnique({
         ...query,
         where: {
-          slug: args.slug,
+          slug,
         },
-      }),
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
+        },
+      });
+    },
   }),
   vehiclesByVendorId: t.prismaConnection({
     type: Vehicle,
     cursor: "id",
     args: {
-      vendorId: t.arg.string({ required: true }),
-      status: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx, _info) => {
-      const { vendorId, status } = args;
+    resolve: async (
+      query,
+      _parent,
+      args,
+      _ctx,
+      _info
+    ): Promise<any | undefined> => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { vendorId, status } = payload;
 
       return await prisma.vehicle.findMany({
         ...query,
@@ -133,19 +178,29 @@ builder.queryFields((t) => ({
           vendorId,
           status,
         },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
+        },
         orderBy: {
           createdAt: "desc",
         },
       });
     },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.vehicle.count({
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { vendorId, status } = payload;
+
+      return await prisma.vehicle.count({
         ...connection,
         where: {
-          vendorId: args.vendorId,
-          status: args.status,
+          vendorId,
+          status,
         },
-      }),
+      });
+    },
   }),
   vehiclesCount: t.prismaField({
     type: Vehicle,
@@ -156,21 +211,21 @@ builder.queryFields((t) => ({
     resolve: async (_query, _parent, args, _info): Promise<any | undefined> => {
       const active = await prisma.vehicle.count({
         where: {
-          ...(args.vendorId && { vendorId: args.vendorId }),
+          ...(args && args.vendorId && { vendorId: args.vendorId }),
           status: "active",
         },
       });
 
       const pending = await prisma.vehicle.count({
         where: {
-          ...(args.vendorId && { vendorId: args.vendorId }),
+          ...(args && args.vendorId && { vendorId: args.vendorId }),
           status: "pending",
         },
       });
 
       const declined = await prisma.vehicle.count({
         where: {
-          ...(args.vendorId && { vendorId: args.vendorId }),
+          ...(args && args.vendorId && { vendorId: args.vendorId }),
           status: "declined",
         },
       });
@@ -178,7 +233,7 @@ builder.queryFields((t) => ({
       const stats = { active, pending, declined };
 
       return {
-        vehicleVerified: JSON.stringify(stats),
+        dt: JSON.stringify(stats),
       };
     },
   }),
@@ -186,483 +241,470 @@ builder.queryFields((t) => ({
     type: Vehicle,
     cursor: "id",
     args: {
-      entryNo: t.arg.string(),
-      vendorId: t.arg.string(),
-      brandId: t.arg.string(),
-      modelId: t.arg.string(),
-      minYear: t.arg.string(),
-      maxYear: t.arg.string(),
-      registered: t.arg.string(),
-      condition: t.arg.string(),
-      minMileage: t.arg.int(),
-      maxMileage: t.arg.int(),
-      status: t.arg.string(),
-      viewingLocation: t.arg.string(),
-      vehicleOriginCountry: t.arg.string(),
-      transmissionType: t.arg.string(),
-      fuelType: t.arg.string(),
-      minEngineCapacity: t.arg.int(),
-      maxEngineCapacity: t.arg.int(),
-      exteriorColor: t.arg.string(),
-      upholstery: t.arg.string(),
-      engineType: t.arg.string(),
-      driveType: t.arg.string(),
-      bodyType: t.arg.string(),
-      interiorColor: t.arg.string(),
-      steering: t.arg.string(),
-      seats: t.arg.int(),
-      doors: t.arg.int(),
-      minPrice: t.arg.int(),
-      maxPrice: t.arg.int(),
-      hasDiscount: t.arg.string(),
-      biggestDiscount: t.arg.string(),
-      reserved: t.arg.string(),
-      sold: t.arg.string(),
-      random: t.arg.string(),
-      sortBy: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
       const where = {
-        ...(args.entryNo && {
+        ...(payload.entryNo && {
           entryNo: {
-            equals: args.entryNo,
+            equals: payload.entryNo,
           },
         }),
-        ...(args.vendorId && {
+        ...(payload.vendorId && {
           vendorId: {
-            equals: args.vendorId,
+            equals: payload.vendorId,
           },
         }),
-        ...(args.brandId && {
-          brandId: { equals: args.brandId },
+        ...(payload.brandId && {
+          brandId: { equals: payload.brandId },
         }),
-        ...(args.modelId && {
-          modelId: { equals: args.modelId },
+        ...(payload.modelId && {
+          modelId: { equals: payload.modelId },
         }),
-        ...(args.minYear &&
-          args.maxYear && {
+        ...(payload.minYear &&
+          payload.maxYear && {
             OR: <any>[
               {
                 AND: <any>[
-                  args.minYear && {
+                  payload.minYear && {
                     yearOfManufacture: {
-                      gte: <any>args.minYear,
+                      gte: <any>payload.minYear,
                     },
                   },
-                  args.maxYear && {
+                  payload.maxYear && {
                     yearOfManufacture: {
-                      lte: <any>args.maxYear,
+                      lte: <any>payload.maxYear,
                     },
                   },
                 ],
               },
               {
                 AND: <any>[
-                  args.minYear && {
+                  payload.minYear && {
                     yearOfFirstRegistration: {
-                      gte: <any>args.minYear,
+                      gte: <any>payload.minYear,
                     },
                   },
-                  args.maxYear && {
+                  payload.maxYear && {
                     yearOfFirstRegistration: {
-                      lte: <any>args.maxYear,
+                      lte: <any>payload.maxYear,
                     },
                   },
                 ],
               },
             ],
           }),
-        ...(args.registered && {
+        ...(payload.registered && {
           registered: {
-            equals: args.registered,
+            equals: payload.registered,
           },
         }),
-        ...(args.condition && {
+        ...(payload.condition && {
           condition: {
-            equals: args.condition,
+            equals: payload.condition,
           },
         }),
-        ...(args.minMileage && {
+        ...(payload.minMileage && {
           mileage: {
-            gte: <any>args.minMileage,
+            gte: <any>payload.minMileage,
           },
         }),
-        ...(args.maxMileage && {
+        ...(payload.maxMileage && {
           mileage: {
-            lte: <any>args.maxMileage,
+            lte: <any>payload.maxMileage,
           },
         }),
-        ...(args.status && {
+        ...(payload.status && {
           status: {
-            equals: args.status,
+            equals: payload.status,
           },
         }),
-        ...(args.viewingLocation && {
+        ...(payload.viewingLocation && {
           viewingLocation: <any>{
-            search: args.viewingLocation,
+            search: payload.viewingLocation,
             mode: "insensitive",
           },
         }),
-        ...(args.vehicleOriginCountry && {
+        ...(payload.vehicleOriginCountry && {
           vehicleOriginCountry: {
-            equals: args.vehicleOriginCountry,
+            equals: payload.vehicleOriginCountry,
           },
         }),
-        ...(args.transmissionType && {
+        ...(payload.transmissionType && {
           transmissionType: {
-            equals: args.transmissionType,
+            equals: payload.transmissionType,
           },
         }),
-        ...(args.fuelType && {
+        ...(payload.fuelType && {
           fuelType: {
-            equals: args.fuelType,
+            equals: payload.fuelType,
           },
         }),
-        ...(args.minEngineCapacity && {
+        ...(payload.minEngineCapacity && {
           engineCapacity: {
-            gte: <any>args.minEngineCapacity,
+            gte: <any>payload.minEngineCapacity,
           },
         }),
-        ...(args.maxEngineCapacity && {
+        ...(payload.maxEngineCapacity && {
           engineCapacity: {
-            lte: <any>args.maxEngineCapacity,
+            lte: <any>payload.maxEngineCapacity,
           },
         }),
-        ...(args.exteriorColor && {
+        ...(payload.exteriorColor && {
           exteriorColor: <any>{
-            search: args.exteriorColor,
+            search: payload.exteriorColor,
             mode: "insensitive",
           },
         }),
-        ...(args.upholstery && {
+        ...(payload.upholstery && {
           upholstery: {
-            equals: args.upholstery,
+            equals: payload.upholstery,
           },
         }),
-        ...(args.engineType && {
+        ...(payload.engineType && {
           engineType: <any>{
-            search: args.engineType,
+            search: payload.engineType,
             mode: "insensitive",
           },
         }),
-        ...(args.driveType && {
+        ...(payload.driveType && {
           driveType: {
-            equals: args.driveType,
+            equals: payload.driveType,
           },
         }),
-        ...(args.bodyType && {
+        ...(payload.bodyType && {
           bodyType: {
-            equals: args.bodyType,
+            equals: payload.bodyType,
           },
         }),
-        ...(args.interiorColor && {
+        ...(payload.interiorColor && {
           interiorColor: <any>{
-            search: args.interiorColor,
+            search: payload.interiorColor,
             mode: "insensitive",
           },
         }),
-        ...(args.steering && {
+        ...(payload.steering && {
           steering: {
-            equals: args.steering,
+            equals: payload.steering,
           },
         }),
-        ...(args.seats && {
+        ...(payload.seats && {
           seats: {
-            equals: args.seats,
+            equals: payload.seats,
           },
         }),
-        ...(args.doors && {
+        ...(payload.doors && {
           doors: {
-            equals: args.doors,
+            equals: payload.doors,
           },
         }),
-        ...(args.minPrice &&
-          args.maxPrice && {
+        ...(payload.minPrice &&
+          payload.maxPrice && {
             OR: <any>[
               {
                 AND: <any>[
-                  args.minPrice && {
+                  payload.minPrice && {
                     listingPrice: {
-                      gte: <any>args.minPrice,
+                      gte: <any>payload.minPrice,
                     },
                   },
-                  args.maxPrice && {
+                  payload.maxPrice && {
                     listingPrice: {
-                      lte: <any>args.maxPrice,
+                      lte: <any>payload.maxPrice,
                     },
                   },
                 ],
               },
               {
                 AND: <any>[
-                  args.minPrice && {
+                  payload.minPrice && {
                     discountedPrice: {
-                      gte: <any>args.minPrice,
+                      gte: <any>payload.minPrice,
                     },
                   },
-                  args.maxPrice && {
+                  payload.maxPrice && {
                     discountedPrice: {
-                      lte: <any>args.maxPrice,
+                      lte: <any>payload.maxPrice,
                     },
                   },
                 ],
               },
             ],
           }),
-        ...(args.hasDiscount === "yes" && {
+        ...(payload.hasDiscount === "yes" && {
           discountedPrice: {
             not: null,
             gt: 0,
           },
         }),
-        ...(args.reserved && {
+        ...(payload.reserved && {
           reserved: {
-            equals: args.reserved,
+            equals: payload.reserved,
           },
         }),
-        ...(args.sold && {
+        ...(payload.sold && {
           sold: {
-            equals: args.sold,
+            equals: payload.sold,
           },
         }),
       };
 
       return await prisma.vehicle.findMany({
         ...query,
-        where,
+        ...(payload && { where }),
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
+        },
         orderBy: [
           {
-            ...(args.sortBy === "relevance"
+            ...(payload && payload.sortBy === "relevance"
               ? { impressions: "desc" }
-              : args.sortBy === "price-l-to-h"
+              : payload && payload.sortBy === "price-l-to-h"
               ? { listingPrice: "asc" }
-              : args.sortBy === "price-h-to-l"
+              : payload && payload.sortBy === "price-h-to-l"
               ? { listingPrice: "desc" }
-              : args.sortBy === "mileage-l-to-h"
+              : payload && payload.sortBy === "mileage-l-to-h"
               ? { mileage: "asc" }
-              : args.sortBy === "mileage-h-to-l"
+              : payload && payload.sortBy === "mileage-h-to-l"
               ? { mileage: "desc" }
               : {}),
           },
           {
-            ...(args.biggestDiscount !== "yes" &&
-              !args.sortBy && {
-                ...(args.random === "yes"
+            ...(payload &&
+              payload.biggestDiscount !== "yes" &&
+              !payload.sortBy && {
+                ...(payload && payload.random === "yes"
                   ? { mileage: "asc" }
                   : { createdAt: "desc" }),
               }),
           },
-          { ...(args.biggestDiscount === "yes" && { discountAmount: "desc" }) },
+          {
+            ...(payload &&
+              payload.biggestDiscount === "yes" && {
+                discountAmount: "desc",
+              }),
+          },
         ],
       });
     },
     totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
       const where = {
-        ...(args.entryNo && {
+        ...(payload.entryNo && {
           entryNo: {
-            equals: args.entryNo,
+            equals: payload.entryNo,
           },
         }),
-        ...(args.vendorId && {
+        ...(payload.vendorId && {
           vendorId: {
-            equals: args.vendorId,
+            equals: payload.vendorId,
           },
         }),
-        ...(args.brandId && {
-          brandId: { equals: args.brandId },
+        ...(payload.brandId && {
+          brandId: { equals: payload.brandId },
         }),
-        ...(args.modelId && {
-          modelId: { equals: args.modelId },
+        ...(payload.modelId && {
+          modelId: { equals: payload.modelId },
         }),
-        ...(args.minYear &&
-          args.maxYear && {
+        ...(payload.minYear &&
+          payload.maxYear && {
             OR: <any>[
               {
                 AND: <any>[
-                  args.minYear && {
+                  payload.minYear && {
                     yearOfManufacture: {
-                      gte: <any>args.minYear,
+                      gte: <any>payload.minYear,
                     },
                   },
-                  args.maxYear && {
+                  payload.maxYear && {
                     yearOfManufacture: {
-                      lte: <any>args.maxYear,
+                      lte: <any>payload.maxYear,
                     },
                   },
                 ],
               },
               {
                 AND: <any>[
-                  args.minYear && {
+                  payload.minYear && {
                     yearOfFirstRegistration: {
-                      gte: <any>args.minYear,
+                      gte: <any>payload.minYear,
                     },
                   },
-                  args.maxYear && {
+                  payload.maxYear && {
                     yearOfFirstRegistration: {
-                      lte: <any>args.maxYear,
+                      lte: <any>payload.maxYear,
                     },
                   },
                 ],
               },
             ],
           }),
-        ...(args.registered && {
+        ...(payload.registered && {
           registered: {
-            equals: args.registered,
+            equals: payload.registered,
           },
         }),
-        ...(args.condition && {
+        ...(payload.condition && {
           condition: {
-            equals: args.condition,
+            equals: payload.condition,
           },
         }),
-        ...(args.minMileage && {
+        ...(payload.minMileage && {
           mileage: {
-            gte: <any>args.minMileage,
+            gte: <any>payload.minMileage,
           },
         }),
-        ...(args.maxMileage && {
+        ...(payload.maxMileage && {
           mileage: {
-            lte: <any>args.maxMileage,
+            lte: <any>payload.maxMileage,
           },
         }),
-        ...(args.status && {
+        ...(payload.status && {
           status: {
-            equals: args.status,
+            equals: payload.status,
           },
         }),
-        ...(args.viewingLocation && {
+        ...(payload.viewingLocation && {
           viewingLocation: <any>{
-            search: args.viewingLocation,
+            search: payload.viewingLocation,
             mode: "insensitive",
           },
         }),
-        ...(args.vehicleOriginCountry && {
+        ...(payload.vehicleOriginCountry && {
           vehicleOriginCountry: {
-            equals: args.vehicleOriginCountry,
+            equals: payload.vehicleOriginCountry,
           },
         }),
-        ...(args.transmissionType && {
+        ...(payload.transmissionType && {
           transmissionType: {
-            equals: args.transmissionType,
+            equals: payload.transmissionType,
           },
         }),
-        ...(args.fuelType && {
+        ...(payload.fuelType && {
           fuelType: {
-            equals: args.fuelType,
+            equals: payload.fuelType,
           },
         }),
-        ...(args.minEngineCapacity && {
+        ...(payload.minEngineCapacity && {
           engineCapacity: {
-            gte: <any>args.minEngineCapacity,
+            gte: <any>payload.minEngineCapacity,
           },
         }),
-        ...(args.maxEngineCapacity && {
+        ...(payload.maxEngineCapacity && {
           engineCapacity: {
-            lte: <any>args.maxEngineCapacity,
+            lte: <any>payload.maxEngineCapacity,
           },
         }),
-        ...(args.exteriorColor && {
+        ...(payload.exteriorColor && {
           exteriorColor: <any>{
-            search: args.exteriorColor,
+            search: payload.exteriorColor,
             mode: "insensitive",
           },
         }),
-        ...(args.upholstery && {
+        ...(payload.upholstery && {
           upholstery: {
-            equals: args.upholstery,
+            equals: payload.upholstery,
           },
         }),
-        ...(args.engineType && {
+        ...(payload.engineType && {
           engineType: <any>{
-            search: args.engineType,
+            search: payload.engineType,
             mode: "insensitive",
           },
         }),
-        ...(args.driveType && {
+        ...(payload.driveType && {
           driveType: {
-            equals: args.driveType,
+            equals: payload.driveType,
           },
         }),
-        ...(args.bodyType && {
+        ...(payload.bodyType && {
           bodyType: {
-            equals: args.bodyType,
+            equals: payload.bodyType,
           },
         }),
-        ...(args.interiorColor && {
+        ...(payload.interiorColor && {
           interiorColor: <any>{
-            search: args.interiorColor,
+            search: payload.interiorColor,
             mode: "insensitive",
           },
         }),
-        ...(args.steering && {
+        ...(payload.steering && {
           steering: {
-            equals: args.steering,
+            equals: payload.steering,
           },
         }),
-        ...(args.seats && {
+        ...(payload.seats && {
           seats: {
-            equals: args.seats,
+            equals: payload.seats,
           },
         }),
-        ...(args.doors && {
+        ...(payload.doors && {
           doors: {
-            equals: args.doors,
+            equals: payload.doors,
           },
         }),
-        ...(args.minPrice &&
-          args.maxPrice && {
+        ...(payload.minPrice &&
+          payload.maxPrice && {
             OR: <any>[
               {
                 AND: <any>[
-                  args.minPrice && {
+                  payload.minPrice && {
                     listingPrice: {
-                      gte: <any>args.minPrice,
+                      gte: <any>payload.minPrice,
                     },
                   },
-                  args.maxPrice && {
+                  payload.maxPrice && {
                     listingPrice: {
-                      lte: <any>args.maxPrice,
+                      lte: <any>payload.maxPrice,
                     },
                   },
                 ],
               },
               {
                 AND: <any>[
-                  args.minPrice && {
+                  payload.minPrice && {
                     discountedPrice: {
-                      gte: <any>args.minPrice,
+                      gte: <any>payload.minPrice,
                     },
                   },
-                  args.maxPrice && {
+                  payload.maxPrice && {
                     discountedPrice: {
-                      lte: <any>args.maxPrice,
+                      lte: <any>payload.maxPrice,
                     },
                   },
                 ],
               },
             ],
           }),
-        ...(args.hasDiscount === "yes" && {
+        ...(payload.hasDiscount === "yes" && {
           discountedPrice: {
             not: null,
             gt: 0,
           },
         }),
-        ...(args.reserved && {
+        ...(payload.reserved && {
           reserved: {
-            equals: args.reserved,
+            equals: payload.reserved,
           },
         }),
-        ...(args.sold && {
+        ...(payload.sold && {
           sold: {
-            equals: args.sold,
+            equals: payload.sold,
           },
         }),
       };
 
-      return await prisma.vehicle.count({ ...connection, where });
+      return await prisma.vehicle.count({
+        ...connection,
+        ...(payload && { where }),
+      });
     },
   }),
 }));
@@ -671,53 +713,12 @@ builder.mutationFields((t) => ({
   createVehicle: t.prismaField({
     type: Vehicle,
     args: {
-      entryNo: t.arg.string({ required: true }),
-      vendorId: t.arg.string({ required: true }),
-      brandId: t.arg.string({ required: true }),
-      modelId: t.arg.string({ required: true }),
-      trim: t.arg.string(),
-      slug: t.arg.string(),
-      yearOfManufacture: t.arg.string(),
-      yearOfFirstRegistration: t.arg.string(),
-      registered: t.arg.string(),
-      registrationNo: t.arg.string(),
-      condition: t.arg.string(),
-      mileage: t.arg.int(),
-      mileageMetric: t.arg.string(),
-      transmissionType: t.arg.string(),
-      fuelType: t.arg.string(),
-      engineCapacity: t.arg.int(),
-      exteriorColor: t.arg.string(),
-      upholstery: t.arg.string(),
-      images: t.arg.string(),
-      thumbnail: t.arg.string(),
-      status: t.arg.string(),
-      viewingLocation: t.arg.string(),
-      vehicleOriginCountry: t.arg.string(),
-      engineType: t.arg.string(),
-      driveType: t.arg.string(),
-      vinNo: t.arg.string(),
-      bodyType: t.arg.string(),
-      interiorColor: t.arg.string(),
-      steering: t.arg.string(),
-      seats: t.arg.int(),
-      doors: t.arg.int(),
-      listingPrice: t.arg.int(),
-      discountedPrice: t.arg.int(),
-      discountAmount: t.arg.int(),
-      allowedPaymentModes: t.arg.string(),
-      offerType: t.arg.string(),
-      features: t.arg.string(),
-      extraInfo: t.arg.string(),
-      reserved: t.arg.string(),
-      sold: t.arg.string(),
-      publishedAt: t.arg.string(),
-      impressions: t.arg.int(),
-      detailExpands: t.arg.int(),
-      interested: t.arg.int(),
-      vehicleVerified: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
       const {
         entryNo,
         vendorId,
@@ -764,7 +765,7 @@ builder.mutationFields((t) => ({
         detailExpands,
         interested,
         vehicleVerified,
-      } = args;
+      } = payload;
 
       return await prisma.vehicle.create({
         ...query,
@@ -821,47 +822,14 @@ builder.mutationFields((t) => ({
   updateVehicle: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      vendorId: t.arg.string(),
-      brandId: t.arg.string(),
-      modelId: t.arg.string(),
-      trim: t.arg.string(),
-      slug: t.arg.string(),
-      yearOfManufacture: t.arg.string(),
-      yearOfFirstRegistration: t.arg.string(),
-      registered: t.arg.string(),
-      registrationNo: t.arg.string(),
-      condition: t.arg.string(),
-      mileage: t.arg.int(),
-      mileageMetric: t.arg.string(),
-      transmissionType: t.arg.string(),
-      fuelType: t.arg.string(),
-      engineCapacity: t.arg.int(),
-      exteriorColor: t.arg.string(),
-      upholstery: t.arg.string(),
-      images: t.arg.string(),
-      viewingLocation: t.arg.string(),
-      vehicleOriginCountry: t.arg.string(),
-      engineType: t.arg.string(),
-      driveType: t.arg.string(),
-      vinNo: t.arg.string(),
-      bodyType: t.arg.string(),
-      interiorColor: t.arg.string(),
-      steering: t.arg.string(),
-      seats: t.arg.int(),
-      doors: t.arg.int(),
-      listingPrice: t.arg.int(),
-      discountedPrice: t.arg.int(),
-      discountAmount: t.arg.int(),
-      allowedPaymentModes: t.arg.string(),
-      offerType: t.arg.string(),
-      features: t.arg.string(),
-      extraInfo: t.arg.string(),
-      reserved: t.arg.string(),
-      sold: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
       const {
+        id,
         vendorId,
         brandId,
         modelId,
@@ -899,12 +867,12 @@ builder.mutationFields((t) => ({
         extraInfo,
         reserved,
         sold,
-      } = args;
+      } = payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           vendor: vendorId
@@ -957,25 +925,36 @@ builder.mutationFields((t) => ({
           reserved: reserved ? reserved : undefined,
           sold: sold ? sold : undefined,
         },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
+        },
       });
     },
   }),
   updateVehicleStatus: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      status: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { status } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, status } = payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           status: status ? status : undefined,
+        },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
         },
       });
     },
@@ -983,19 +962,25 @@ builder.mutationFields((t) => ({
   updateVehicleVerified: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      vehicleVerified: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { vehicleVerified } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, vehicleVerified } = payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           vehicleVerified: vehicleVerified ? vehicleVerified : undefined,
+        },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
         },
       });
     },
@@ -1003,19 +988,25 @@ builder.mutationFields((t) => ({
   updateVehicleSlug: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      slug: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { slug } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, slug } = payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           slug: slug ? slug : undefined,
+        },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
         },
       });
     },
@@ -1023,19 +1014,25 @@ builder.mutationFields((t) => ({
   updateVehicleReserved: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      reserved: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { reserved } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, reserved } = payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           reserved: reserved ? reserved : undefined,
+        },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
         },
       });
     },
@@ -1043,19 +1040,25 @@ builder.mutationFields((t) => ({
   updateVehicleSold: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      sold: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { sold } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, sold } = payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           sold: sold ? sold : undefined,
+        },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
         },
       });
     },
@@ -1063,19 +1066,25 @@ builder.mutationFields((t) => ({
   updateVehicleImages: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      images: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { images } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, images } = payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           images: images ? images : undefined,
+        },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
         },
       });
     },
@@ -1083,11 +1092,12 @@ builder.mutationFields((t) => ({
   updateVehicleThumbnail: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      thumbnail: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { id, thumbnail } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, thumbnail } = payload;
 
       return await prisma.vehicle.update({
         ...query,
@@ -1097,25 +1107,36 @@ builder.mutationFields((t) => ({
         data: {
           thumbnail: thumbnail ? thumbnail : undefined,
         },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
+        },
       });
     },
   }),
   updateVehiclePublishedAt: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      publishedAt: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { publishedAt } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, publishedAt } = payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           publishedAt: publishedAt ? publishedAt : undefined,
+        },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
         },
       });
     },
@@ -1123,19 +1144,25 @@ builder.mutationFields((t) => ({
   updateVehicleImpressions: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      impressions: t.arg.int(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { impressions } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, impressions } = payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           impressions: impressions ? impressions : undefined,
+        },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
         },
       });
     },
@@ -1143,19 +1170,25 @@ builder.mutationFields((t) => ({
   updateVehicleDetailExpands: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      detailExpands: t.arg.int(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { detailExpands } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, detailExpands } = payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           detailExpands: detailExpands ? detailExpands : undefined,
+        },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
         },
       });
     },
@@ -1163,19 +1196,25 @@ builder.mutationFields((t) => ({
   updateVehicleInterested: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      interested: t.arg.int(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { interested } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, interested } = payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           interested: interested || interested === 0 ? interested : undefined,
+        },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
         },
       });
     },
@@ -1183,27 +1222,13 @@ builder.mutationFields((t) => ({
   updateVehicleBasic: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      vendorId: t.arg.string(),
-      brandId: t.arg.string(),
-      modelId: t.arg.string(),
-      trim: t.arg.string(),
-      slug: t.arg.string(),
-      yearOfManufacture: t.arg.string(),
-      yearOfFirstRegistration: t.arg.string(),
-      registered: t.arg.string(),
-      registrationNo: t.arg.string(),
-      condition: t.arg.string(),
-      viewingLocation: t.arg.string(),
-      vehicleOriginCountry: t.arg.string(),
-      mileage: t.arg.int(),
-      mileageMetric: t.arg.string(),
-      listingPrice: t.arg.int(),
-      discountedPrice: t.arg.int(),
-      discountAmount: t.arg.int(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
       const {
+        id,
         vendorId,
         brandId,
         modelId,
@@ -1221,12 +1246,12 @@ builder.mutationFields((t) => ({
         listingPrice,
         discountedPrice,
         discountAmount,
-      } = args;
+      } = payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           vendor: vendorId
@@ -1257,28 +1282,24 @@ builder.mutationFields((t) => ({
           discountedPrice: discountedPrice ? discountedPrice : undefined,
           discountAmount: discountAmount ? discountAmount : undefined,
         },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
+        },
       });
     },
   }),
   updateVehicleSpecifications: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      transmissionType: t.arg.string(),
-      fuelType: t.arg.string(),
-      engineCapacity: t.arg.int(),
-      exteriorColor: t.arg.string(),
-      upholstery: t.arg.string(),
-      engineType: t.arg.string(),
-      driveType: t.arg.string(),
-      bodyType: t.arg.string(),
-      interiorColor: t.arg.string(),
-      steering: t.arg.string(),
-      seats: t.arg.int(),
-      doors: t.arg.int(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
       const {
+        id,
         transmissionType,
         fuelType,
         engineCapacity,
@@ -1291,12 +1312,12 @@ builder.mutationFields((t) => ({
         steering,
         seats,
         doors,
-      } = args;
+      } = payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           transmissionType: transmissionType ? transmissionType : undefined,
@@ -1312,27 +1333,29 @@ builder.mutationFields((t) => ({
           seats: seats ? seats : undefined,
           doors: doors ? doors : undefined,
         },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
+        },
       });
     },
   }),
   updateVehicleExtraInfo: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
-      vinNo: t.arg.string(),
-      allowedPaymentModes: t.arg.string(),
-      offerType: t.arg.string(),
-      features: t.arg.string(),
-      extraInfo: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { vinNo, allowedPaymentModes, offerType, features, extraInfo } =
-        args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, vinNo, allowedPaymentModes, offerType, features, extraInfo } =
+        payload;
 
       return await prisma.vehicle.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           vinNo: vinNo ? vinNo : undefined,
@@ -1343,20 +1366,30 @@ builder.mutationFields((t) => ({
           features: features ? features : undefined,
           extraInfo: extraInfo ? extraInfo : undefined,
         },
+        include: {
+          vendor: true,
+          brand: true,
+          model: true,
+        },
       });
     },
   }),
   deleteVehicle: t.prismaField({
     type: Vehicle,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.vehicle.delete({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.vehicle.delete({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
 }));

@@ -7,6 +7,7 @@ import {
   GET_BANNER_BY_ID,
   CREATE_BANNER,
   UPDATE_BANNER,
+  UPDATE_BANNER_STATUS,
   UPDATE_BANNER_IMPRESSIONS,
   UPDATE_BANNER_CLICKS,
   DELETE_BANNER,
@@ -14,10 +15,21 @@ import {
 
 // ** Others
 import { Banner } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const bannerInitialState = {
   id: "",
+  vendor: {
+    firstName: "",
+    lastName: "",
+    storeLink: "",
+    organization: {
+      nicename: "",
+      name: "",
+    },
+  },
+  status: "",
   type: "",
   title: "",
   link: "",
@@ -35,10 +47,12 @@ const bannerInitialState = {
 export const fetchBannerById = createAsyncThunk<Banner, { id: string }, {}>(
   "appBanner/fetchBannerById",
   async (id, { rejectWithValue }) => {
+    const encryptedData = encryptData(id);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_BANNER_BY_ID,
-        variables: { ...id },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -57,10 +71,12 @@ export const fetchBannerById = createAsyncThunk<Banner, { id: string }, {}>(
 export const addBanner = createAsyncThunk<Banner, Partial<Banner>, {}>(
   "appBanner/addBanner",
   async (bannerData, { rejectWithValue }) => {
+    const encryptedData = encryptData(bannerData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_BANNER,
-        variables: { ...bannerData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -79,10 +95,36 @@ export const addBanner = createAsyncThunk<Banner, Partial<Banner>, {}>(
 export const editBanner = createAsyncThunk<Banner, Partial<Banner>, {}>(
   "appBanner/editBanner",
   async (bannerData, { rejectWithValue }) => {
+    const encryptedData = encryptData(bannerData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_BANNER,
-        variables: { ...bannerData },
+        variables: { pl: encryptedData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Update Status
+export const editStatus = createAsyncThunk<Banner, any, {}>(
+  "appBanner/editStatus",
+  async (bannerData, { rejectWithValue }) => {
+    const encryptedData = encryptData(bannerData);
+
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_BANNER_STATUS,
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -101,10 +143,12 @@ export const editBanner = createAsyncThunk<Banner, Partial<Banner>, {}>(
 export const editImpressions = createAsyncThunk<Banner, any, {}>(
   "appBanner/editImpressions",
   async (bannerData, { rejectWithValue }) => {
+    const encryptedData = encryptData(bannerData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_BANNER_IMPRESSIONS,
-        variables: { ...bannerData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -123,10 +167,12 @@ export const editImpressions = createAsyncThunk<Banner, any, {}>(
 export const editClicks = createAsyncThunk<Banner, any, {}>(
   "appBanner/editClicks",
   async (bannerData, { rejectWithValue }) => {
+    const encryptedData = encryptData(bannerData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_BANNER_CLICKS,
-        variables: { ...bannerData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -145,10 +191,12 @@ export const editClicks = createAsyncThunk<Banner, any, {}>(
 export const removeBanner = createAsyncThunk<Banner, Partial<Banner>, {}>(
   "appBanner/removeBanner",
   async (bannerData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: bannerData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_BANNER,
-        variables: { id: bannerData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -198,6 +246,11 @@ export const appBannerSlice = createSlice({
         const { updateBanner }: any = payload;
 
         state.banner = { ...updateBanner };
+      })
+      .addCase(editStatus.fulfilled, (state, { payload }) => {
+        const { updateBannerStatus }: any = payload;
+
+        state.banner.status = updateBannerStatus.status;
       })
       .addCase(editImpressions.fulfilled, (state, { payload }) => {
         const { updateBannerImpressions }: any = payload;

@@ -1,5 +1,6 @@
 import prisma from "@lib/prisma";
 import { builder } from "../builder";
+import { decryptData } from "@core/utils/encryption";
 
 export const VehicleReview = builder.prismaObject("VehicleReview", {
   fields: (t) => ({
@@ -12,6 +13,8 @@ export const VehicleReview = builder.prismaObject("VehicleReview", {
     count: t.exposeString("count", { nullable: true }),
     rating: t.exposeString("rating", { nullable: true }),
     publishedAt: t.exposeString("publishedAt", { nullable: true }),
+    pl: t.exposeString("pl", { nullable: true }),
+    dt: t.exposeString("dt", { nullable: true }),
   }),
 });
 
@@ -20,54 +23,84 @@ builder.queryFields((t) => ({
     type: VehicleReview,
     cursor: "id",
     args: {
-      status: t.arg.string(),
+      pl: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
+      const payload = args && args.pl && decryptData(args.pl);
+
       return await prisma.vehicleReview.findMany({
         ...query,
-        where: {
-          ...(args.status && { status: args.status }),
+        ...(payload && {
+          where: {
+            ...(payload.status && {
+              status: payload.status,
+            }),
+          },
+        }),
+        include: {
+          vehicle: true,
+          customer: true,
         },
         orderBy: {
           publishedAt: "desc",
         },
       });
     },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.vehicleReview.count({
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
+      return await prisma.vehicleReview.count({
         ...connection,
-        where: {
-          ...(args.status && { status: args.status }),
-        },
-      }),
+        ...(payload && {
+          where: {
+            ...(payload.status && {
+              status: payload.status,
+            }),
+          },
+        }),
+      });
+    },
   }),
   vehicleByIdReviews: t.prismaConnection({
     type: VehicleReview,
     cursor: "id",
     args: {
-      vehicleId: t.arg.string({ required: true }),
-      status: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { vehicleId } = payload;
+
       return await prisma.vehicleReview.findMany({
         ...query,
         where: {
-          vehicleId: args.vehicleId,
-          ...(args.status && { status: args.status }),
+          vehicleId,
+          ...(payload.status && { status: payload.status }),
+        },
+        include: {
+          vehicle: true,
+          customer: true,
         },
         orderBy: {
           publishedAt: "desc",
         },
       });
     },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.vehicleReview.count({
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { vehicleId } = payload;
+
+      return await prisma.vehicleReview.count({
         ...connection,
         where: {
-          vehicleId: args.vehicleId,
-          ...(args.status && { status: args.status }),
+          vehicleId,
+          ...(payload.status && { status: payload.status }),
         },
-      }),
+      });
+    },
   }),
   vehicleReviewsCount: t.prismaField({
     type: VehicleReview,
@@ -107,15 +140,18 @@ builder.queryFields((t) => ({
     type: VehicleReview,
     nullable: true,
     args: {
-      vehicleId: t.arg.string({ required: true }),
-      status: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (_query, _parent, args, _info): Promise<any | undefined> => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { vehicleId, status } = payload;
+
       const aggregation = await prisma.vehicleReview.aggregate({
         _avg: { stars: true },
         where: {
-          vehicleId: args.vehicleId,
-          status: args.status,
+          vehicleId,
+          status,
         },
       });
 
@@ -130,15 +166,18 @@ builder.queryFields((t) => ({
     type: VehicleReview,
     nullable: true,
     args: {
-      status: t.arg.string({ required: true }),
-      limit: t.arg.int(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (_query, _parent, args, _info): Promise<any | undefined> => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { status } = payload;
+
       const group = await prisma.vehicleReview.groupBy({
         by: ["vehicleId"],
-        ...(args.limit && { take: args.limit }),
+        ...(payload.limit && { take: payload.limit }),
         where: {
-          status: args.status,
+          status,
         },
         _avg: { stars: true },
         _count: { vehicleId: true },
@@ -151,8 +190,9 @@ builder.queryFields((t) => ({
       const groupedData = group.map((item) => {
         return {
           vehicleId: item.vehicleId,
-          stars: item._avg.stars,
-          count: item._count.vehicleId,
+          stars: item._avg?.stars,
+          // @ts-ignore
+          count: item._count?.vehicleId,
         };
       });
 
@@ -165,15 +205,25 @@ builder.queryFields((t) => ({
     type: VehicleReview,
     nullable: true,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.vehicleReview.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
+      const { id } = payload;
+
+      return await prisma.vehicleReview.findUnique({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+        include: {
+          vehicle: true,
+          customer: true,
+        },
+      });
+    },
   }),
 }));
 
@@ -181,16 +231,13 @@ builder.mutationFields((t) => ({
   createVehicleReview: t.prismaField({
     type: VehicleReview,
     args: {
-      vehicleId: t.arg.string({ required: true }),
-      customerId: t.arg.string({ required: true }),
-      stars: t.arg.int({ required: false }),
-      comment: t.arg.string({ required: false }),
-      status: t.arg.string({ required: false }),
-      publishedAt: t.arg.string({ required: false }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
       const { vehicleId, customerId, stars, comment, status, publishedAt } =
-        args;
+        payload;
 
       return await prisma.vehicleReview.create({
         ...query,
@@ -208,50 +255,70 @@ builder.mutationFields((t) => ({
   updateVehicleReview: t.prismaField({
     type: VehicleReview,
     args: {
-      id: t.arg.string({ required: true }),
-      stars: t.arg.int({ required: false }),
-      comment: t.arg.string({ required: false }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.vehicleReview.update({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, stars, comment } = payload;
+
+      return await prisma.vehicleReview.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
-          stars: args.stars ? args.stars : undefined,
-          comment: args.comment ? args.comment : undefined,
+          stars: stars ? stars : undefined,
+          comment: comment ? comment : undefined,
         },
-      }),
+        include: {
+          vehicle: true,
+          customer: true,
+        },
+      });
+    },
   }),
   updateVehicleReviewStatus: t.prismaField({
     type: VehicleReview,
     args: {
-      id: t.arg.string({ required: true }),
-      status: t.arg.string({ required: false }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.vehicleReview.update({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, status } = payload;
+
+      return await prisma.vehicleReview.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
-          status: args.status ? args.status : undefined,
+          status: status ? status : undefined,
         },
-      }),
+        include: {
+          vehicle: true,
+          customer: true,
+        },
+      });
+    },
   }),
   deleteVehicleReview: t.prismaField({
     type: VehicleReview,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.vehicleReview.delete({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.vehicleReview.delete({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
 }));

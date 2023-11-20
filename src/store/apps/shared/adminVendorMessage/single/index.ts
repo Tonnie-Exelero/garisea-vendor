@@ -12,6 +12,7 @@ import {
 
 // ** Others
 import { AdminVendorMessage } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const adminVendorMessageInitialState = {
@@ -38,10 +39,12 @@ export const addAdminVendorMessage = createAsyncThunk<
 >(
   "appAdminVendorMessage/addAdminVendorMessage",
   async (adminVendorMessageData, { rejectWithValue }) => {
+    const encryptedData = encryptData(adminVendorMessageData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_MESSAGE,
-        variables: { ...adminVendorMessageData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -64,10 +67,12 @@ export const editAdminVendorMessage = createAsyncThunk<
 >(
   "appAdminVendorMessage/editAdminVendorMessage",
   async (adminVendorMessageData, { rejectWithValue }) => {
+    const encryptedData = encryptData(adminVendorMessageData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_MESSAGE,
-        variables: { ...adminVendorMessageData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -90,10 +95,12 @@ export const editAdminVendorMessageSeen = createAsyncThunk<
 >(
   "appAdminVendorMessage/editAdminVendorMessageSeen",
   async (adminVendorMessageData, { rejectWithValue }) => {
+    const encryptedData = encryptData(adminVendorMessageData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_MESSAGE_SEEN,
-        variables: { ...adminVendorMessageData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -116,10 +123,12 @@ export const removeAdminVendorMessage = createAsyncThunk<
 >(
   "appAdminVendorMessage/removeAdminVendorMessage",
   async (adminVendorMessageData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: adminVendorMessageData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_MESSAGE,
-        variables: { id: adminVendorMessageData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;

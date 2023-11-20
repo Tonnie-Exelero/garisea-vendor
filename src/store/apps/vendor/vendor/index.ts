@@ -11,6 +11,7 @@ import {
 
 // ** Others
 import { Vendor } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state
 const vendorsInitialState = {
@@ -22,8 +23,6 @@ const vendorsInitialState = {
         firstName: "",
         lastName: "",
         username: "",
-        email: "",
-        phone: "",
         image: "",
         storeLink: "",
         language: "",
@@ -80,10 +79,19 @@ interface VendorsState {
 export const fetchVendors = createAsyncThunk<Vendor, any, {}>(
   "appVendors/fetchVendors",
   async (vendorData, { rejectWithValue }) => {
+    const pagination = {
+      ...(vendorData.first && { first: vendorData.first }),
+      ...(vendorData.last && { last: vendorData.last }),
+      ...(vendorData.after && { after: vendorData.after }),
+      ...(vendorData.before && { before: vendorData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_VENDORS,
-        variables: vendorData,
+        variables: {
+          ...pagination,
+        },
       });
 
       return data;
@@ -102,10 +110,21 @@ export const fetchVendors = createAsyncThunk<Vendor, any, {}>(
 export const fetchVendorsByStatus = createAsyncThunk<Vendor, any, {}>(
   "appVendors/fetchVendorsByStatus",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = vendorData && encryptData(vendorData);
+    const pagination = {
+      ...(vendorData.first && { first: vendorData.first }),
+      ...(vendorData.last && { last: vendorData.last }),
+      ...(vendorData.after && { after: vendorData.after }),
+      ...(vendorData.before && { before: vendorData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_VENDORS_BY_STATUS,
-        variables: vendorData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -124,10 +143,21 @@ export const fetchVendorsByStatus = createAsyncThunk<Vendor, any, {}>(
 export const fetchFilteredVendors = createAsyncThunk<Vendor, any, {}>(
   "appVendors/fetchFilteredVendors",
   async (vendorData, { rejectWithValue }) => {
+    const encryptedData = vendorData && encryptData(vendorData);
+    const pagination = {
+      ...(vendorData.first && { first: vendorData.first }),
+      ...(vendorData.last && { last: vendorData.last }),
+      ...(vendorData.after && { after: vendorData.after }),
+      ...(vendorData.before && { before: vendorData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_VENDORS,
-        variables: vendorData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

@@ -10,8 +10,6 @@ export const GET_USERS = gql`
           firstName
           lastName
           username
-          email
-          phone
           image
           language
           status
@@ -40,14 +38,14 @@ export const GET_USERS = gql`
 
 export const GET_USERS_BY_ROLE_ID = gql`
   query GetUsersByRoleId(
-    $roleId: String!
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     usersByRoleId(
-      roleId: $roleId
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -60,8 +58,6 @@ export const GET_USERS_BY_ROLE_ID = gql`
           firstName
           lastName
           username
-          email
-          phone
           image
           language
           status
@@ -90,14 +86,14 @@ export const GET_USERS_BY_ROLE_ID = gql`
 
 export const GET_USERS_BY_STATUS = gql`
   query GetUsersByStatus(
-    $status: String!
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     usersByStatus(
-      status: $status
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -110,8 +106,6 @@ export const GET_USERS_BY_STATUS = gql`
           firstName
           lastName
           username
-          email
-          phone
           image
           language
           status
@@ -139,8 +133,20 @@ export const GET_USERS_BY_STATUS = gql`
 `;
 
 export const GET_FILTERED_USERS = gql`
-  query GetFilteredUsers($filter: String!) {
-    usersFiltered(filter: $filter) {
+  query GetFilteredUsers(
+    $pl: String!
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
+    usersFiltered(
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
       edges {
         cursor
         node {
@@ -148,8 +154,6 @@ export const GET_FILTERED_USERS = gql`
           firstName
           lastName
           username
-          email
-          phone
           image
           language
           status
@@ -177,8 +181,8 @@ export const GET_FILTERED_USERS = gql`
 `;
 
 export const GET_USER_BY_ID = gql`
-  query GetUserById($id: String!) {
-    userById(id: $id) {
+  query GetUserById($pl: String!) {
+    userById(pl: $pl) {
       id
       firstName
       lastName
@@ -204,8 +208,8 @@ export const GET_USER_BY_ID = gql`
 `;
 
 export const GET_USER_BY_EMAIL = gql`
-  query GetUserByEmail($email: String!) {
-    userByEmail(email: $email) {
+  query GetUserByEmail($pl: String!) {
+    userByEmail(pl: $pl) {
       id
       firstName
       lastName
@@ -231,38 +235,8 @@ export const GET_USER_BY_EMAIL = gql`
 `;
 
 export const CREATE_USER = gql`
-  mutation CreateUser(
-    $firstName: String
-    $lastName: String
-    $username: String!
-    $email: String!
-    $password: String
-    $phone: String
-    $image: String
-    $language: String
-    $status: String
-    $address: String
-    $city: String
-    $country: String
-    $emailVerified: String
-    $roleId: ID
-  ) {
-    createUser(
-      firstName: $firstName
-      lastName: $lastName
-      username: $username
-      email: $email
-      password: $password
-      phone: $phone
-      image: $image
-      language: $language
-      status: $status
-      address: $address
-      city: $city
-      country: $country
-      emailVerified: $emailVerified
-      roleId: $roleId
-    ) {
+  mutation CreateUser($pl: String!) {
+    createUser(pl: $pl) {
       id
       firstName
       lastName
@@ -288,34 +262,8 @@ export const CREATE_USER = gql`
 `;
 
 export const UPDATE_USER = gql`
-  mutation UpdateUser(
-    $id: String!
-    $firstName: String
-    $lastName: String
-    $username: String
-    $phone: String
-    $image: String
-    $language: String
-    $status: String
-    $address: String
-    $city: String
-    $country: String
-    $roleId: String
-  ) {
-    updateUser(
-      id: $id
-      firstName: $firstName
-      lastName: $lastName
-      username: $username
-      phone: $phone
-      image: $image
-      language: $language
-      status: $status
-      address: $address
-      city: $city
-      country: $country
-      roleId: $roleId
-    ) {
+  mutation UpdateUser($pl: String!) {
+    updateUser(pl: $pl) {
       id
       firstName
       lastName
@@ -341,103 +289,45 @@ export const UPDATE_USER = gql`
 `;
 
 export const UPDATE_PASSWORD = gql`
-  mutation UpdatePassword($id: String!, $password: String!) {
-    updatePassword(id: $id, password: $password) {
+  mutation UpdatePassword($pl: String!) {
+    updatePassword(pl: $pl) {
       id
       firstName
-      lastName
-      username
-      email
-      password
-      phone
-      image
-      language
-      status
-      address
-      city
-      country
-      emailVerified
-      onlineStatus
-      role {
-        id
-        name
-        slug
-      }
     }
   }
 `;
 
 export const UPDATE_IMAGE = gql`
-  mutation UpdateImage($id: String!, $image: String!) {
-    updateUserImage(id: $id, image: $image) {
+  mutation UpdateImage($pl: String!) {
+    updateUserImage(pl: $pl) {
       id
-      firstName
-      lastName
-      username
-      email
-      password
-      phone
       image
-      language
-      status
-      address
-      city
-      country
-      emailVerified
-      onlineStatus
-      role {
-        id
-        name
-        slug
-      }
     }
   }
 `;
 
 export const UPDATE_STATUS = gql`
-  mutation UpdateStatus($id: String!, $status: String!) {
-    updateUserStatus(id: $id, status: $status) {
+  mutation UpdateStatus($pl: String!) {
+    updateUserStatus(pl: $pl) {
       id
-      firstName
-      lastName
-      username
-      email
-      password
-      phone
-      image
-      language
       status
-      address
-      city
-      country
-      emailVerified
-      onlineStatus
-      role {
-        id
-        name
-        slug
-      }
     }
   }
 `;
 
 export const UPDATE_EMAIL_VERIFIED = gql`
-  mutation UpdateUserEmailVerified($id: String!, $emailVerified: String!) {
-    updateUserEmailVerified(id: $id, emailVerified: $emailVerified) {
+  mutation UpdateUserEmailVerified($pl: String!) {
+    updateUserEmailVerified(pl: $pl) {
       id
-      firstName
-      lastName
-      email
+      emailVerified
     }
   }
 `;
 
 export const DELETE_USER = gql`
-  mutation DeleteUser($id: String!) {
-    deleteUser(id: $id) {
+  mutation DeleteUser($pl: String!) {
+    deleteUser(pl: $pl) {
       id
-      firstName
-      lastName
     }
   }
 `;

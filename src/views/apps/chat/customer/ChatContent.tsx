@@ -28,6 +28,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@src/store";
 import apolloClient from "@src/lib/apollo";
 import { GET_MESSAGES } from "@src/api/shared/vendorCustomerMessage";
+import { encryptData } from "@core/utils/encryption";
 
 // ** Styled Components
 const ChatWrapperStartChat = styled(Box)<BoxProps>(({ theme }) => ({
@@ -86,8 +87,10 @@ const ChatContent = (props: ChatContentType) => {
     const { data } = await apolloClient.query({
       query: GET_MESSAGES,
       variables: {
-        vendorId: authedVendor.id,
-        customerId: currCustomer.id,
+        pl: encryptData({
+          vendorId: authedVendor.id,
+          customerId: currCustomer.id,
+        }),
         last: 100,
       },
       fetchPolicy: "no-cache",

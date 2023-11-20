@@ -7,6 +7,7 @@ import { GET_USER_BY_ID } from "@api/admin/user";
 
 // ** Others
 import { User } from "../../../admin/user/types";
+import { encryptData } from "@core/utils/encryption";
 
 // ** User initial state
 const userInitialState = {
@@ -46,10 +47,12 @@ const userInitialState = {
 export const fetchActiveAdminById = createAsyncThunk<User, { id: string }, {}>(
   "appAdminVendorContact/fetchActiveAdminById",
   async (id, { rejectWithValue }) => {
+    const encryptedData = encryptData(id);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_USER_BY_ID,
-        variables: { ...id },
+        variables: { pl: encryptedData },
       });
 
       return data;

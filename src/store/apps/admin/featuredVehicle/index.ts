@@ -10,6 +10,7 @@ import {
 
 // ** Others
 import { FeaturedVehicle } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const featuredVehiclesInitialState = {
@@ -18,15 +19,18 @@ const featuredVehiclesInitialState = {
       cursor: "",
       node: {
         id: "",
+        status: "",
+        vendor: {
+          firstName: "",
+          lastName: "",
+          storeLink: "",
+          organization: {
+            nicename: "",
+            name: "",
+          },
+        },
         vehicle: {
           id: "",
-          vendor: {
-            storeLink: "",
-            organization: {
-              name: "",
-              nicename: "",
-            },
-          },
           brand: {
             name: "",
           },
@@ -77,10 +81,22 @@ interface FeaturedVehiclesState {
 export const fetchFeaturedVehicles = createAsyncThunk<FeaturedVehicle, any, {}>(
   "appFeaturedVehicles/fetchFeaturedVehicles",
   async (featuredVehicleData, { rejectWithValue }) => {
+    const encryptedData =
+      featuredVehicleData && encryptData(featuredVehicleData);
+    const pagination = {
+      ...(featuredVehicleData.first && { first: featuredVehicleData.first }),
+      ...(featuredVehicleData.last && { last: featuredVehicleData.last }),
+      ...(featuredVehicleData.after && { after: featuredVehicleData.after }),
+      ...(featuredVehicleData.before && { before: featuredVehicleData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FEATURED_VEHICLES,
-        variables: featuredVehicleData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -103,10 +119,22 @@ export const fetchFilteredFeaturedVehicles = createAsyncThunk<
 >(
   "appFeaturedVehicles/fetchFilteredFeaturedVehicles",
   async (featuredVehicleData, { rejectWithValue }) => {
+    const encryptedData =
+      featuredVehicleData && encryptData(featuredVehicleData);
+    const pagination = {
+      ...(featuredVehicleData.first && { first: featuredVehicleData.first }),
+      ...(featuredVehicleData.last && { last: featuredVehicleData.last }),
+      ...(featuredVehicleData.after && { after: featuredVehicleData.after }),
+      ...(featuredVehicleData.before && { before: featuredVehicleData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_FEATURED_VEHICLES,
-        variables: featuredVehicleData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

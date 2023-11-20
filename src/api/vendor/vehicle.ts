@@ -12,14 +12,7 @@ export const GET_VEHICLES = gql`
             id
             firstName
             lastName
-            username
-            email
-            phone
-            image
             storeLink
-            address
-            city
-            country
             vendorVerified
             organization {
               id
@@ -91,22 +84,15 @@ export const GET_VEHICLES = gql`
 `;
 
 export const GET_VEHICLE_BY_ID = gql`
-  query GetVehicleById($id: String!) {
-    vehicleById(id: $id) {
+  query GetVehicleById($pl: String!) {
+    vehicleById(pl: $pl) {
       id
       entryNo
       vendor {
         id
         firstName
         lastName
-        username
-        email
-        phone
-        image
         storeLink
-        address
-        city
-        country
         vendorVerified
         organization {
           id
@@ -169,22 +155,15 @@ export const GET_VEHICLE_BY_ID = gql`
 `;
 
 export const GET_VEHICLE_BY_ENTRY_NO = gql`
-  query GetVehicleByEntryNo($entryNo: String!) {
-    vehicleByEntryNo(entryNo: $entryNo) {
+  query GetVehicleByEntryNo($pl: String!) {
+    vehicleByEntryNo(pl: $pl) {
       id
       entryNo
       vendor {
         id
         firstName
         lastName
-        username
-        email
-        phone
-        image
         storeLink
-        address
-        city
-        country
         vendorVerified
         organization {
           id
@@ -247,22 +226,15 @@ export const GET_VEHICLE_BY_ENTRY_NO = gql`
 `;
 
 export const GET_VEHICLE_BY_SLUG = gql`
-  query GetVehicleBySlug($slug: String!) {
-    vehicleBySlug(slug: $slug) {
+  query GetVehicleBySlug($pl: String!) {
+    vehicleBySlug(pl: $pl) {
       id
       entryNo
       vendor {
         id
         firstName
         lastName
-        username
-        email
-        phone
-        image
         storeLink
-        address
-        city
-        country
         vendorVerified
         organization {
           id
@@ -326,16 +298,14 @@ export const GET_VEHICLE_BY_SLUG = gql`
 
 export const GET_VEHICLES_BY_VENDOR_ID = gql`
   query GetVehiclesByVendorId(
-    $vendorId: String!
-    $status: String
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     vehiclesByVendorId(
-      vendorId: $vendorId
-      status: $status
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -350,14 +320,7 @@ export const GET_VEHICLES_BY_VENDOR_ID = gql`
             id
             firstName
             lastName
-            username
-            email
-            phone
-            image
             storeLink
-            address
-            city
-            country
             vendorVerified
             organization {
               id
@@ -431,91 +394,25 @@ export const GET_VEHICLES_BY_VENDOR_ID = gql`
 export const GET_VEHICLES_STATS_BY_VENDOR_ID = gql`
   query GetVehiclesStatsByVendorId($vendorId: String) {
     vehiclesCount(vendorId: $vendorId) {
-      vehicleVerified
+      dt
     }
   }
 `;
 
 export const GET_FILTERED_VEHICLES = gql`
   query GetVehiclesFiltered(
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
-    $entryNo: String
-    $vendorId: String
-    $brandId: String
-    $modelId: String
-    $minYear: String
-    $maxYear: String
-    $registered: String
-    $condition: String
-    $minMileage: Int
-    $maxMileage: Int
-    $status: String
-    $viewingLocation: String
-    $vehicleOriginCountry: String
-    $transmissionType: String
-    $fuelType: String
-    $minEngineCapacity: Int
-    $maxEngineCapacity: Int
-    $exteriorColor: String
-    $upholstery: String
-    $engineType: String
-    $driveType: String
-    $bodyType: String
-    $interiorColor: String
-    $steering: String
-    $seats: Int
-    $doors: Int
-    $minPrice: Int
-    $maxPrice: Int
-    $hasDiscount: String
-    $biggestDiscount: String
-    $reserved: String
-    $sold: String
-    $random: String
-    $sortBy: String
   ) {
     vehiclesFiltered(
+      pl: $pl
       first: $first
       last: $last
       after: $after
       before: $before
-      entryNo: $entryNo
-      vendorId: $vendorId
-      brandId: $brandId
-      modelId: $modelId
-      minYear: $minYear
-      maxYear: $maxYear
-      registered: $registered
-      condition: $condition
-      minMileage: $minMileage
-      maxMileage: $maxMileage
-      status: $status
-      viewingLocation: $viewingLocation
-      vehicleOriginCountry: $vehicleOriginCountry
-      transmissionType: $transmissionType
-      fuelType: $fuelType
-      minEngineCapacity: $minEngineCapacity
-      maxEngineCapacity: $maxEngineCapacity
-      exteriorColor: $exteriorColor
-      upholstery: $upholstery
-      engineType: $engineType
-      driveType: $driveType
-      bodyType: $bodyType
-      interiorColor: $interiorColor
-      steering: $steering
-      seats: $seats
-      doors: $doors
-      minPrice: $minPrice
-      maxPrice: $maxPrice
-      hasDiscount: $hasDiscount
-      biggestDiscount: $biggestDiscount
-      reserved: $reserved
-      sold: $sold
-      random: $random
-      sortBy: $sortBy
     ) {
       edges {
         cursor
@@ -526,14 +423,7 @@ export const GET_FILTERED_VEHICLES = gql`
             id
             firstName
             lastName
-            username
-            email
-            phone
-            image
             storeLink
-            address
-            city
-            country
             vendorVerified
             organization {
               id
@@ -605,8 +495,8 @@ export const GET_FILTERED_VEHICLES = gql`
 `;
 
 export const GET_VEHICLE_ANALYTICS = gql`
-  query GetVehicleAnalytics($id: String!) {
-    vehicleById(id: $id) {
+  query GetVehicleAnalytics($pl: String!) {
+    vehicleById(pl: $pl) {
       id
       impressions
       detailExpands
@@ -616,114 +506,15 @@ export const GET_VEHICLE_ANALYTICS = gql`
 `;
 
 export const CREATE_VEHICLE = gql`
-  mutation CreateVehicle(
-    $entryNo: String!
-    $vendorId: String!
-    $brandId: String!
-    $modelId: String!
-    $trim: String
-    $slug: String
-    $yearOfManufacture: String
-    $yearOfFirstRegistration: String
-    $registered: String
-    $registrationNo: String
-    $condition: String
-    $mileage: Int
-    $mileageMetric: String
-    $transmissionType: String
-    $fuelType: String
-    $engineCapacity: Int
-    $exteriorColor: String
-    $upholstery: String
-    $images: String
-    $thumbnail: String
-    $status: String
-    $viewingLocation: String
-    $vehicleOriginCountry: String
-    $engineType: String
-    $driveType: String
-    $vinNo: String
-    $bodyType: String
-    $interiorColor: String
-    $steering: String
-    $seats: Int
-    $doors: Int
-    $listingPrice: Int
-    $discountedPrice: Int
-    $discountAmount: Int
-    $allowedPaymentModes: String
-    $offerType: String
-    $features: String
-    $extraInfo: String
-    $reserved: String
-    $sold: String
-    $publishedAt: String
-    $impressions: Int
-    $detailExpands: Int
-    $interested: Int
-    $vehicleVerified: String
-  ) {
-    createVehicle(
-      entryNo: $entryNo
-      vendorId: $vendorId
-      brandId: $brandId
-      modelId: $modelId
-      trim: $trim
-      slug: $slug
-      yearOfManufacture: $yearOfManufacture
-      yearOfFirstRegistration: $yearOfFirstRegistration
-      registered: $registered
-      registrationNo: $registrationNo
-      condition: $condition
-      mileage: $mileage
-      mileageMetric: $mileageMetric
-      transmissionType: $transmissionType
-      fuelType: $fuelType
-      engineCapacity: $engineCapacity
-      exteriorColor: $exteriorColor
-      upholstery: $upholstery
-      images: $images
-      thumbnail: $thumbnail
-      status: $status
-      viewingLocation: $viewingLocation
-      vehicleOriginCountry: $vehicleOriginCountry
-      engineType: $engineType
-      driveType: $driveType
-      vinNo: $vinNo
-      bodyType: $bodyType
-      interiorColor: $interiorColor
-      steering: $steering
-      seats: $seats
-      doors: $doors
-      listingPrice: $listingPrice
-      discountedPrice: $discountedPrice
-      discountAmount: $discountAmount
-      allowedPaymentModes: $allowedPaymentModes
-      offerType: $offerType
-      features: $features
-      extraInfo: $extraInfo
-      reserved: $reserved
-      sold: $sold
-      publishedAt: $publishedAt
-      impressions: $impressions
-      detailExpands: $detailExpands
-      interested: $interested
-      vehicleVerified: $vehicleVerified
-    ) {
+  mutation CreateVehicle($pl: String!) {
+    createVehicle(pl: $pl) {
       id
       entryNo
       vendor {
         id
         firstName
         lastName
-        username
-        email
-        phone
-        image
         storeLink
-        address
-        city
-        country
         vendorVerified
         organization {
           id
@@ -786,100 +577,15 @@ export const CREATE_VEHICLE = gql`
 `;
 
 export const UPDATE_VEHICLE = gql`
-  mutation UpdateVehicle(
-    $id: String!
-    $vendorId: String
-    $brandId: String
-    $modelId: String
-    $trim: String
-    $slug: String
-    $yearOfManufacture: String
-    $yearOfFirstRegistration: String
-    $registered: String
-    $registrationNo: String
-    $condition: String
-    $mileage: Int
-    $mileageMetric: String
-    $transmissionType: String
-    $fuelType: String
-    $engineCapacity: Int
-    $exteriorColor: String
-    $upholstery: String
-    $images: String
-    $viewingLocation: String
-    $vehicleOriginCountry: String
-    $engineType: String
-    $driveType: String
-    $vinNo: String
-    $bodyType: String
-    $interiorColor: String
-    $steering: String
-    $seats: Int
-    $doors: Int
-    $listingPrice: Int
-    $discountedPrice: Int
-    $discountAmount: Int
-    $allowedPaymentModes: String
-    $offerType: String
-    $features: String
-    $extraInfo: String
-    $reserved: String
-    $sold: String
-  ) {
-    updateVehicle(
-      id: $id
-      vendorId: $vendorId
-      brandId: $brandId
-      modelId: $modelId
-      trim: $trim
-      slug: $slug
-      yearOfManufacture: $yearOfManufacture
-      yearOfFirstRegistration: $yearOfFirstRegistration
-      registered: $registered
-      registrationNo: $registrationNo
-      condition: $condition
-      mileage: $mileage
-      mileageMetric: $mileageMetric
-      transmissionType: $transmissionType
-      fuelType: $fuelType
-      engineCapacity: $engineCapacity
-      exteriorColor: $exteriorColor
-      upholstery: $upholstery
-      images: $images
-      viewingLocation: $viewingLocation
-      vehicleOriginCountry: $vehicleOriginCountry
-      engineType: $engineType
-      driveType: $driveType
-      vinNo: $vinNo
-      bodyType: $bodyType
-      interiorColor: $interiorColor
-      steering: $steering
-      seats: $seats
-      doors: $doors
-      listingPrice: $listingPrice
-      discountedPrice: $discountedPrice
-      discountAmount: $discountAmount
-      allowedPaymentModes: $allowedPaymentModes
-      offerType: $offerType
-      features: $features
-      extraInfo: $extraInfo
-      reserved: $reserved
-      sold: $sold
-    ) {
+  mutation UpdateVehicle($pl: String!) {
+    updateVehicle(pl: $pl) {
       id
       entryNo
       vendor {
         id
         firstName
         lastName
-        username
-        email
-        phone
-        image
         storeLink
-        address
-        city
-        country
         vendorVerified
         organization {
           id
@@ -942,8 +648,8 @@ export const UPDATE_VEHICLE = gql`
 `;
 
 export const UPDATE_VEHICLE_STATUS = gql`
-  mutation UpdateVehicleStatus($id: String!, $status: String) {
-    updateVehicleStatus(id: $id, status: $status) {
+  mutation UpdateVehicleStatus($pl: String!) {
+    updateVehicleStatus(pl: $pl) {
       id
       status
     }
@@ -951,8 +657,8 @@ export const UPDATE_VEHICLE_STATUS = gql`
 `;
 
 export const UPDATE_VEHICLE_VERIFIED = gql`
-  mutation UpdateVehicleVerified($id: String!, $vehicleVerified: String) {
-    updateVehicleVerified(id: $id, vehicleVerified: $vehicleVerified) {
+  mutation UpdateVehicleVerified($pl: String!) {
+    updateVehicleVerified(pl: $pl) {
       id
       vehicleVerified
     }
@@ -960,8 +666,8 @@ export const UPDATE_VEHICLE_VERIFIED = gql`
 `;
 
 export const UPDATE_VEHICLE_SLUG = gql`
-  mutation UpdateVehicleSlug($id: String!, $slug: String) {
-    updateVehicleSlug(id: $id, slug: $slug) {
+  mutation UpdateVehicleSlug($pl: String!) {
+    updateVehicleSlug(pl: $pl) {
       id
       slug
     }
@@ -969,8 +675,8 @@ export const UPDATE_VEHICLE_SLUG = gql`
 `;
 
 export const UPDATE_VEHICLE_RESERVED = gql`
-  mutation UpdateVehicleReserved($id: String!, $reserved: String) {
-    updateVehicleReserved(id: $id, reserved: $reserved) {
+  mutation UpdateVehicleReserved($pl: String!) {
+    updateVehicleReserved(pl: $pl) {
       id
       reserved
     }
@@ -978,8 +684,8 @@ export const UPDATE_VEHICLE_RESERVED = gql`
 `;
 
 export const UPDATE_VEHICLE_SOLD = gql`
-  mutation UpdateVehicleSold($id: String!, $sold: String) {
-    updateVehicleSold(id: $id, sold: $sold) {
+  mutation UpdateVehicleSold($pl: String!) {
+    updateVehicleSold(pl: $pl) {
       id
       sold
     }
@@ -987,8 +693,8 @@ export const UPDATE_VEHICLE_SOLD = gql`
 `;
 
 export const UPDATE_VEHICLE_IMAGES = gql`
-  mutation UpdateVehicleImages($id: String!, $images: String) {
-    updateVehicleImages(id: $id, images: $images) {
+  mutation UpdateVehicleImages($pl: String!) {
+    updateVehicleImages(pl: $pl) {
       id
       images
     }
@@ -996,8 +702,8 @@ export const UPDATE_VEHICLE_IMAGES = gql`
 `;
 
 export const UPDATE_VEHICLE_THUMBNAIL = gql`
-  mutation UpdateVehicleThumbnail($id: String!, $thumbnail: String) {
-    updateVehicleThumbnail(id: $id, thumbnail: $thumbnail) {
+  mutation UpdateVehicleThumbnail($pl: String!) {
+    updateVehicleThumbnail(pl: $pl) {
       id
       thumbnail
     }
@@ -1005,8 +711,8 @@ export const UPDATE_VEHICLE_THUMBNAIL = gql`
 `;
 
 export const UPDATE_VEHICLE_PUPLISHED_AT = gql`
-  mutation UpdateVehiclePublishedAt($id: String!, $publishedAt: String) {
-    updateVehiclePublishedAt(id: $id, publishedAt: $publishedAt) {
+  mutation UpdateVehiclePublishedAt($pl: String!) {
+    updateVehiclePublishedAt(pl: $pl) {
       id
       publishedAt
     }
@@ -1014,8 +720,8 @@ export const UPDATE_VEHICLE_PUPLISHED_AT = gql`
 `;
 
 export const UPDATE_VEHICLE_IMPRESSIONS = gql`
-  mutation UpdateVehicleImpressions($id: String!, $impressions: Int) {
-    updateVehicleImpressions(id: $id, impressions: $impressions) {
+  mutation UpdateVehicleImpressions($pl: String!) {
+    updateVehicleImpressions(pl: $pl) {
       id
       impressions
     }
@@ -1023,8 +729,8 @@ export const UPDATE_VEHICLE_IMPRESSIONS = gql`
 `;
 
 export const UPDATE_VEHICLE_DETAIL_EXPANDS = gql`
-  mutation UpdateVehicleDetailExpands($id: String!, $detailExpands: Int) {
-    updateVehicleDetailExpands(id: $id, detailExpands: $detailExpands) {
+  mutation UpdateVehicleDetailExpands($pl: String!) {
+    updateVehicleDetailExpands(pl: $pl) {
       id
       detailExpands
     }
@@ -1032,8 +738,8 @@ export const UPDATE_VEHICLE_DETAIL_EXPANDS = gql`
 `;
 
 export const UPDATE_VEHICLE_INTERESTED = gql`
-  mutation UpdateVehicleInterested($id: String!, $interested: Int) {
-    updateVehicleInterested(id: $id, interested: $interested) {
+  mutation UpdateVehicleInterested($pl: String!) {
+    updateVehicleInterested(pl: $pl) {
       id
       interested
     }
@@ -1041,60 +747,15 @@ export const UPDATE_VEHICLE_INTERESTED = gql`
 `;
 
 export const UPDATE_VEHICLE_BASIC = gql`
-  mutation UpdateVehicleBasic(
-    $id: String!
-    $vendorId: String
-    $brandId: String
-    $modelId: String
-    $trim: String
-    $slug: String
-    $yearOfManufacture: String
-    $yearOfFirstRegistration: String
-    $registered: String
-    $registrationNo: String
-    $condition: String
-    $viewingLocation: String
-    $vehicleOriginCountry: String
-    $mileage: Int
-    $mileageMetric: String
-    $listingPrice: Int
-    $discountedPrice: Int
-    $discountAmount: Int
-  ) {
-    updateVehicleBasic(
-      id: $id
-      vendorId: $vendorId
-      brandId: $brandId
-      modelId: $modelId
-      trim: $trim
-      slug: $slug
-      yearOfManufacture: $yearOfManufacture
-      yearOfFirstRegistration: $yearOfFirstRegistration
-      registered: $registered
-      registrationNo: $registrationNo
-      viewingLocation: $viewingLocation
-      vehicleOriginCountry: $vehicleOriginCountry
-      condition: $condition
-      mileage: $mileage
-      mileageMetric: $mileageMetric
-      listingPrice: $listingPrice
-      discountedPrice: $discountedPrice
-      discountAmount: $discountAmount
-    ) {
+  mutation UpdateVehicleBasic($pl: String!) {
+    updateVehicleBasic(pl: $pl) {
       id
       entryNo
       vendor {
         id
         firstName
         lastName
-        username
-        email
-        phone
-        image
         storeLink
-        address
-        city
-        country
         vendorVerified
         organization {
           id
@@ -1157,50 +818,15 @@ export const UPDATE_VEHICLE_BASIC = gql`
 `;
 
 export const UPDATE_VEHICLE_SPECIFICATIONS = gql`
-  mutation UpdateVehicleSpecifications(
-    $id: String!
-    $transmissionType: String
-    $fuelType: String
-    $engineCapacity: Int
-    $exteriorColor: String
-    $upholstery: String
-    $engineType: String
-    $driveType: String
-    $bodyType: String
-    $interiorColor: String
-    $steering: String
-    $seats: Int
-    $doors: Int
-  ) {
-    updateVehicleSpecifications(
-      id: $id
-      transmissionType: $transmissionType
-      fuelType: $fuelType
-      engineCapacity: $engineCapacity
-      exteriorColor: $exteriorColor
-      upholstery: $upholstery
-      engineType: $engineType
-      driveType: $driveType
-      bodyType: $bodyType
-      interiorColor: $interiorColor
-      steering: $steering
-      seats: $seats
-      doors: $doors
-    ) {
+  mutation UpdateVehicleSpecifications($pl: String!) {
+    updateVehicleSpecifications(pl: $pl) {
       id
       entryNo
       vendor {
         id
         firstName
         lastName
-        username
-        email
-        phone
-        image
         storeLink
-        address
-        city
-        country
         vendorVerified
         organization {
           id
@@ -1263,36 +889,15 @@ export const UPDATE_VEHICLE_SPECIFICATIONS = gql`
 `;
 
 export const UPDATE_VEHICLE_EXTRA_INFO = gql`
-  mutation UpdateVehicleExtraInfo(
-    $id: String!
-    $vinNo: String
-    $allowedPaymentModes: String
-    $offerType: String
-    $features: String
-    $extraInfo: String
-  ) {
-    updateVehicleExtraInfo(
-      id: $id
-      vinNo: $vinNo
-      allowedPaymentModes: $allowedPaymentModes
-      offerType: $offerType
-      features: $features
-      extraInfo: $extraInfo
-    ) {
+  mutation UpdateVehicleExtraInfo($pl: String!) {
+    updateVehicleExtraInfo(pl: $pl) {
       id
       entryNo
       vendor {
         id
         firstName
         lastName
-        username
-        email
-        phone
-        image
         storeLink
-        address
-        city
-        country
         vendorVerified
         organization {
           id
@@ -1355,8 +960,8 @@ export const UPDATE_VEHICLE_EXTRA_INFO = gql`
 `;
 
 export const DELETE_VEHICLE = gql`
-  mutation DeleteVehicle($id: String!) {
-    deleteVehicle(id: $id) {
+  mutation DeleteVehicle($pl: String!) {
+    deleteVehicle(pl: $pl) {
       id
       entryNo
     }

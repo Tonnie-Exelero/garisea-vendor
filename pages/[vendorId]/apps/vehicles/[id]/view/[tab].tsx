@@ -1,5 +1,5 @@
 // ** React Imports
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // ** Next Imports
 import Link from "next/link";
@@ -14,11 +14,14 @@ import VehicleViewPage from "src/views/apps/vehicle/view/VehicleViewPage";
 // ** API
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@src/store";
-import { fetchVehicleById } from "@src/store/apps/vendor/vehicle/single";
 
 // ** Others
 import Icon from "@components/icon";
 import { idleTimer } from "@src/configs/idleOrReload";
+import apolloClient from "@src/lib/apollo";
+import { GET_VEHICLE_BY_ID } from "@src/api/vendor/vehicle";
+import { encryptData } from "@core/utils/encryption";
+import { fetchVehicleById } from "@src/store/apps/vendor/vehicle/single";
 
 const VehicleView = ({
   id,
@@ -49,7 +52,7 @@ const VehicleView = ({
       >
         Vehicles List
       </Button>
-      <VehicleViewPage tab={tab} vehicle={vehicle} />
+      {vehicle && <VehicleViewPage tab={tab} vehicle={vehicle} />}
     </>
   );
 };

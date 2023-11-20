@@ -10,6 +10,7 @@ import {
 
 // ** Others
 import { AdminVendorContact } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const adminVendorContactsInitialState = {
@@ -67,10 +68,21 @@ export const fetchAdminVendorContacts = createAsyncThunk<
 >(
   "appAdminVendorContacts/fetchAdminVendorContacts",
   async (adminVendorContactData, { rejectWithValue }) => {
+    const encryptedData = adminVendorContactData && encryptData(adminVendorContactData);
+    const pagination = {
+      ...(adminVendorContactData.first && { first: adminVendorContactData.first }),
+      ...(adminVendorContactData.last && { last: adminVendorContactData.last }),
+      ...(adminVendorContactData.after && { after: adminVendorContactData.after }),
+      ...(adminVendorContactData.before && { before: adminVendorContactData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_CONTACTS,
-        variables: adminVendorContactData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -93,10 +105,21 @@ export const fetchAdminVendorContactsByIds = createAsyncThunk<
 >(
   "appAdminVendorContacts/fetchAdminVendorContactsByIds",
   async (adminVendorContactData, { rejectWithValue }) => {
+    const encryptedData = adminVendorContactData && encryptData(adminVendorContactData);
+    const pagination = {
+      ...(adminVendorContactData.first && { first: adminVendorContactData.first }),
+      ...(adminVendorContactData.last && { last: adminVendorContactData.last }),
+      ...(adminVendorContactData.after && { after: adminVendorContactData.after }),
+      ...(adminVendorContactData.before && { before: adminVendorContactData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_CONTACTS_BY_IDS,
-        variables: adminVendorContactData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

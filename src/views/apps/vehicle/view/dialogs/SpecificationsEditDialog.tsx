@@ -212,9 +212,7 @@ const SpecificationsEditDialog: React.FC<SpecificationsEditDialogProps> = ({
                   inputProps={{ placeholder: "Select Transmission Type" }}
                 >
                   <MenuItem value="Automatic">Automatic</MenuItem>
-                  <MenuItem value="Semi-Automatic">
-                    Semi-Automatic (Tiptronic)
-                  </MenuItem>
+                  <MenuItem value="Semi-Automatic">Semi-Automatic</MenuItem>
                   <MenuItem value="Manual">Manual</MenuItem>
                   <MenuItem value="Unspecified">Unspecified</MenuItem>
                 </Select>
@@ -239,7 +237,7 @@ const SpecificationsEditDialog: React.FC<SpecificationsEditDialogProps> = ({
                     2 Wheel Drive (Rear)
                   </MenuItem>
                   <MenuItem value="All Wheel Drive">All Wheel Drive</MenuItem>
-                  <MenuItem value="4x4">4x4/4WD</MenuItem>
+                  <MenuItem value="4x4">4x4</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

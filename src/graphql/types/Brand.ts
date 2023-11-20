@@ -1,5 +1,6 @@
 import prisma from "@lib/prisma";
 import { builder } from "../builder";
+import { decryptData } from "@core/utils/encryption";
 
 export const Brand = builder.prismaObject("Brand", {
   fields: (t) => ({
@@ -8,6 +9,8 @@ export const Brand = builder.prismaObject("Brand", {
     slug: t.exposeString("slug", { nullable: false }),
     description: t.exposeString("description", { nullable: true }),
     image: t.exposeString("image", { nullable: true }),
+    pl: t.exposeString("pl", { nullable: true }),
+    dt: t.exposeString("dt", { nullable: true }),
   }),
 });
 
@@ -16,98 +19,130 @@ builder.queryFields((t) => ({
     type: Brand,
     cursor: "id",
     args: {
-      hasVehicles: t.arg.string(),
-      orderBy: t.arg.string(),
+      pl: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
+      const payload = args && args.pl && decryptData(args.pl);
+
       return await prisma.brand.findMany({
         ...query,
-        where: {
-          ...(args.hasVehicles === "yes" && {
-            Vehicle: {
-              some: {},
-            },
-          }),
-        },
+        ...(payload && {
+          where: {
+            ...(payload.hasVehicles === "yes" && {
+              Vehicle: {
+                some: {},
+              },
+            }),
+          },
+        }),
         orderBy: {
-          ...(args.orderBy === "random" ? { id: "desc" } : { name: "asc" }),
+          ...(payload && payload.orderBy === "random"
+            ? { id: "desc" }
+            : { name: "asc" }),
         },
       });
     },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.brand.count({
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
+      return await prisma.brand.count({
         ...connection,
-        where: {
-          ...(args.hasVehicles === "yes" && {
-            Vehicle: {
-              some: {},
-            },
-          }),
-        },
-      }),
+        ...(payload && {
+          where: {
+            ...(payload.hasVehicles === "yes" && {
+              Vehicle: {
+                some: {},
+              },
+            }),
+          },
+        }),
+      });
+    },
   }),
   brandsFiltered: t.prismaConnection({
     type: Brand,
     cursor: "id",
     args: {
-      filter: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { filter } = payload;
+
       const where = {
         OR: [
-          { id: { contains: args.filter } },
-          { name: { contains: args.filter } },
-          { slug: { contains: args.filter } },
+          { id: { contains: filter } },
+          { name: { contains: filter } },
+          { slug: { contains: filter } },
         ],
       };
 
       return await prisma.brand.findMany({
         ...query,
-        where,
+        ...(payload && { where }),
         orderBy: {
           name: "asc",
         },
       });
     },
     totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { filter } = payload;
+
       const where = {
         OR: [
-          { id: { contains: args.filter } },
-          { name: { contains: args.filter } },
-          { slug: { contains: args.filter } },
+          { id: { contains: filter } },
+          { name: { contains: filter } },
+          { slug: { contains: filter } },
         ],
       };
 
-      return await prisma.brand.count({ ...connection, where });
+      return await prisma.brand.count({
+        ...connection,
+        ...(payload && { where }),
+      });
     },
   }),
   brandById: t.prismaField({
     type: Brand,
     nullable: true,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.brand.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.brand.findUnique({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
   brandBySlug: t.prismaField({
     type: Brand,
     nullable: true,
     args: {
-      slug: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.brand.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { slug } = payload;
+
+      return await prisma.brand.findUnique({
         ...query,
         where: {
-          slug: args.slug,
+          slug,
         },
-      }),
+      });
+    },
   }),
 }));
 
@@ -115,13 +150,12 @@ builder.mutationFields((t) => ({
   createBrand: t.prismaField({
     type: Brand,
     args: {
-      name: t.arg.string({ required: true }),
-      slug: t.arg.string({ required: true }),
-      description: t.arg.string({ required: false }),
-      image: t.arg.string({ required: false }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, ctx) => {
-      const { name, slug, description, image } = args;
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { name, slug, description, image } = payload;
 
       return await prisma.brand.create({
         ...query,
@@ -137,37 +171,43 @@ builder.mutationFields((t) => ({
   updateBrand: t.prismaField({
     type: Brand,
     args: {
-      id: t.arg.string({ required: true }),
-      name: t.arg.string(),
-      slug: t.arg.string(),
-      description: t.arg.string(),
-      image: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.brand.update({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, name, slug, description, image } = payload;
+
+      return await prisma.brand.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
-          name: args.name ? args.name : undefined,
-          slug: args.slug ? args.slug : undefined,
-          description: args.description ? args.description : undefined,
-          image: args.image ? args.image : undefined,
+          name: name ? name : undefined,
+          slug: slug ? slug : undefined,
+          description: description ? description : undefined,
+          image: image ? image : undefined,
         },
-      }),
+      });
+    },
   }),
   deleteBrand: t.prismaField({
     type: Brand,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.brand.delete({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.brand.delete({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
 }));

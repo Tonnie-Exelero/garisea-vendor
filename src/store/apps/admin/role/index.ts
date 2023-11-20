@@ -7,6 +7,7 @@ import { GET_ROLES, GET_FILTERED_ROLES } from "@api/admin/role";
 
 // ** Others
 import { Role } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const rolesInitialState = {
@@ -31,9 +32,6 @@ const rolesInitialState = {
         users: [
           {
             id: "",
-            firstName: "",
-            lastName: "",
-            image: "",
           },
         ],
       },
@@ -66,10 +64,21 @@ interface RolesState {
 export const fetchRoles = createAsyncThunk<Role, any, {}>(
   "appRoles/fetchRoles",
   async (roleData, { rejectWithValue }) => {
+    const encryptedData = roleData && encryptData(roleData);
+    const pagination = {
+      ...(roleData.first && { first: roleData.first }),
+      ...(roleData.last && { last: roleData.last }),
+      ...(roleData.after && { after: roleData.after }),
+      ...(roleData.before && { before: roleData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_ROLES,
-        variables: roleData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -88,10 +97,21 @@ export const fetchRoles = createAsyncThunk<Role, any, {}>(
 export const fetchFilteredRoles = createAsyncThunk<Role, any, {}>(
   "appRoles/fetchFilteredRoles",
   async (roleData, { rejectWithValue }) => {
+    const encryptedData = roleData && encryptData(roleData);
+    const pagination = {
+      ...(roleData.first && { first: roleData.first }),
+      ...(roleData.last && { last: roleData.last }),
+      ...(roleData.after && { after: roleData.after }),
+      ...(roleData.before && { before: roleData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_ROLES,
-        variables: roleData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

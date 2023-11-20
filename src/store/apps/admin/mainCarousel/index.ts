@@ -10,6 +10,7 @@ import {
 
 // ** Others
 import { MainCarousel } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const mainCarouselsInitialState = {
@@ -18,6 +19,16 @@ const mainCarouselsInitialState = {
       cursor: "",
       node: {
         id: "",
+        vendor: {
+          firstName: "",
+          lastName: "",
+          storeLink: "",
+          organization: {
+            nicename: "",
+            name: "",
+          },
+        },
+        status: "",
         type: "",
         title: "",
         image: "",
@@ -59,10 +70,21 @@ interface MainCarouselsState {
 export const fetchMainCarousels = createAsyncThunk<MainCarousel, any, {}>(
   "appMainCarousels/fetchMainCarousels",
   async (mainCarouselData, { rejectWithValue }) => {
+    const encryptedData = mainCarouselData && encryptData(mainCarouselData);
+    const pagination = {
+      ...(mainCarouselData.first && { first: mainCarouselData.first }),
+      ...(mainCarouselData.last && { last: mainCarouselData.last }),
+      ...(mainCarouselData.after && { after: mainCarouselData.after }),
+      ...(mainCarouselData.before && { before: mainCarouselData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_MAIN_CAROUSELS,
-        variables: mainCarouselData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -85,10 +107,21 @@ export const fetchFilteredMainCarousels = createAsyncThunk<
 >(
   "appMainCarousels/fetchFilteredMainCarousels",
   async (mainCarouselData, { rejectWithValue }) => {
+    const encryptedData = mainCarouselData && encryptData(mainCarouselData);
+    const pagination = {
+      ...(mainCarouselData.first && { first: mainCarouselData.first }),
+      ...(mainCarouselData.last && { last: mainCarouselData.last }),
+      ...(mainCarouselData.after && { after: mainCarouselData.after }),
+      ...(mainCarouselData.before && { before: mainCarouselData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_MAIN_CAROUSELS,
-        variables: mainCarouselData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
