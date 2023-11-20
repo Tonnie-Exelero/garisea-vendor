@@ -1,5 +1,6 @@
 import prisma from "@lib/prisma";
 import { builder } from "../builder";
+import { decryptData } from "@core/utils/encryption";
 
 export const Organization = builder.prismaObject("Organization", {
   fields: (t) => ({
@@ -16,6 +17,8 @@ export const Organization = builder.prismaObject("Organization", {
     address2: t.exposeString("address2", { nullable: true }),
     city: t.exposeString("city", { nullable: true }),
     country: t.exposeString("country", { nullable: true }),
+    pl: t.exposeString("pl", { nullable: true }),
+    dt: t.exposeString("dt", { nullable: true }),
   }),
 });
 
@@ -38,84 +41,110 @@ builder.queryFields((t) => ({
     type: Organization,
     cursor: "id",
     args: {
-      filter: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { filter } = payload;
+
       const where = {
         OR: [
-          { id: { contains: args.filter } },
-          { name: { contains: args.filter } },
-          { nicename: { contains: args.filter } },
-          { email: { contains: args.filter } },
-          { phone: { contains: args.filter } },
-          { city: { contains: args.filter } },
-          { country: { contains: args.filter } },
+          { id: { contains: filter } },
+          { name: { contains: filter } },
+          { nicename: { contains: filter } },
+          { email: { contains: filter } },
+          { phone: { contains: filter } },
+          { city: { contains: filter } },
+          { country: { contains: filter } },
         ],
       };
 
       return await prisma.organization.findMany({
         ...query,
-        where,
+        ...(payload && { where }),
         orderBy: {
           name: "asc",
         },
       });
     },
     totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { filter } = payload;
+
       const where = {
         OR: [
-          { id: { contains: args.filter } },
-          { name: { contains: args.filter } },
-          { nicename: { contains: args.filter } },
-          { email: { contains: args.filter } },
-          { phone: { contains: args.filter } },
-          { city: { contains: args.filter } },
-          { country: { contains: args.filter } },
+          { id: { contains: filter } },
+          { name: { contains: filter } },
+          { nicename: { contains: filter } },
+          { email: { contains: filter } },
+          { phone: { contains: filter } },
+          { city: { contains: filter } },
+          { country: { contains: filter } },
         ],
       };
 
-      return await prisma.organization.count({ ...connection, where });
+      return await prisma.organization.count({
+        ...connection,
+        ...(payload && { where }),
+      });
     },
   }),
   organizationById: t.prismaField({
     type: Organization,
     nullable: true,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.organization.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.organization.findUnique({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
   organizationByName: t.prismaField({
     type: Organization,
     nullable: true,
     args: {
-      name: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.organization.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { name } = payload;
+
+      return await prisma.organization.findUnique({
         ...query,
         where: {
-          name: args.name,
+          name,
         },
-      }),
+      });
+    },
   }),
   organizationCheckName: t.prismaField({
     type: Organization,
     nullable: true,
     args: {
-      name: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _info): Promise<any | undefined> => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
+      const { name } = payload;
+
       const organization = await prisma.organization.findUnique({
         ...query,
         where: {
-          name: args.name,
+          name,
         },
       });
 
@@ -138,16 +167,12 @@ builder.mutationFields((t) => ({
   createOrganization: t.prismaField({
     type: "Organization",
     args: {
-      name: t.arg.string({ required: true }),
-      email: t.arg.string(),
-      phone: t.arg.string(),
-      address: t.arg.string(),
-      address2: t.arg.string(),
-      city: t.arg.string(),
-      country: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { name, email, phone, address, address2, city, country } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { name, email, phone, address, address2, city, country } = payload;
 
       return await prisma.organization.create({
         ...query,
@@ -166,24 +191,27 @@ builder.mutationFields((t) => ({
   updateOrganization: t.prismaField({
     type: "Organization",
     args: {
-      id: t.arg.string({ required: true }),
-      name: t.arg.string(),
-      nicename: t.arg.string(),
-      email: t.arg.string(),
-      phone: t.arg.string(),
-      address: t.arg.string(),
-      address2: t.arg.string(),
-      city: t.arg.string(),
-      country: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { name, nicename, email, phone, address, address2, city, country } =
-        args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const {
+        id,
+        name,
+        nicename,
+        email,
+        phone,
+        address,
+        address2,
+        city,
+        country,
+      } = payload;
 
       return await prisma.organization.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           name: name ? name : undefined,
@@ -201,16 +229,17 @@ builder.mutationFields((t) => ({
   updateOrganizationCoverImage: t.prismaField({
     type: "Organization",
     args: {
-      id: t.arg.string({ required: true }),
-      coverImage: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { coverImage } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, coverImage } = payload;
 
       return await prisma.organization.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           coverImage: coverImage ? coverImage : undefined,
@@ -221,16 +250,17 @@ builder.mutationFields((t) => ({
   updateOrganizationLogo: t.prismaField({
     type: "Organization",
     args: {
-      id: t.arg.string({ required: true }),
-      logo: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { logo } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, logo } = payload;
 
       return await prisma.organization.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           logo: logo ? logo : undefined,
@@ -241,16 +271,17 @@ builder.mutationFields((t) => ({
   updateOrganizationCertificate: t.prismaField({
     type: "Organization",
     args: {
-      id: t.arg.string({ required: true }),
-      certificate: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { certificate } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, certificate } = payload;
 
       return await prisma.organization.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           certificate: certificate ? certificate : undefined,
@@ -261,16 +292,17 @@ builder.mutationFields((t) => ({
   updateOrganizationKRAPin: t.prismaField({
     type: "Organization",
     args: {
-      id: t.arg.string({ required: true }),
-      kraPin: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { kraPin } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, kraPin } = payload;
 
       return await prisma.organization.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           kraPin: kraPin ? kraPin : undefined,
@@ -281,14 +313,19 @@ builder.mutationFields((t) => ({
   deleteOrganization: t.prismaField({
     type: "Organization",
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.organization.delete({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.organization.delete({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
 }));

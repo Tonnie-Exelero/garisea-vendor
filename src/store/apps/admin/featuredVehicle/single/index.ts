@@ -7,6 +7,7 @@ import {
   GET_FEATURED_VEHICLE_BY_ID,
   CREATE_FEATURED_VEHICLE,
   UPDATE_FEATURED_VEHICLE,
+  UPDATE_FEATURED_VEHICLE_STATUS,
   UPDATE_FEATURED_VEHICLE_IMPRESSIONS,
   UPDATE_FEATURED_VEHICLE_CLICKS,
   DELETE_FEATURED_VEHICLE,
@@ -14,19 +15,23 @@ import {
 
 // ** Others
 import { FeaturedVehicle } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const featuredVehicleInitialState = {
   id: "",
+  status: "",
+  vendor: {
+    firstName: "",
+    lastName: "",
+    storeLink: "",
+    organization: {
+      nicename: "",
+      name: "",
+    },
+  },
   vehicle: {
     id: "",
-    vendor: {
-      storeLink: "",
-      organization: {
-        name: "",
-        nicename: "",
-      },
-    },
     brand: {
       name: "",
     },
@@ -57,10 +62,12 @@ export const fetchFeaturedVehicleById = createAsyncThunk<
 >(
   "appFeaturedVehicle/fetchFeaturedVehicleById",
   async (id, { rejectWithValue }) => {
+    const encryptedData = encryptData(id);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FEATURED_VEHICLE_BY_ID,
-        variables: { ...id },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -83,10 +90,12 @@ export const addFeaturedVehicle = createAsyncThunk<
 >(
   "appFeaturedVehicle/addFeaturedVehicle",
   async (featuredVehicleData, { rejectWithValue }) => {
+    const encryptedData = encryptData(featuredVehicleData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_FEATURED_VEHICLE,
-        variables: { ...featuredVehicleData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -109,10 +118,36 @@ export const editFeaturedVehicle = createAsyncThunk<
 >(
   "appFeaturedVehicle/editFeaturedVehicle",
   async (featuredVehicleData, { rejectWithValue }) => {
+    const encryptedData = encryptData(featuredVehicleData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_FEATURED_VEHICLE,
-        variables: { ...featuredVehicleData },
+        variables: { pl: encryptedData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Update Status
+export const editStatus = createAsyncThunk<FeaturedVehicle, any, {}>(
+  "appFeaturedVehicle/editStatus",
+  async (featuredVehicleData, { rejectWithValue }) => {
+    const encryptedData = encryptData(featuredVehicleData);
+
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_FEATURED_VEHICLE_STATUS,
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -131,10 +166,12 @@ export const editFeaturedVehicle = createAsyncThunk<
 export const editImpressions = createAsyncThunk<FeaturedVehicle, any, {}>(
   "appFeaturedVehicle/editImpressions",
   async (featuredVehicleData, { rejectWithValue }) => {
+    const encryptedData = encryptData(featuredVehicleData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_FEATURED_VEHICLE_IMPRESSIONS,
-        variables: { ...featuredVehicleData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -153,10 +190,12 @@ export const editImpressions = createAsyncThunk<FeaturedVehicle, any, {}>(
 export const editClicks = createAsyncThunk<FeaturedVehicle, any, {}>(
   "appFeaturedVehicle/editClicks",
   async (featuredVehicleData, { rejectWithValue }) => {
+    const encryptedData = encryptData(featuredVehicleData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_FEATURED_VEHICLE_CLICKS,
-        variables: { ...featuredVehicleData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -179,10 +218,12 @@ export const removeFeaturedVehicle = createAsyncThunk<
 >(
   "appFeaturedVehicle/removeFeaturedVehicle",
   async (featuredVehicleData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: featuredVehicleData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_FEATURED_VEHICLE,
-        variables: { id: featuredVehicleData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -232,6 +273,11 @@ export const appFeaturedVehicleSlice = createSlice({
         const { updateFeaturedVehicle }: any = payload;
 
         state.featuredVehicle = { ...updateFeaturedVehicle };
+      })
+      .addCase(editStatus.fulfilled, (state, { payload }) => {
+        const { updateFeaturedVehicleStatus }: any = payload;
+
+        state.featuredVehicle.status = updateFeaturedVehicleStatus.status;
       })
       .addCase(editImpressions.fulfilled, (state, { payload }) => {
         const { updateFeaturedVehicleImpressions }: any = payload;

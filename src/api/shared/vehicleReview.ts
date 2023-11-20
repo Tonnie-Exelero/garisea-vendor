@@ -2,14 +2,14 @@ import { gql } from "@apollo/client";
 
 export const GET_VEHICLE_REVIEWS = gql`
   query GetVehicleReviews(
-    $status: String
+    $pl: String
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     vehicleReviews(
-      status: $status
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -66,16 +66,14 @@ export const GET_VEHICLE_REVIEWS = gql`
 
 export const GET_VEHICLE_BY_ID_REVIEWS = gql`
   query GetVehicleByIdReviews(
-    $vehicleId: String!
-    $status: String
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     vehicleByIdReviews(
-      vehicleId: $vehicleId
-      status: $status
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -139,24 +137,24 @@ export const GET_VEHICLE_REVIEWS_COUNT = gql`
 `;
 
 export const GET_VEHICLE_REVIEWS_STARS_AVG = gql`
-  query GetVehicleReviewsStarsAvg($vehicleId: String!, $status: String) {
-    vehicleReviewStarsAvg(vehicleId: $vehicleId, status: $status) {
+  query GetVehicleReviewsStarsAvg($pl: String!) {
+    vehicleReviewStarsAvg(pl: $pl) {
       rating
     }
   }
 `;
 
 export const GET_VEHICLES_REVIEWS_TOP_RATED = gql`
-  query GetVehiclesReviewsTopRated($status: String!, $limit: Int) {
-    vehiclesReviewsTopRated(status: $status, limit: $limit) {
+  query GetVehiclesReviewsTopRated($pl: String!) {
+    vehiclesReviewsTopRated(pl: $pl) {
       rating
     }
   }
 `;
 
 export const GET_VEHICLE_REVIEW_BY_ID = gql`
-  query GetVehicleReviewById($id: String!) {
-    vehicleReviewById(id: $id) {
+  query GetVehicleReviewById($pl: String!) {
+    vehicleReviewById(pl: $pl) {
       id
       publishedAt
       vehicle {
@@ -195,22 +193,8 @@ export const GET_VEHICLE_REVIEW_BY_ID = gql`
 `;
 
 export const CREATE_VEHICLE_REVIEW = gql`
-  mutation CreateVehicleReview(
-    $vehicleId: String!
-    $customerId: String!
-    $stars: Int
-    $comment: String
-    $status: String
-    $publishedAt: String
-  ) {
-    createVehicleReview(
-      vehicleId: $vehicleId
-      customerId: $customerId
-      stars: $stars
-      comment: $comment
-      status: $status
-      publishedAt: $publishedAt
-    ) {
+  mutation CreateVehicleReview($pl: String!) {
+    createVehicleReview(pl: $pl) {
       id
       publishedAt
       vehicle {
@@ -249,8 +233,8 @@ export const CREATE_VEHICLE_REVIEW = gql`
 `;
 
 export const UPDATE_VEHICLE_REVIEW = gql`
-  mutation UpdateVehicleReview($id: String!, $stars: Int, $comment: String) {
-    updateVehicleReview(id: $id, stars: $stars, comment: $comment) {
+  mutation UpdateVehicleReview($pl: String!) {
+    updateVehicleReview(pl: $pl) {
       id
       publishedAt
       vehicle {
@@ -289,8 +273,8 @@ export const UPDATE_VEHICLE_REVIEW = gql`
 `;
 
 export const UPDATE_VEHICLE_REVIEW_STATUS = gql`
-  mutation UpdateVehicleReviewStatus($id: String!, $status: String) {
-    updateVehicleReviewStatus(id: $id, status: $status) {
+  mutation UpdateVehicleReviewStatus($pl: String!) {
+    updateVehicleReviewStatus(pl: $pl) {
       id
       publishedAt
       vehicle {
@@ -329,8 +313,8 @@ export const UPDATE_VEHICLE_REVIEW_STATUS = gql`
 `;
 
 export const DELETE_VEHICLE_REVIEW = gql`
-  mutation DeleteVehicleReview($id: String!) {
-    deleteVehicleReview(id: $id) {
+  mutation DeleteVehicleReview($pl: String!) {
+    deleteVehicleReview(pl: $pl) {
       id
     }
   }

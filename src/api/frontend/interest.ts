@@ -2,16 +2,14 @@ import { gql } from "@apollo/client";
 
 export const GET_INTERESTS = gql`
   query GetInterests(
-    $customerId: String!
-    $vehicleId: String
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     interests(
-      customerId: $customerId
-      vehicleId: $vehicleId
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -74,8 +72,8 @@ export const GET_INTERESTS = gql`
 `;
 
 export const CREATE_INTEREST = gql`
-  mutation CreateInterest($customerId: String!, $vehicleId: String!) {
-    createInterest(customerId: $customerId, vehicleId: $vehicleId) {
+  mutation CreateInterest($pl: String!) {
+    createInterest(pl: $pl) {
       id
       customer {
         id
@@ -88,8 +86,8 @@ export const CREATE_INTEREST = gql`
 `;
 
 export const DELETE_INTEREST = gql`
-  mutation DeleteInterest($id: String!) {
-    deleteInterest(id: $id) {
+  mutation DeleteInterest($pl: String!) {
+    deleteInterest(pl: $pl) {
       id
     }
   }

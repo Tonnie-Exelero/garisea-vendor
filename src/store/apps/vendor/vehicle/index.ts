@@ -11,6 +11,7 @@ import {
 
 // ** Others
 import { Vehicle } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state
 const vehiclesInitialState = {
@@ -121,10 +122,21 @@ interface VehiclesState {
 export const fetchVehicles = createAsyncThunk<Vehicle, any, {}>(
   "appVehicles/fetchVehicles",
   async (vehicleData, { rejectWithValue }) => {
+    const encryptedData = vehicleData && encryptData(vehicleData);
+    const pagination = {
+      ...(vehicleData.first && { first: vehicleData.first }),
+      ...(vehicleData.last && { last: vehicleData.last }),
+      ...(vehicleData.after && { after: vehicleData.after }),
+      ...(vehicleData.before && { before: vehicleData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_VEHICLES,
-        variables: vehicleData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -143,10 +155,21 @@ export const fetchVehicles = createAsyncThunk<Vehicle, any, {}>(
 export const fetchVehiclesByVendor = createAsyncThunk<Vehicle, any, {}>(
   "appVehicles/fetchVehiclesByVendor",
   async (vehicleData, { rejectWithValue }) => {
+    const encryptedData = vehicleData && encryptData(vehicleData);
+    const pagination = {
+      ...(vehicleData.first && { first: vehicleData.first }),
+      ...(vehicleData.last && { last: vehicleData.last }),
+      ...(vehicleData.after && { after: vehicleData.after }),
+      ...(vehicleData.before && { before: vehicleData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_VEHICLES_BY_VENDOR_ID,
-        variables: vehicleData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -165,10 +188,21 @@ export const fetchVehiclesByVendor = createAsyncThunk<Vehicle, any, {}>(
 export const fetchFilteredVehicles = createAsyncThunk<Vehicle, any, {}>(
   "appVehicles/fetchFilteredVehicles",
   async (vehicleData, { rejectWithValue }) => {
+    const encryptedData = vehicleData && encryptData(vehicleData);
+    const pagination = {
+      ...(vehicleData.first && { first: vehicleData.first }),
+      ...(vehicleData.last && { last: vehicleData.last }),
+      ...(vehicleData.after && { after: vehicleData.after }),
+      ...(vehicleData.before && { before: vehicleData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_VEHICLES,
-        variables: vehicleData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

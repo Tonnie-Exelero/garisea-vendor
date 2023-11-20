@@ -1,8 +1,15 @@
 import { gql } from "@apollo/client";
 
 export const GET_FEATURED_VEHICLES = gql`
-  query GetFeaturedVehicles($first: Int, $last: Int, $after: ID, $before: ID) {
+  query GetFeaturedVehicles(
+    $pl: String
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
     featuredVehicles(
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -16,6 +23,7 @@ export const GET_FEATURED_VEHICLES = gql`
             id
             vendor {
               storeLink
+              vendorVerified
               organization {
                 name
                 nicename
@@ -32,6 +40,7 @@ export const GET_FEATURED_VEHICLES = gql`
             yearOfManufacture
             yearOfFirstRegistration
             images
+            thumbnail
             status
           }
           page
@@ -56,14 +65,18 @@ export const GET_FEATURED_VEHICLES = gql`
 
 export const GET_FILTERED_FEATURED_VEHICLES = gql`
   query GetFilteredFeaturedVehicles(
-    $vehicleId: String
-    $page: String
-    $position: String
+    $pl: String!
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
   ) {
     featuredVehiclesFiltered(
-      vehicleId: $vehicleId
-      page: $page
-      position: $position
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
     ) {
       edges {
         cursor
@@ -73,6 +86,7 @@ export const GET_FILTERED_FEATURED_VEHICLES = gql`
             id
             vendor {
               storeLink
+              vendorVerified
               organization {
                 name
                 nicename
@@ -89,6 +103,7 @@ export const GET_FILTERED_FEATURED_VEHICLES = gql`
             yearOfManufacture
             yearOfFirstRegistration
             images
+            thumbnail
             status
           }
           page
@@ -112,13 +127,14 @@ export const GET_FILTERED_FEATURED_VEHICLES = gql`
 `;
 
 export const GET_FEATURED_VEHICLE_BY_ID = gql`
-  query GetFeaturedVehicleById($id: String!) {
-    featuredVehicleById(id: $id) {
+  query GetFeaturedVehicleById($pl: String!) {
+    featuredVehicleById(pl: $pl) {
       id
       vehicle {
         id
         vendor {
           storeLink
+          vendorVerified
           organization {
             name
             nicename
@@ -135,6 +151,7 @@ export const GET_FEATURED_VEHICLE_BY_ID = gql`
         yearOfManufacture
         yearOfFirstRegistration
         images
+        thumbnail
         status
       }
       page
@@ -149,31 +166,14 @@ export const GET_FEATURED_VEHICLE_BY_ID = gql`
 `;
 
 export const CREATE_FEATURED_VEHICLE = gql`
-  mutation CreateFeaturedVehicle(
-    $vehicleId: String!
-    $page: String
-    $position: String
-    $rank: Int
-    $impressions: Int
-    $clicks: Int
-    $targetImpressions: Int
-    $targetClicks: Int
-  ) {
-    createFeaturedVehicle(
-      vehicleId: $vehicleId
-      page: $page
-      position: $position
-      rank: $rank
-      impressions: $impressions
-      clicks: $clicks
-      targetImpressions: $targetImpressions
-      targetClicks: $targetClicks
-    ) {
+  mutation CreateFeaturedVehicle($pl: String!) {
+    createFeaturedVehicle(pl: $pl) {
       id
       vehicle {
         id
         vendor {
           storeLink
+          vendorVerified
           organization {
             name
             nicename
@@ -190,6 +190,7 @@ export const CREATE_FEATURED_VEHICLE = gql`
         yearOfManufacture
         yearOfFirstRegistration
         images
+        thumbnail
         status
       }
       page
@@ -204,31 +205,14 @@ export const CREATE_FEATURED_VEHICLE = gql`
 `;
 
 export const UPDATE_FEATURED_VEHICLE = gql`
-  mutation UpdateFeaturedVehicle(
-    $id: String!
-    $page: String
-    $position: String
-    $rank: Int
-    $impressions: Int
-    $clicks: Int
-    $targetImpressions: Int
-    $targetClicks: Int
-  ) {
-    updateFeaturedVehicle(
-      id: $id
-      page: $page
-      position: $position
-      rank: $rank
-      impressions: $impressions
-      clicks: $clicks
-      targetImpressions: $targetImpressions
-      targetClicks: $targetClicks
-    ) {
+  mutation UpdateFeaturedVehicle($pl: String!) {
+    updateFeaturedVehicle(pl: $pl) {
       id
       vehicle {
         id
         vendor {
           storeLink
+          vendorVerified
           organization {
             name
             nicename
@@ -245,6 +229,7 @@ export const UPDATE_FEATURED_VEHICLE = gql`
         yearOfManufacture
         yearOfFirstRegistration
         images
+        thumbnail
         status
       }
       page
@@ -258,9 +243,18 @@ export const UPDATE_FEATURED_VEHICLE = gql`
   }
 `;
 
+export const UPDATE_FEATURED_VEHICLE_STATUS = gql`
+  mutation UpdateFeaturedVehicleStatus($pl: String!) {
+    updateFeaturedVehicleStatus(pl: $pl) {
+      id
+      status
+    }
+  }
+`;
+
 export const UPDATE_FEATURED_VEHICLE_IMPRESSIONS = gql`
-  mutation UpdateFeaturedVehicleImpressions($id: String!, $impressions: Int) {
-    updateFeaturedVehicleImpressions(id: $id, impressions: $impressions) {
+  mutation UpdateFeaturedVehicleImpressions($pl: String!) {
+    updateFeaturedVehicleImpressions(pl: $pl) {
       id
       impressions
     }
@@ -268,8 +262,8 @@ export const UPDATE_FEATURED_VEHICLE_IMPRESSIONS = gql`
 `;
 
 export const UPDATE_FEATURED_VEHICLE_CLICKS = gql`
-  mutation UpdateFeaturedVehicleClicks($id: String!, $clicks: Int) {
-    updateFeaturedVehicleClicks(id: $id, clicks: $clicks) {
+  mutation UpdateFeaturedVehicleClicks($pl: String!) {
+    updateFeaturedVehicleClicks(pl: $pl) {
       id
       clicks
     }
@@ -277,8 +271,8 @@ export const UPDATE_FEATURED_VEHICLE_CLICKS = gql`
 `;
 
 export const DELETE_FEATURED_VEHICLE = gql`
-  mutation DeleteFeaturedVehicle($id: String!) {
-    deleteFeaturedVehicle(id: $id) {
+  mutation DeleteFeaturedVehicle($pl: String!) {
+    deleteFeaturedVehicle(pl: $pl) {
       id
     }
   }

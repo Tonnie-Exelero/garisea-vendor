@@ -12,10 +12,12 @@ import {
   UPDATE_IMAGE,
   UPDATE_STATUS,
   UPDATE_EMAIL_VERIFIED,
+  DELETE_USER,
 } from "@api/admin/user";
 
 // ** Others
 import { User } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // ** User initial state
 const userInitialState = {
@@ -55,10 +57,12 @@ const userInitialState = {
 export const fetchUserById = createAsyncThunk<User, { id: string }, {}>(
   "appUser/fetchUserById",
   async (id, { rejectWithValue }) => {
+    const encryptedData = encryptData(id);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_USER_BY_ID,
-        variables: { ...id },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -77,10 +81,12 @@ export const fetchUserById = createAsyncThunk<User, { id: string }, {}>(
 export const fetchUserByEmail = createAsyncThunk<User, { email: string }, {}>(
   "appUser/fetchUserByEmail",
   async (email, { rejectWithValue }) => {
+    const encryptedData = encryptData(email);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_USER_BY_EMAIL,
-        variables: { ...email },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -99,10 +105,12 @@ export const fetchUserByEmail = createAsyncThunk<User, { email: string }, {}>(
 export const addUser = createAsyncThunk<User, Partial<User>, {}>(
   "appUser/addUser",
   async (userData, { rejectWithValue }) => {
+    const encryptedData = encryptData(userData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_USER,
-        variables: { ...userData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -121,10 +129,12 @@ export const addUser = createAsyncThunk<User, Partial<User>, {}>(
 export const editUser = createAsyncThunk<User, Partial<User>, {}>(
   "appUser/editUser",
   async (userData, { rejectWithValue }) => {
+    const encryptedData = encryptData(userData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_USER,
-        variables: { ...userData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -143,10 +153,12 @@ export const editUser = createAsyncThunk<User, Partial<User>, {}>(
 export const editPassword = createAsyncThunk<User, Partial<User>, {}>(
   "appUser/editPassword",
   async (userData, { rejectWithValue }) => {
+    const encryptedData = encryptData(userData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_PASSWORD,
-        variables: { ...userData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -165,10 +177,12 @@ export const editPassword = createAsyncThunk<User, Partial<User>, {}>(
 export const editImage = createAsyncThunk<User, Partial<User>, {}>(
   "appUser/editImage",
   async (userData, { rejectWithValue }) => {
+    const encryptedData = encryptData(userData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_IMAGE,
-        variables: { ...userData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -187,10 +201,12 @@ export const editImage = createAsyncThunk<User, Partial<User>, {}>(
 export const editStatus = createAsyncThunk<User, Partial<User>, {}>(
   "appUser/editStatus",
   async (userData, { rejectWithValue }) => {
+    const encryptedData = encryptData(userData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_STATUS,
-        variables: { ...userData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -209,10 +225,36 @@ export const editStatus = createAsyncThunk<User, Partial<User>, {}>(
 export const editEmailVerified = createAsyncThunk<User, Partial<User>, {}>(
   "appUser/editEmailVerified",
   async (userData, { rejectWithValue }) => {
+    const encryptedData = encryptData(userData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_EMAIL_VERIFIED,
-        variables: { ...userData },
+        variables: { pl: encryptedData },
+      });
+
+      return data;
+    } catch (err) {
+      let error: any = err; // cast the error for access
+      if (!error.response) {
+        throw err;
+      }
+      // We got validation errors, let's return those so we can reference in our component and set form errors
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// ** Delete User
+export const removeUser = createAsyncThunk<User, Partial<User>, {}>(
+  "appUser/removeUser",
+  async (userData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: userData.id });
+
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: DELETE_USER,
+        variables: { pl: encryptedData },
       });
 
       return data;

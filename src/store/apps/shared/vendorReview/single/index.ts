@@ -13,6 +13,7 @@ import {
 
 // ** Others
 import { VendorReview } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const vendorReviewInitialState = {
@@ -45,10 +46,12 @@ export const fetchVendorReviewById = createAsyncThunk<
   { id: string },
   {}
 >("appVendorReview/fetchVendorReviewById", async (id, { rejectWithValue }) => {
+  const encryptedData = encryptData(id);
+
   try {
     const { data } = await apolloClient.query({
       query: GET_VENDOR_REVIEW_BY_ID,
-      variables: { ...id },
+      variables: { pl: encryptedData },
     });
 
     return data;
@@ -66,10 +69,12 @@ export const fetchVendorReviewById = createAsyncThunk<
 export const addVendorReview = createAsyncThunk<VendorReview, any, {}>(
   "appVendorReview/addVendorReview",
   async (vendorReviewData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorReviewData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_VENDOR_REVIEW,
-        variables: { ...vendorReviewData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -88,10 +93,12 @@ export const addVendorReview = createAsyncThunk<VendorReview, any, {}>(
 export const editVendorReview = createAsyncThunk<VendorReview, any, {}>(
   "appVendorReview/editVendorReview",
   async (vendorReviewData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorReviewData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_VENDOR_REVIEW,
-        variables: { ...vendorReviewData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -110,10 +117,12 @@ export const editVendorReview = createAsyncThunk<VendorReview, any, {}>(
 export const editVendorReviewStatus = createAsyncThunk<VendorReview, any, {}>(
   "appVendorReview/editVendorReviewStatus",
   async (vendorReviewData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vendorReviewData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_VENDOR_REVIEW_STATUS,
-        variables: { ...vendorReviewData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -132,10 +141,12 @@ export const editVendorReviewStatus = createAsyncThunk<VendorReview, any, {}>(
 export const removeVendorReview = createAsyncThunk<VendorReview, any, {}>(
   "appVendorReview/removeVendorReview",
   async (vendorReviewData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: vendorReviewData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_VENDOR_REVIEW,
-        variables: { id: vendorReviewData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;

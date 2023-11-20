@@ -33,8 +33,20 @@ export const GET_ORGANIZATIONS = gql`
 `;
 
 export const GET_FILTERED_ORGANIZATIONS = gql`
-  query GetFilteredOrganizations($filter: String!) {
-    organizationsFiltered(filter: $filter) {
+  query GetFilteredOrganizations(
+    $pl: String!
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
+    organizationsFiltered(
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
       edges {
         cursor
         node {
@@ -65,8 +77,8 @@ export const GET_FILTERED_ORGANIZATIONS = gql`
 `;
 
 export const GET_ORGANIZATION_BY_ID = gql`
-  query GetOrganizationById($id: String!) {
-    organizationById(id: $id) {
+  query GetOrganizationById($pl: String!) {
+    organizationById(pl: $pl) {
       id
       name
       nicename
@@ -85,8 +97,8 @@ export const GET_ORGANIZATION_BY_ID = gql`
 `;
 
 export const GET_ORGANIZATION_BY_NAME = gql`
-  query GetOrganizationByName($name: String!) {
-    organizationByName(name: $name) {
+  query GetOrganizationByName($pl: String!) {
+    organizationByName(pl: $pl) {
       id
       name
       nicename
@@ -105,32 +117,16 @@ export const GET_ORGANIZATION_BY_NAME = gql`
 `;
 
 export const GET_ORGANIZATION_NAME = gql`
-  query GetOrganizationName($name: String!) {
-    organizationCheckName(name: $name) {
+  query GetOrganizationName($pl: String!) {
+    organizationCheckName(pl: $pl) {
       name
     }
   }
 `;
 
 export const CREATE_ORGANIZATION = gql`
-  mutation CreateOrganization(
-    $name: String!
-    $email: String
-    $phone: String
-    $address: String
-    $address2: String
-    $city: String
-    $country: String
-  ) {
-    createOrganization(
-      name: $name
-      email: $email
-      phone: $phone
-      address: $address
-      address2: $address2
-      city: $city
-      country: $country
-    ) {
+  mutation CreateOrganization($pl: String!) {
+    createOrganization(pl: $pl) {
       id
       name
       nicename
@@ -149,28 +145,8 @@ export const CREATE_ORGANIZATION = gql`
 `;
 
 export const UPDATE_ORGANIZATION = gql`
-  mutation UpdateOrganization(
-    $id: String!
-    $name: String
-    $nicename: String
-    $email: String
-    $phone: String
-    $address: String
-    $address2: String
-    $city: String
-    $country: String
-  ) {
-    updateOrganization(
-      id: $id
-      name: $name
-      nicename: $nicename
-      email: $email
-      phone: $phone
-      address: $address
-      address2: $address2
-      city: $city
-      country: $country
-    ) {
+  mutation UpdateOrganization($pl: String!) {
+    updateOrganization(pl: $pl) {
       id
       name
       nicename
@@ -189,8 +165,8 @@ export const UPDATE_ORGANIZATION = gql`
 `;
 
 export const UPDATE_COVER_IMAGE = gql`
-  mutation UpdateCoverImage($id: String!, $coverImage: String!) {
-    updateOrganizationCoverImage(id: $id, coverImage: $coverImage) {
+  mutation UpdateCoverImage($pl: String!) {
+    updateOrganizationCoverImage(pl: $pl) {
       id
       coverImage
     }
@@ -198,8 +174,8 @@ export const UPDATE_COVER_IMAGE = gql`
 `;
 
 export const UPDATE_LOGO = gql`
-  mutation UpdateLogo($id: String!, $logo: String!) {
-    updateOrganizationLogo(id: $id, logo: $logo) {
+  mutation UpdateLogo($pl: String!) {
+    updateOrganizationLogo(pl: $pl) {
       id
       logo
     }
@@ -207,8 +183,8 @@ export const UPDATE_LOGO = gql`
 `;
 
 export const UPDATE_CERTIFICATE = gql`
-  mutation UpdateCertificate($id: String!, $certificate: String!) {
-    updateOrganizationCertificate(id: $id, certificate: $certificate) {
+  mutation UpdateCertificate($pl: String!) {
+    updateOrganizationCertificate(pl: $pl) {
       id
       certificate
     }
@@ -216,8 +192,8 @@ export const UPDATE_CERTIFICATE = gql`
 `;
 
 export const UPDATE_KRA_PIN = gql`
-  mutation UpdateKRAPin($id: String!, $kraPin: String!) {
-    updateOrganizationKRAPin(id: $id, kraPin: $kraPin) {
+  mutation UpdateKRAPin($pl: String!) {
+    updateOrganizationKRAPin(pl: $pl) {
       id
       kraPin
     }
@@ -225,10 +201,9 @@ export const UPDATE_KRA_PIN = gql`
 `;
 
 export const DELETE_ORGANIZATION = gql`
-  mutation DeleteOrganization($id: String!) {
-    deleteOrganization(id: $id) {
+  mutation DeleteOrganization($pl: String!) {
+    deleteOrganization(pl: $pl) {
       id
-      name
     }
   }
 `;

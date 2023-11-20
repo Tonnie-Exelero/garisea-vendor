@@ -8,14 +8,11 @@ import {
   GET_FILTERED_USERS,
   GET_USERS_BY_ROLE_ID,
   GET_USERS_BY_STATUS,
-  CREATE_USER,
-  UPDATE_USER,
-  DELETE_USER,
 } from "@api/admin/user";
 
 // ** Others
 import { User } from "./types";
-import { generateRandomString } from "@utils/random-string";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const usersInitialState = {
@@ -27,8 +24,6 @@ const usersInitialState = {
         firstName: "",
         lastName: "",
         username: "",
-        email: "",
-        phone: "",
         image: "",
         language: "",
         status: "",
@@ -72,10 +67,21 @@ interface UsersState {
 export const fetchUsers = createAsyncThunk<User, any, {}>(
   "appUsers/fetchUsers",
   async (userData, { rejectWithValue }) => {
+    const encryptedData = userData && encryptData(userData);
+    const pagination = {
+      ...(userData.first && { first: userData.first }),
+      ...(userData.last && { last: userData.last }),
+      ...(userData.after && { after: userData.after }),
+      ...(userData.before && { before: userData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_USERS,
-        variables: userData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -94,10 +100,21 @@ export const fetchUsers = createAsyncThunk<User, any, {}>(
 export const fetchFilteredUsers = createAsyncThunk<User, any, {}>(
   "appUsers/fetchFilteredUsers",
   async (userData, { rejectWithValue }) => {
+    const encryptedData = userData && encryptData(userData);
+    const pagination = {
+      ...(userData.first && { first: userData.first }),
+      ...(userData.last && { last: userData.last }),
+      ...(userData.after && { after: userData.after }),
+      ...(userData.before && { before: userData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_USERS,
-        variables: userData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -116,10 +133,21 @@ export const fetchFilteredUsers = createAsyncThunk<User, any, {}>(
 export const fetchUsersByRole = createAsyncThunk<User, any, {}>(
   "appUsers/fetchUsersByRole",
   async (userData, { rejectWithValue }) => {
+    const encryptedData = userData && encryptData(userData);
+    const pagination = {
+      ...(userData.first && { first: userData.first }),
+      ...(userData.last && { last: userData.last }),
+      ...(userData.after && { after: userData.after }),
+      ...(userData.before && { before: userData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_USERS_BY_ROLE_ID,
-        variables: userData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -138,76 +166,21 @@ export const fetchUsersByRole = createAsyncThunk<User, any, {}>(
 export const fetchUsersByStatus = createAsyncThunk<User, any, {}>(
   "appUsers/fetchUsersByStatus",
   async (userData, { rejectWithValue }) => {
+    const encryptedData = userData && encryptData(userData);
+    const pagination = {
+      ...(userData.first && { first: userData.first }),
+      ...(userData.last && { last: userData.last }),
+      ...(userData.after && { after: userData.after }),
+      ...(userData.before && { before: userData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_USERS_BY_STATUS,
-        variables: userData,
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Create User
-export const addUser = createAsyncThunk<User, Partial<User>, {}>(
-  "appUsers/addUser",
-  async (userData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: CREATE_USER,
-        variables: { ...userData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Update User
-export const editUser = createAsyncThunk<User, Partial<User>, {}>(
-  "appUsers/editUser",
-  async (userData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: UPDATE_USER,
-        variables: { ...userData },
-      });
-
-      return data;
-    } catch (err) {
-      let error: any = err; // cast the error for access
-      if (!error.response) {
-        throw err;
-      }
-      // We got validation errors, let's return those so we can reference in our component and set form errors
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// ** Delete User
-export const removeUser = createAsyncThunk<User, Partial<User>, {}>(
-  "appUsers/removeUser",
-  async (userData, { rejectWithValue }) => {
-    try {
-      const { data } = await apolloClient.mutate({
-        mutation: DELETE_USER,
-        variables: { id: userData.id },
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -309,38 +282,6 @@ export const appUsersSlice = createSlice({
         if (state.loading === "pending") {
           state.loading = "";
           state.error = <any>action.error.message;
-        }
-      })
-      .addCase(addUser.fulfilled, (state, { payload }) => {
-        const { createUser }: any = payload;
-
-        const newUser = {
-          cursor: generateRandomString(12),
-          node: { ...createUser },
-        };
-        state.users.edges.push(newUser);
-      })
-      .addCase(editUser.fulfilled, (state, { payload }) => {
-        const { updateUser }: any = payload;
-        const { id, ...rest } = updateUser;
-
-        state.users.edges.some((user) => {
-          if (user.node.id === updateUser.id) {
-            return {
-              ...user,
-              node: {
-                ...user.node,
-                rest,
-              },
-            };
-          }
-        });
-      })
-      .addCase(removeUser.fulfilled, (state, { payload }) => {
-        const { deleteUser }: any = payload;
-
-        if (state.users.edges.some((user) => user.node.id === deleteUser.id)) {
-          state.users.edges.filter((user) => user.node.id !== deleteUser.id);
         }
       });
   },

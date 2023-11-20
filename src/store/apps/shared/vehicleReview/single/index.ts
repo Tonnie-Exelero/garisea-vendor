@@ -13,6 +13,7 @@ import {
 
 // ** Others
 import { VehicleReview } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const vehicleReviewInitialState = {
@@ -60,10 +61,12 @@ export const fetchVehicleReviewById = createAsyncThunk<
 >(
   "appVehicleReview/fetchVehicleReviewById",
   async (id, { rejectWithValue }) => {
+    const encryptedData = encryptData(id);
+
     try {
       const { data } = await apolloClient.query({
         query: GET_VEHICLE_REVIEW_BY_ID,
-        variables: { ...id },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -82,10 +85,12 @@ export const fetchVehicleReviewById = createAsyncThunk<
 export const addVehicleReview = createAsyncThunk<VehicleReview, any, {}>(
   "appVehicleReview/addVehicleReview",
   async (vehicleReviewData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vehicleReviewData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_VEHICLE_REVIEW,
-        variables: { ...vehicleReviewData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -104,10 +109,12 @@ export const addVehicleReview = createAsyncThunk<VehicleReview, any, {}>(
 export const editVehicleReview = createAsyncThunk<VehicleReview, any, {}>(
   "appVehicleReview/editVehicleReview",
   async (vehicleReviewData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vehicleReviewData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_VEHICLE_REVIEW,
-        variables: { ...vehicleReviewData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -126,10 +133,12 @@ export const editVehicleReview = createAsyncThunk<VehicleReview, any, {}>(
 export const editVehicleReviewStatus = createAsyncThunk<VehicleReview, any, {}>(
   "appVehicleReview/editVehicleReviewStatus",
   async (vehicleReviewData, { rejectWithValue }) => {
+    const encryptedData = encryptData(vehicleReviewData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_VEHICLE_REVIEW_STATUS,
-        variables: { ...vehicleReviewData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -148,10 +157,12 @@ export const editVehicleReviewStatus = createAsyncThunk<VehicleReview, any, {}>(
 export const removeVehicleReview = createAsyncThunk<VehicleReview, any, {}>(
   "appVehicleReview/removeVehicleReview",
   async (vehicleReviewData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: vehicleReviewData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_VEHICLE_REVIEW,
-        variables: { id: vehicleReviewData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;

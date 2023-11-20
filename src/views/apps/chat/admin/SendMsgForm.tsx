@@ -20,6 +20,7 @@ import {
 } from "@src/api/shared/adminVendorContact";
 import { sendEmail } from "@src/configs/email";
 import Notification from "@emails/Notification";
+import { encryptData } from "@core/utils/encryption";
 
 // ** Styled Components
 const ChatFormWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -47,8 +48,7 @@ const SendMsgForm = (props: SendMsgComponentType) => {
     const { data } = await apolloClient.query({
       query: GET_CONTACTS_BY_IDS,
       variables: {
-        vendorId,
-        userId,
+        pl: encryptData({ vendorId, userId }),
       },
       fetchPolicy: "no-cache",
     });
@@ -68,9 +68,7 @@ const SendMsgForm = (props: SendMsgComponentType) => {
     return await apolloClient.query({
       query: CREATE_CONTACT,
       variables: {
-        vendorId,
-        userId,
-        latestMessageTime,
+        pl: encryptData({ vendorId, userId, latestMessageTime }),
       },
       fetchPolicy: "no-cache",
     });
@@ -80,8 +78,7 @@ const SendMsgForm = (props: SendMsgComponentType) => {
     return await apolloClient.query({
       query: UPDATE_CONTACT,
       variables: {
-        id,
-        latestMessageTime,
+        pl: encryptData({ id, latestMessageTime }),
       },
       fetchPolicy: "no-cache",
     });

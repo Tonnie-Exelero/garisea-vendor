@@ -7,6 +7,7 @@ import { GET_INTERESTS } from "@api/frontend/interest";
 
 // ** Others
 import { Interest } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state
 const interestsInitialState = {
@@ -81,10 +82,21 @@ interface InterestsState {
 export const fetchInterests = createAsyncThunk<Interest, any, {}>(
   "appInterests/fetchInterests",
   async (interestData, { rejectWithValue }) => {
+    const encryptedData = interestData && encryptData(interestData);
+    const pagination = {
+      ...(interestData.first && { first: interestData.first }),
+      ...(interestData.last && { last: interestData.last }),
+      ...(interestData.after && { after: interestData.after }),
+      ...(interestData.before && { before: interestData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_INTERESTS,
-        variables: interestData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

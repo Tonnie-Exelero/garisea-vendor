@@ -7,6 +7,7 @@ import { GET_BRANDS, GET_FILTERED_BRANDS } from "@api/admin/brand";
 
 // ** Others
 import { Brand } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 export const brandsInitialState = {
@@ -49,10 +50,21 @@ interface BrandsState {
 export const fetchBrands = createAsyncThunk<Brand, any, {}>(
   "appBrands/fetchBrands",
   async (brandData, { rejectWithValue }) => {
+    const encryptedData = brandData && encryptData(brandData);
+    const pagination = {
+      ...(brandData.first && { first: brandData.first }),
+      ...(brandData.last && { last: brandData.last }),
+      ...(brandData.after && { after: brandData.after }),
+      ...(brandData.before && { before: brandData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_BRANDS,
-        variables: brandData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -71,10 +83,21 @@ export const fetchBrands = createAsyncThunk<Brand, any, {}>(
 export const fetchFilteredBrands = createAsyncThunk<Brand, any, {}>(
   "appBrands/fetchFilteredBrands",
   async (brandData, { rejectWithValue }) => {
+    const encryptedData = brandData && encryptData(brandData);
+    const pagination = {
+      ...(brandData.first && { first: brandData.first }),
+      ...(brandData.last && { last: brandData.last }),
+      ...(brandData.after && { after: brandData.after }),
+      ...(brandData.before && { before: brandData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_BRANDS,
-        variables: brandData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

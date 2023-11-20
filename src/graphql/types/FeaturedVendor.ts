@@ -1,10 +1,12 @@
 import prisma from "@lib/prisma";
 import { builder } from "../builder";
+import { decryptData } from "@core/utils/encryption";
 
 export const FeaturedVendor = builder.prismaObject("FeaturedVendor", {
   fields: (t) => ({
     id: t.exposeID("id"),
     vendor: t.relation("vendor", { nullable: true }),
+    status: t.exposeString("status", { nullable: true }),
     image: t.exposeString("image", { nullable: true }),
     text: t.exposeString("text", { nullable: true }),
     page: t.exposeString("page", { nullable: true }),
@@ -14,6 +16,8 @@ export const FeaturedVendor = builder.prismaObject("FeaturedVendor", {
     clicks: t.exposeInt("clicks", { nullable: true }),
     targetImpressions: t.exposeInt("targetImpressions", { nullable: true }),
     targetClicks: t.exposeInt("targetClicks", { nullable: true }),
+    pl: t.exposeString("pl", { nullable: true }),
+    dt: t.exposeString("dt", { nullable: true }),
   }),
 });
 
@@ -21,99 +25,156 @@ builder.queryFields((t) => ({
   featuredVendors: t.prismaConnection({
     type: FeaturedVendor,
     cursor: "id",
-    resolve: async (query, _parent, _args, _ctx, _info) => {
-      return await prisma.featuredVendor.findMany({
-        ...query,
-        orderBy: {
-          rank: "asc",
-        },
-      });
-    },
-    totalCount: async (connection, _args, _ctx, _info) =>
-      await prisma.featuredVendor.count({ ...connection }),
-  }),
-  featuredVendorsFiltered: t.prismaConnection({
-    type: FeaturedVendor,
-    cursor: "id",
     args: {
-      vendorId: t.arg.string(),
-      text: t.arg.string(),
-      page: t.arg.string(),
-      position: t.arg.string(),
+      pl: t.arg.string(),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
-      const where = {
-        ...(args.vendorId && {
-          vendorId: {
-            equals: args.vendorId,
-          },
-        }),
-        ...(args.text && {
-          text: <any>{
-            search: args.text,
-            mode: "insensitive",
-          },
-        }),
-        ...(args.page && {
-          page: {
-            equals: args.page,
-          },
-        }),
-        ...(args.position && {
-          position: {
-            equals: args.position,
-          },
-        }),
-      };
+      const payload = args && args.pl && decryptData(args.pl);
 
       return await prisma.featuredVendor.findMany({
         ...query,
-        where,
+        ...(payload && {
+          where: {
+            ...(payload.status && {
+              status: payload.status,
+            }),
+          },
+        }),
+        include: {
+          vendor: true,
+        },
         orderBy: {
           rank: "asc",
         },
       });
     },
     totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
+      return await prisma.featuredVendor.count({
+        ...connection,
+        ...(payload && {
+          where: {
+            ...(payload.status && {
+              status: payload.status,
+            }),
+          },
+        }),
+      });
+    },
+  }),
+  featuredVendorsFiltered: t.prismaConnection({
+    type: FeaturedVendor,
+    cursor: "id",
+    args: {
+      pl: t.arg.string({ required: true }),
+    },
+    resolve: async (query, _parent, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
       const where = {
-        ...(args.vendorId && {
+        ...(payload.vendorId && {
           vendorId: {
-            equals: args.vendorId,
+            equals: payload.vendorId,
           },
         }),
-        ...(args.text && {
-          text: {
-            contains: args.text,
+        ...(payload.status && {
+          status: {
+            equals: payload.status,
           },
         }),
-        ...(args.page && {
+        ...(payload.text && {
+          text: <any>{
+            search: payload.text,
+            mode: "insensitive",
+          },
+        }),
+        ...(payload.page && {
           page: {
-            equals: args.page,
+            equals: payload.page,
           },
         }),
-        ...(args.position && {
+        ...(payload.position && {
           position: {
-            equals: args.position,
+            equals: payload.position,
           },
         }),
       };
 
-      return await prisma.featuredVendor.count({ ...connection, where });
+      return await prisma.featuredVendor.findMany({
+        ...query,
+        ...(payload && { where }),
+        include: {
+          vendor: true,
+        },
+        orderBy: {
+          rank: "asc",
+        },
+      });
+    },
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
+      const where = {
+        ...(payload.vendorId && {
+          vendorId: {
+            equals: payload.vendorId,
+          },
+        }),
+        ...(payload.status && {
+          status: {
+            equals: payload.status,
+          },
+        }),
+        ...(payload.text && {
+          text: <any>{
+            search: payload.text,
+            mode: "insensitive",
+          },
+        }),
+        ...(payload.page && {
+          page: {
+            equals: payload.page,
+          },
+        }),
+        ...(payload.position && {
+          position: {
+            equals: payload.position,
+          },
+        }),
+      };
+
+      return await prisma.featuredVendor.count({
+        ...connection,
+        ...(payload && { where }),
+      });
     },
   }),
   featuredVendorById: t.prismaField({
     type: FeaturedVendor,
     nullable: true,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _info) =>
-      await prisma.featuredVendor.findUnique({
+    resolve: async (query, _parent, args, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
+      const { id } = payload;
+
+      return await prisma.featuredVendor.findUnique({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+        include: {
+          vendor: true,
+        },
+      });
+    },
   }),
 }));
 
@@ -121,20 +182,14 @@ builder.mutationFields((t) => ({
   createFeaturedVendor: t.prismaField({
     type: FeaturedVendor,
     args: {
-      vendorId: t.arg.string({ required: true }),
-      image: t.arg.string(),
-      text: t.arg.string(),
-      page: t.arg.string(),
-      position: t.arg.string(),
-      rank: t.arg.int(),
-      impressions: t.arg.int(),
-      clicks: t.arg.int(),
-      targetImpressions: t.arg.int(),
-      targetClicks: t.arg.int(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
       const {
         vendorId,
+        status,
         image,
         text,
         page,
@@ -144,12 +199,13 @@ builder.mutationFields((t) => ({
         clicks,
         targetImpressions,
         targetClicks,
-      } = args;
+      } = payload;
 
       return await prisma.featuredVendor.create({
         ...query,
         data: {
           vendor: { connect: { id: String(vendorId) || undefined } },
+          status,
           image,
           text,
           page,
@@ -166,19 +222,14 @@ builder.mutationFields((t) => ({
   updateFeaturedVendor: t.prismaField({
     type: FeaturedVendor,
     args: {
-      id: t.arg.string({ required: true }),
-      image: t.arg.string(),
-      text: t.arg.string(),
-      page: t.arg.string(),
-      position: t.arg.string(),
-      rank: t.arg.int(),
-      impressions: t.arg.int(),
-      clicks: t.arg.int(),
-      targetImpressions: t.arg.int(),
-      targetClicks: t.arg.int(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+
       const {
+        id,
         image,
         text,
         page,
@@ -188,12 +239,12 @@ builder.mutationFields((t) => ({
         clicks,
         targetImpressions,
         targetClicks,
-      } = args;
+      } = payload;
 
       return await prisma.featuredVendor.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           image: image ? image : undefined,
@@ -206,25 +257,56 @@ builder.mutationFields((t) => ({
           targetImpressions: targetImpressions ? targetImpressions : undefined,
           targetClicks: targetClicks ? targetClicks : undefined,
         },
+        include: {
+          vendor: true,
+        },
+      });
+    },
+  }),
+  updateFeaturedVendorStatus: t.prismaField({
+    type: FeaturedVendor,
+    args: {
+      pl: t.arg.string({ required: true }),
+    },
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, status } = payload;
+
+      return await prisma.featuredVendor.update({
+        ...query,
+        where: {
+          id,
+        },
+        data: {
+          status: status ? status : undefined,
+        },
+        include: {
+          vendor: true,
+        },
       });
     },
   }),
   updateFeaturedVendorImpressions: t.prismaField({
     type: FeaturedVendor,
     args: {
-      id: t.arg.string({ required: true }),
-      impressions: t.arg.int(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { impressions } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, impressions } = payload;
 
       return await prisma.featuredVendor.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           impressions: impressions ? impressions : undefined,
+        },
+        include: {
+          vendor: true,
         },
       });
     },
@@ -232,19 +314,23 @@ builder.mutationFields((t) => ({
   updateFeaturedVendorClicks: t.prismaField({
     type: FeaturedVendor,
     args: {
-      id: t.arg.string({ required: true }),
-      clicks: t.arg.int(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { clicks } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id, clicks } = payload;
 
       return await prisma.featuredVendor.update({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
         data: {
           clicks: clicks ? clicks : undefined,
+        },
+        include: {
+          vendor: true,
         },
       });
     },
@@ -252,14 +338,19 @@ builder.mutationFields((t) => ({
   deleteFeaturedVendor: t.prismaField({
     type: FeaturedVendor,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.featuredVendor.delete({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.featuredVendor.delete({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
 }));

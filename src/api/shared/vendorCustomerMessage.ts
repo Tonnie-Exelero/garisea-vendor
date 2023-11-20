@@ -2,20 +2,14 @@ import { gql } from "@apollo/client";
 
 export const GET_MESSAGES = gql`
   query GetMessages(
-    $vendorId: String!
-    $customerId: String!
-    $vehicleId: String
-    $senderId: String
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     vendorCustomerMessages(
-      vendorId: $vendorId
-      customerId: $customerId
-      vehicleId: $vehicleId
-      senderId: $senderId
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -58,14 +52,14 @@ export const GET_MESSAGES = gql`
 
 export const GET_CUSTOMER_MESSAGES = gql`
   query GetMessages(
-    $customerId: String!
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     customerMessages(
-      customerId: $customerId
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -101,36 +95,16 @@ export const GET_CUSTOMER_MESSAGES = gql`
 `;
 
 export const GET_NEW_CUSTOMER_MESSAGES_COUNT = gql`
-  query GetNewMessagesCount($customerId: String!) {
-    newMessagesCount(customerId: $customerId) {
+  query GetNewMessagesCount($pl: String!) {
+    newMessagesCount(pl: $pl) {
       message
     }
   }
 `;
 
 export const CREATE_MESSAGE = gql`
-  mutation CreateMessage(
-    $vendorId: String!
-    $customerId: String!
-    $vehicleId: String
-    $senderId: String!
-    $type: String
-    $message: String!
-    $timeSent: String!
-    $isSent: Boolean
-    $isSeen: Boolean
-  ) {
-    createVendorCustomerMessage(
-      vendorId: $vendorId
-      customerId: $customerId
-      vehicleId: $vehicleId
-      senderId: $senderId
-      type: $type
-      message: $message
-      timeSent: $timeSent
-      isSent: $isSent
-      isSeen: $isSeen
-    ) {
+  mutation CreateMessage($pl: String!) {
+    createVendorCustomerMessage(pl: $pl) {
       id
       vendor {
         id
@@ -149,8 +123,8 @@ export const CREATE_MESSAGE = gql`
 `;
 
 export const UPDATE_MESSAGE = gql`
-  mutation UpdateMessage($id: String!, $message: String) {
-    updateVendorCustomerMessage(id: $id, message: $message) {
+  mutation UpdateMessage($pl: String!) {
+    updateVendorCustomerMessage(pl: $pl) {
       id
       message
     }
@@ -158,8 +132,8 @@ export const UPDATE_MESSAGE = gql`
 `;
 
 export const UPDATE_MESSAGE_SEEN = gql`
-  mutation UpdateMessageSeen($id: String!, $isSeen: Boolean) {
-    updateVendorCustomerMessageSeen(id: $id, isSeen: $isSeen) {
+  mutation UpdateMessageSeen($pl: String!) {
+    updateVendorCustomerMessageSeen(pl: $pl) {
       id
       isSeen
     }
@@ -167,8 +141,8 @@ export const UPDATE_MESSAGE_SEEN = gql`
 `;
 
 export const DELETE_MESSAGE = gql`
-  mutation DeleteMessage($id: String!) {
-    deleteVendorCustomerMessage(id: $id) {
+  mutation DeleteMessage($pl: String!) {
+    deleteVendorCustomerMessage(pl: $pl) {
       id
     }
   }

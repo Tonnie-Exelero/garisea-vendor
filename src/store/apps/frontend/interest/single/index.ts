@@ -7,6 +7,7 @@ import { CREATE_INTEREST, DELETE_INTEREST } from "@api/frontend/interest";
 
 // ** Others
 import { Interest } from "../types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state
 const interestInitialState = {
@@ -53,10 +54,12 @@ const interestInitialState = {
 export const addInterest = createAsyncThunk<Interest, Partial<Interest>, {}>(
   "appInterest/addInterest",
   async (interestData, { rejectWithValue }) => {
+    const encryptedData = encryptData(interestData);
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: CREATE_INTEREST,
-        variables: { ...interestData },
+        variables: { pl: encryptedData },
       });
 
       return data;
@@ -75,10 +78,12 @@ export const addInterest = createAsyncThunk<Interest, Partial<Interest>, {}>(
 export const removeInterest = createAsyncThunk<Interest, Partial<Interest>, {}>(
   "appInterest/removeInterest",
   async (interestData, { rejectWithValue }) => {
+    const encryptedData = encryptData({ id: interestData.id });
+
     try {
       const { data } = await apolloClient.mutate({
         mutation: DELETE_INTEREST,
-        variables: { id: interestData.id },
+        variables: { pl: encryptedData },
       });
 
       return data;

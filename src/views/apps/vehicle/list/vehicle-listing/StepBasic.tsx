@@ -54,6 +54,7 @@ import { AppDispatch, RootState } from "@src/store";
 import { country, metrics } from "../../config";
 import { mainCountries } from "@src/configs/countries";
 import toast from "react-hot-toast";
+import { encryptData } from "@core/utils/encryption";
 
 interface IconType {
   icon: CustomRadioIconsProps["icon"];
@@ -228,7 +229,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
     setIsLoadingModels(true);
     const { data } = await apolloClient.query({
       query: GET_MODELS_BY_BRAND_ID,
-      variables: { brandId, first: 100 },
+      variables: { pl: encryptData({ brandId }), first: 100 },
       fetchPolicy: "no-cache",
     });
 
@@ -264,7 +265,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
       // Fetch Models by Brand ID
       const { data } = await apolloClient.query({
         query: GET_MODELS_BY_BRAND_ID,
-        variables: { brandId, first: 100 },
+        variables: { pl: encryptData({ brandId }), first: 100 },
         fetchPolicy: "no-cache",
       });
 

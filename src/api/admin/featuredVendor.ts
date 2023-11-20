@@ -1,8 +1,15 @@
 import { gql } from "@apollo/client";
 
 export const GET_FEATURED_VENDORS = gql`
-  query GetFeaturedVendors($first: Int, $last: Int, $after: ID, $before: ID) {
+  query GetFeaturedVendors(
+    $pl: String
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
     featuredVendors(
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -26,6 +33,7 @@ export const GET_FEATURED_VENDORS = gql`
               address2
               city
               country
+              coverImage
               logo
             }
           }
@@ -53,16 +61,18 @@ export const GET_FEATURED_VENDORS = gql`
 
 export const GET_FILTERED_FEATURED_VENDORS = gql`
   query GetFilteredFeaturedVendors(
-    $vendorId: String
-    $text: String
-    $page: String
-    $position: String
+    $pl: String!
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
   ) {
     featuredVendorsFiltered(
-      vendorId: $vendorId
-      text: $text
-      page: $page
-      position: $position
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
     ) {
       edges {
         cursor
@@ -82,6 +92,7 @@ export const GET_FILTERED_FEATURED_VENDORS = gql`
               address2
               city
               country
+              coverImage
               logo
             }
           }
@@ -108,8 +119,8 @@ export const GET_FILTERED_FEATURED_VENDORS = gql`
 `;
 
 export const GET_FEATURED_VENDOR_BY_ID = gql`
-  query GetFeaturedVendorById($id: String!) {
-    featuredVendorById(id: $id) {
+  query GetFeaturedVendorById($pl: String!) {
+    featuredVendorById(pl: $pl) {
       id
       vendor {
         id
@@ -125,6 +136,7 @@ export const GET_FEATURED_VENDOR_BY_ID = gql`
           address2
           city
           country
+          coverImage
           logo
         }
       }
@@ -142,30 +154,8 @@ export const GET_FEATURED_VENDOR_BY_ID = gql`
 `;
 
 export const CREATE_FEATURED_VENDOR = gql`
-  mutation CreateFeaturedVendor(
-    $vendorId: String!
-    $image: String
-    $text: String
-    $page: String
-    $position: String
-    $rank: Int
-    $impressions: Int
-    $clicks: Int
-    $targetImpressions: Int
-    $targetClicks: Int
-  ) {
-    createFeaturedVendor(
-      vendorId: $vendorId
-      image: $image
-      text: $text
-      page: $page
-      position: $position
-      rank: $rank
-      impressions: $impressions
-      clicks: $clicks
-      targetImpressions: $targetImpressions
-      targetClicks: $targetClicks
-    ) {
+  mutation CreateFeaturedVendor($pl: String!) {
+    createFeaturedVendor(pl: $pl) {
       id
       vendor {
         id
@@ -181,6 +171,7 @@ export const CREATE_FEATURED_VENDOR = gql`
           address2
           city
           country
+          coverImage
           logo
         }
       }
@@ -198,30 +189,8 @@ export const CREATE_FEATURED_VENDOR = gql`
 `;
 
 export const UPDATE_FEATURED_VENDOR = gql`
-  mutation UpdateFeaturedVendor(
-    $id: String!
-    $image: String
-    $text: String
-    $page: String
-    $position: String
-    $rank: Int
-    $impressions: Int
-    $clicks: Int
-    $targetImpressions: Int
-    $targetClicks: Int
-  ) {
-    updateFeaturedVendor(
-      id: $id
-      image: $image
-      text: $text
-      page: $page
-      position: $position
-      rank: $rank
-      impressions: $impressions
-      clicks: $clicks
-      targetImpressions: $targetImpressions
-      targetClicks: $targetClicks
-    ) {
+  mutation UpdateFeaturedVendor($pl: String!) {
+    updateFeaturedVendor(pl: $pl) {
       id
       vendor {
         id
@@ -237,6 +206,7 @@ export const UPDATE_FEATURED_VENDOR = gql`
           address2
           city
           country
+          coverImage
           logo
         }
       }
@@ -253,9 +223,18 @@ export const UPDATE_FEATURED_VENDOR = gql`
   }
 `;
 
+export const UPDATE_FEATURED_VENDOR_STATUS = gql`
+  mutation UpdateFeaturedVendorStatus($pl: String!) {
+    updateFeaturedVendorStatus(pl: $pl) {
+      id
+      status
+    }
+  }
+`;
+
 export const UPDATE_FEATURED_VENDOR_IMPRESSIONS = gql`
-  mutation UpdateFeaturedVendorImpressions($id: String!, $impressions: Int) {
-    updateFeaturedVendorImpressions(id: $id, impressions: $impressions) {
+  mutation UpdateFeaturedVendorImpressions($pl: String!) {
+    updateFeaturedVendorImpressions(pl: $pl) {
       id
       impressions
     }
@@ -263,8 +242,8 @@ export const UPDATE_FEATURED_VENDOR_IMPRESSIONS = gql`
 `;
 
 export const UPDATE_FEATURED_VENDOR_CLICKS = gql`
-  mutation UpdateFeaturedVendorClicks($id: String!, $clicks: Int) {
-    updateFeaturedVendorClicks(id: $id, clicks: $clicks) {
+  mutation UpdateFeaturedVendorClicks($pl: String!) {
+    updateFeaturedVendorClicks(pl: $pl) {
       id
       clicks
     }
@@ -272,8 +251,8 @@ export const UPDATE_FEATURED_VENDOR_CLICKS = gql`
 `;
 
 export const DELETE_FEATURED_VENDOR = gql`
-  mutation DeleteFeaturedVendor($id: String!) {
-    deleteFeaturedVendor(id: $id) {
+  mutation DeleteFeaturedVendor($pl: String!) {
+    deleteFeaturedVendor(pl: $pl) {
       id
     }
   }

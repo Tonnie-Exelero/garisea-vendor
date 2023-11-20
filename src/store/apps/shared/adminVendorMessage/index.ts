@@ -7,6 +7,7 @@ import { GET_MESSAGES } from "@api/shared/adminVendorMessage";
 
 // ** Others
 import { AdminVendorMessage } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const adminVendorMessagesInitialState = {
@@ -61,10 +62,28 @@ export const fetchAdminVendorMessages = createAsyncThunk<
 >(
   "appAdminVendorMessages/fetchAdminVendorMessages",
   async (adminVendorMessageData, { rejectWithValue }) => {
+    const encryptedData =
+      adminVendorMessageData && encryptData(adminVendorMessageData);
+    const pagination = {
+      ...(adminVendorMessageData.first && {
+        first: adminVendorMessageData.first,
+      }),
+      ...(adminVendorMessageData.last && { last: adminVendorMessageData.last }),
+      ...(adminVendorMessageData.after && {
+        after: adminVendorMessageData.after,
+      }),
+      ...(adminVendorMessageData.before && {
+        before: adminVendorMessageData.before,
+      }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_MESSAGES,
-        variables: adminVendorMessageData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -87,10 +106,28 @@ export const fetchMoreAdminVendorMessages = createAsyncThunk<
 >(
   "appAdminVendorMessages/fetchMoreAdminVendorMessages",
   async (adminVendorMessageData, { rejectWithValue }) => {
+    const encryptedData =
+      adminVendorMessageData && encryptData(adminVendorMessageData);
+    const pagination = {
+      ...(adminVendorMessageData.first && {
+        first: adminVendorMessageData.first,
+      }),
+      ...(adminVendorMessageData.last && { last: adminVendorMessageData.last }),
+      ...(adminVendorMessageData.after && {
+        after: adminVendorMessageData.after,
+      }),
+      ...(adminVendorMessageData.before && {
+        before: adminVendorMessageData.before,
+      }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_MESSAGES,
-        variables: adminVendorMessageData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

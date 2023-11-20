@@ -3,6 +3,7 @@ import { Vendor } from "@redux/apps/vendor/vendor/types";
 export interface FeaturedVendor {
   id: string;
   vendor: Partial<Vendor>;
+  status: string;
   image: string;
   text: string;
   page: string;

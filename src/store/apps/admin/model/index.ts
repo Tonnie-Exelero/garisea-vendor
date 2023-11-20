@@ -11,6 +11,7 @@ import {
 
 // ** Others
 import { Model } from "./types";
+import { encryptData } from "@core/utils/encryption";
 
 // Initial state.
 const modelsInitialState = {
@@ -56,10 +57,21 @@ interface ModelsState {
 export const fetchModels = createAsyncThunk<Model, any, {}>(
   "appModels/fetchModels",
   async (modelData, { rejectWithValue }) => {
+    const encryptedData = modelData && encryptData(modelData);
+    const pagination = {
+      ...(modelData.first && { first: modelData.first }),
+      ...(modelData.last && { last: modelData.last }),
+      ...(modelData.after && { after: modelData.after }),
+      ...(modelData.before && { before: modelData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_MODELS,
-        variables: modelData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -78,10 +90,21 @@ export const fetchModels = createAsyncThunk<Model, any, {}>(
 export const fetchFilteredModels = createAsyncThunk<Model, any, {}>(
   "appModels/fetchFilteredModels",
   async (modelData, { rejectWithValue }) => {
+    const encryptedData = modelData && encryptData(modelData);
+    const pagination = {
+      ...(modelData.first && { first: modelData.first }),
+      ...(modelData.last && { last: modelData.last }),
+      ...(modelData.after && { after: modelData.after }),
+      ...(modelData.before && { before: modelData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_FILTERED_MODELS,
-        variables: modelData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;
@@ -100,10 +123,21 @@ export const fetchFilteredModels = createAsyncThunk<Model, any, {}>(
 export const fetchModelsByBrand = createAsyncThunk<Model, any, {}>(
   "appModels/fetchModelsByBrand",
   async (modelData, { rejectWithValue }) => {
+    const encryptedData = modelData && encryptData(modelData);
+    const pagination = {
+      ...(modelData.first && { first: modelData.first }),
+      ...(modelData.last && { last: modelData.last }),
+      ...(modelData.after && { after: modelData.after }),
+      ...(modelData.before && { before: modelData.before }),
+    };
+
     try {
       const { data } = await apolloClient.query({
         query: GET_MODELS_BY_BRAND_ID,
-        variables: modelData,
+        variables: {
+          ...(encryptedData && { pl: encryptedData }),
+          ...pagination,
+        },
       });
 
       return data;

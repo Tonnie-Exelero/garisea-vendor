@@ -2,16 +2,14 @@ import { gql } from "@apollo/client";
 
 export const GET_MESSAGES = gql`
   query GetMessages(
-    $userId: String!
-    $vendorId: String!
+    $pl: String!
     $first: Int
     $last: Int
     $after: ID
     $before: ID
   ) {
     adminVendorMessages(
-      userId: $userId
-      vendorId: $vendorId
+      pl: $pl
       first: $first
       last: $last
       after: $after
@@ -47,26 +45,8 @@ export const GET_MESSAGES = gql`
 `;
 
 export const CREATE_MESSAGE = gql`
-  mutation CreateMessage(
-    $userId: String!
-    $vendorId: String!
-    $senderId: String!
-    $type: String
-    $message: String!
-    $timeSent: String!
-    $isSent: Boolean
-    $isSeen: Boolean
-  ) {
-    createAdminVendorMessage(
-      userId: $userId
-      vendorId: $vendorId
-      senderId: $senderId
-      type: $type
-      message: $message
-      timeSent: $timeSent
-      isSent: $isSent
-      isSeen: $isSeen
-    ) {
+  mutation CreateMessage($pl: String!) {
+    createAdminVendorMessage(pl: $pl) {
       id
       user {
         id
@@ -85,8 +65,8 @@ export const CREATE_MESSAGE = gql`
 `;
 
 export const UPDATE_MESSAGE = gql`
-  mutation UpdateMessage($id: String!, $message: String) {
-    updateAdminVendorMessage(id: $id, message: $message) {
+  mutation UpdateMessage($pl: String!) {
+    updateAdminVendorMessage(pl: $pl) {
       id
       message
     }
@@ -94,8 +74,8 @@ export const UPDATE_MESSAGE = gql`
 `;
 
 export const UPDATE_MESSAGE_SEEN = gql`
-  mutation UpdateMessageSeen($id: String!, $isSeen: Boolean) {
-    updateAdminVendorMessageSeen(id: $id, isSeen: $isSeen) {
+  mutation UpdateMessageSeen($pl: String!) {
+    updateAdminVendorMessageSeen(pl: $pl) {
       id
       isSeen
     }
@@ -103,8 +83,8 @@ export const UPDATE_MESSAGE_SEEN = gql`
 `;
 
 export const DELETE_MESSAGE = gql`
-  mutation DeleteMessage($id: String!) {
-    deleteAdminVendorMessage(id: $id) {
+  mutation DeleteMessage($pl: String!) {
+    deleteAdminVendorMessage(pl: $pl) {
       id
     }
   }

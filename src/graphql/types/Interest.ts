@@ -1,11 +1,14 @@
 import prisma from "@lib/prisma";
 import { builder } from "../builder";
+import { decryptData } from "@core/utils/encryption";
 
 export const Interest = builder.prismaObject("Interest", {
   fields: (t) => ({
     id: t.exposeID("id"),
     customer: t.relation("customer", { nullable: true }),
     vehicle: t.relation("vehicle", { nullable: true }),
+    pl: t.exposeString("pl", { nullable: true }),
+    dt: t.exposeString("dt", { nullable: true }),
   }),
 });
 
@@ -14,31 +17,41 @@ builder.queryFields((t) => ({
     type: Interest,
     cursor: "id",
     args: {
-      customerId: t.arg.string({ required: true }),
-      vehicleId: t.arg.string(),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx, _info) => {
-      const { customerId, vehicleId } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { customerId } = payload;
 
       return await prisma.interest.findMany({
         ...query,
         where: {
           customerId,
-          ...(vehicleId && { vehicleId }),
+          ...(payload.vehicleId && { vehicleId: payload.vehicleId }),
+        },
+        include: {
+          customer: true,
+          vehicle: true,
         },
         orderBy: {
           createdAt: "desc",
         },
       });
     },
-    totalCount: async (connection, args, _ctx, _info) =>
-      await prisma.interest.count({
+    totalCount: async (connection, args, _ctx, _info) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { customerId } = payload;
+
+      return await prisma.interest.count({
         ...connection,
         where: {
-          customerId: args.customerId,
-          ...(args.vehicleId && { vehicleId: args.vehicleId }),
+          customerId,
+          ...(payload.vehicleId && { vehicleId: payload.vehicleId }),
         },
-      }),
+      });
+    },
   }),
 }));
 
@@ -46,11 +59,12 @@ builder.mutationFields((t) => ({
   createInterest: t.prismaField({
     type: Interest,
     args: {
-      customerId: t.arg.string({ required: true }),
-      vehicleId: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
     resolve: async (query, _parent, args, _ctx) => {
-      const { customerId, vehicleId } = args;
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { customerId, vehicleId } = payload;
 
       return await prisma.interest.create({
         ...query,
@@ -64,14 +78,19 @@ builder.mutationFields((t) => ({
   deleteInterest: t.prismaField({
     type: Interest,
     args: {
-      id: t.arg.string({ required: true }),
+      pl: t.arg.string({ required: true }),
     },
-    resolve: async (query, _parent, args, _ctx) =>
-      await prisma.interest.delete({
+    resolve: async (query, _parent, args, _ctx) => {
+      const { pl } = args;
+      const payload = pl && decryptData(pl);
+      const { id } = payload;
+
+      return await prisma.interest.delete({
         ...query,
         where: {
-          id: args.id,
+          id,
         },
-      }),
+      });
+    },
   }),
 }));

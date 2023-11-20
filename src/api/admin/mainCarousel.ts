@@ -1,8 +1,20 @@
 import { gql } from "@apollo/client";
 
 export const GET_MAIN_CAROUSELS = gql`
-  query GetMainCarousels($first: Int, $last: Int, $after: ID, $before: ID) {
-    mainCarousels(first: $first, last: $last, after: $after, before: $before) {
+  query GetMainCarousels(
+    $pl: String
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
+  ) {
+    mainCarousels(
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
       edges {
         cursor
         node {
@@ -33,18 +45,18 @@ export const GET_MAIN_CAROUSELS = gql`
 
 export const GET_FILTERED_MAIN_CAROUSELS = gql`
   query GetFilteredMainCarousels(
-    $type: String
-    $title: String
-    $buttonLink: String
-    $buttonText: String
-    $description: String
+    $pl: String!
+    $first: Int
+    $last: Int
+    $after: ID
+    $before: ID
   ) {
     mainCarouselsFiltered(
-      type: $type
-      title: $title
-      buttonLink: $buttonLink
-      buttonText: $buttonText
-      description: $description
+      pl: $pl
+      first: $first
+      last: $last
+      after: $after
+      before: $before
     ) {
       edges {
         cursor
@@ -75,8 +87,8 @@ export const GET_FILTERED_MAIN_CAROUSELS = gql`
 `;
 
 export const GET_MAIN_CAROUSEL_BY_ID = gql`
-  query GetMainCarouselById($id: String!) {
-    mainCarouselById(id: $id) {
+  query GetMainCarouselById($pl: String!) {
+    mainCarouselById(pl: $pl) {
       id
       type
       title
@@ -94,32 +106,8 @@ export const GET_MAIN_CAROUSEL_BY_ID = gql`
 `;
 
 export const CREATE_MAIN_CAROUSEL = gql`
-  mutation CreateMainCarousel(
-    $type: String
-    $title: String
-    $image: String
-    $buttonLink: String
-    $buttonText: String
-    $description: String
-    $rank: Int
-    $impressions: Int
-    $clicks: Int
-    $targetImpressions: Int
-    $targetClicks: Int
-  ) {
-    createMainCarousel(
-      type: $type
-      title: $title
-      image: $image
-      buttonLink: $buttonLink
-      buttonText: $buttonText
-      description: $description
-      rank: $rank
-      impressions: $impressions
-      clicks: $clicks
-      targetImpressions: $targetImpressions
-      targetClicks: $targetClicks
-    ) {
+  mutation CreateMainCarousel($pl: String!) {
+    createMainCarousel(pl: $pl) {
       id
       type
       title
@@ -137,34 +125,8 @@ export const CREATE_MAIN_CAROUSEL = gql`
 `;
 
 export const UPDATE_MAIN_CAROUSEL = gql`
-  mutation UpdateMainCarousel(
-    $id: String!
-    $type: String
-    $title: String
-    $image: String
-    $buttonLink: String
-    $buttonText: String
-    $description: String
-    $rank: Int
-    $impressions: Int
-    $clicks: Int
-    $targetImpressions: Int
-    $targetClicks: Int
-  ) {
-    updateMainCarousel(
-      id: $id
-      type: $type
-      title: $title
-      image: $image
-      buttonLink: $buttonLink
-      buttonText: $buttonText
-      description: $description
-      rank: $rank
-      impressions: $impressions
-      clicks: $clicks
-      targetImpressions: $targetImpressions
-      targetClicks: $targetClicks
-    ) {
+  mutation UpdateMainCarousel($pl: String!) {
+    updateMainCarousel(pl: $pl) {
       id
       type
       title
@@ -181,9 +143,18 @@ export const UPDATE_MAIN_CAROUSEL = gql`
   }
 `;
 
+export const UPDATE_MAIN_CAROUSEL_STATUS = gql`
+  mutation UpdateMainCarouselStatus($pl: String!) {
+    updateMainCarouselStatus(pl: $pl) {
+      id
+      status
+    }
+  }
+`;
+
 export const UPDATE_MAIN_CAROUSEL_IMPRESSIONS = gql`
-  mutation UpdateMainCarouselImpressions($id: String!, $impressions: Int) {
-    updateMainCarouselImpressions(id: $id, impressions: $impressions) {
+  mutation UpdateMainCarouselImpressions($pl: String!) {
+    updateMainCarouselImpressions(pl: $pl) {
       id
       impressions
     }
@@ -191,8 +162,8 @@ export const UPDATE_MAIN_CAROUSEL_IMPRESSIONS = gql`
 `;
 
 export const UPDATE_MAIN_CAROUSEL_CLICKS = gql`
-  mutation UpdateMainCarouselClicks($id: String!, $clicks: Int) {
-    updateMainCarouselClicks(id: $id, clicks: $clicks) {
+  mutation UpdateMainCarouselClicks($pl: String!) {
+    updateMainCarouselClicks(pl: $pl) {
       id
       clicks
     }
@@ -200,8 +171,8 @@ export const UPDATE_MAIN_CAROUSEL_CLICKS = gql`
 `;
 
 export const DELETE_MAIN_CAROUSEL = gql`
-  mutation DeleteMainCarousel($id: String!) {
-    deleteMainCarousel(id: $id) {
+  mutation DeleteMainCarousel($pl: String!) {
+    deleteMainCarousel(pl: $pl) {
       id
     }
   }
