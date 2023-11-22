@@ -109,14 +109,17 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
                 }}
                 onClick={handleImageClick(url, ind)}
               >
-                <Avatar
+                <Image
                   src={url}
-                  variant="rounded"
-                  sx={{
-                    width: 70,
-                    height: 70,
-                    p: "5px",
+                  alt={"Vehicle image"}
+                  width={70}
+                  height={70}
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: "center",
+                    padding: "5px",
                     border: selectedImage === ind ? "1px solid green" : "none",
+                    borderRadius: "5px",
                   }}
                 />
               </Box>
