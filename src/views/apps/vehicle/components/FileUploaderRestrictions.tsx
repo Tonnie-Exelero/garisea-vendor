@@ -68,16 +68,16 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
   const theme = useTheme();
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 10,
-    maxSize: 3000000,
+    maxSize: 5000000,
     accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif"],
+      "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".svg"],
     },
     onDrop: (acceptedFiles: File[]) => {
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
     },
     onDropRejected: () => {
-      toast.error("You can upload upto 10 files & maximum size of 3 MB/file.", {
-        duration: 2000,
+      toast.error("You can upload upto 10 files & maximum size of 5 MB/file.", {
+        duration: 5000,
       });
     },
   });
@@ -183,7 +183,8 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
               Allowed types: *.jpeg, *.jpg, *.png, *.gif, *.webp, *.avif.
             </Typography>
             <Typography color="textSecondary" sx={{ mb: 2 }}>
-              Upto 10 files and max size of 3 MB/file.
+              Upto <strong>10 files</strong> and max size of{" "}
+              <strong>5 MB/file</strong>.
             </Typography>
             <Typography color="textSecondary" sx={{ mb: 3 }}>
               The <strong>first</strong> image is the <b>thumbnail</b> image.
