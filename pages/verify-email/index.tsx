@@ -85,7 +85,7 @@ const VerifyEmail = (props: Props) => {
     dispatch(fetchVendorById({ id }));
 
     setCurrentVendorVerified(vendor.emailVerified);
-  }, [dispatch, vendor, currentVendorVerified]);
+  }, [dispatch, currentVendorVerified]);
 
   // Update Email Verification status
   const updateEmailVerified = async () => {

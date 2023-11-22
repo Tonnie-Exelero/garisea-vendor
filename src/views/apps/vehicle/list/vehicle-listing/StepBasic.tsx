@@ -166,7 +166,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
     brandId && handleFetchModelsByBrandId(brandId);
 
     setVBrands(brands);
-  }, [dispatch, brands]);
+  }, [dispatch]);
 
   const icons: IconType[] = [
     {
