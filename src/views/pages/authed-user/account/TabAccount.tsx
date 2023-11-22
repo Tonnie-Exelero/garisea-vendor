@@ -133,7 +133,7 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
         first: 2,
       })
     );
-  }, [dispatch, vehicles, user]);
+  }, [dispatch, user]);
 
   const handleClose = () => setOpen(false);
 

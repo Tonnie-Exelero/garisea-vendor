@@ -5,11 +5,23 @@ import { useState } from "react";
 import Image from "next/image";
 
 // ** MUI Imports
-import { Avatar, Box, Button, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+
+// ** Icon Imports
+import Icon from "@components/icon";
 
 // ** Custom Components Imports
 import DropzoneWrapper from "src/@core/styles/libs/react-dropzone";
 import FileUploaderRestrictions from "../../components/FileUploaderRestrictions";
+import { removeFile } from "@core/utils/file-manager";
 
 interface StepImagesProps {
   handleImagesData: (data: any) => void;
@@ -28,6 +40,7 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
   );
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const [uploaded, setUploaded] = useState<boolean>(false);
+  const [deleting, setDeleting] = useState<string>("");
 
   const images: string[] = (imageUrls && [...imageUrls.split(",")]) || [
     imageUrls,
@@ -50,6 +63,21 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
     setThumbnail(url);
     setUploaded(true);
     saveDraft("thumbnail", url);
+  };
+
+  const handleDeleteImage = async (url: string) => {
+    setDeleting("ongoing");
+
+    const newResp = await removeFile(url);
+
+    if (images.some((image) => image === newResp.url)) {
+      const updatedList = images.filter((image) => image !== newResp.url);
+
+      setImageUrls(updatedList.toString());
+      window.localStorage.setItem("imageUrls", updatedList.toString());
+    }
+
+    setDeleting("complete");
   };
 
   const confirmData = () => {
@@ -76,13 +104,55 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
               overflow: "hidden",
             }}
           >
-            <Image
-              src={images[selectedImage]}
-              alt={"Garisea vehicle image"}
-              width={600}
-              height={400}
-              style={{ objectFit: "cover", objectPosition: "center" }}
-            />
+            <Box
+              sx={{
+                position: "relative",
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "2rem",
+                overflow: "hidden",
+              }}
+            >
+              <Image
+                src={images[selectedImage]}
+                alt={"Garisea vehicle image"}
+                width={600}
+                height={400}
+                style={{ objectFit: "cover", objectPosition: "center" }}
+              />
+
+              <Tooltip title="Delete image">
+                <IconButton
+                  onClick={() => handleDeleteImage(images[selectedImage])}
+                  color="error"
+                  sx={{
+                    position: "absolute",
+                    bottom: 4,
+                    right: 0,
+                  }}
+                >
+                  {deleting === "ongoing" && (
+                    <Box
+                      sx={{
+                        mr: 4,
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        alignItems: "center",
+                      }}
+                    >
+                      <CircularProgress
+                        size="1.5rem"
+                        sx={{ mr: 2, color: "lightgrey" }}
+                      />
+                      <Typography variant="h6" sx={{ color: "lightgrey" }}>
+                        Deleting image...
+                      </Typography>
+                    </Box>
+                  )}
+                  <Icon fontSize={30} icon="bx:trash" />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
 
           <Box
