@@ -711,7 +711,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                               View
                             </Button>
                           )}
-                          {vendor.status !== "active" &&
+                          {vendor.vendorVerified === "no" &&
                             ability?.can("update", "organizations") && (
                               <div>
                                 <Box sx={{ display: "flex" }}>
