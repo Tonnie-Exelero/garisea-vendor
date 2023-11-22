@@ -289,7 +289,7 @@ const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
                     View
                   </Button>
                 )}
-                {status !== "active" && (
+                {vendorVerified === "no" && (
                   <div>
                     <Box sx={{ display: "flex" }}>
                       <Tooltip
