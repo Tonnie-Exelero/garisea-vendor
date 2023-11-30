@@ -86,8 +86,8 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
     if (file.type.startsWith("image")) {
       return (
         <img
-          width={38}
-          height={38}
+          width={40}
+          height={40}
           alt={file.name}
           src={URL.createObjectURL(file as any)}
         />
@@ -106,11 +106,12 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
     }
 
     // Create image url array.
-    let imageUrls: string[] = imagesArray.map(({ url }) => url);
+    let imageUrls: string[] =
+      imagesArray.length > 0 ? imagesArray.map((img) => img && img.url) : [];
 
     // Set images without duplication.
     // Push images to image handler as string.
-    handleImages([...new Set(imageUrls)].toString());
+    imageUrls.length > 0 && handleImages([...new Set(imageUrls)].toString());
 
     setUploading("complete");
   };

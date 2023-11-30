@@ -5,6 +5,60 @@ import toast from "react-hot-toast";
 // ** Vercel Imports
 import type { PutBlobResult } from "@vercel/blob";
 
+// ** Watermark
+import { getCoordinates } from "@src/configs/watermark";
+import { generateRandomString } from "./random-string";
+
+const addWatermark = async (
+  canvas: any,
+  baseImage: any,
+  watermarkImage: any,
+  position: any,
+  alpha: any
+) => {
+  const ctx = canvas.getContext("2d");
+  canvas.width = baseImage.width;
+  canvas.height = baseImage.height;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(baseImage, 0, 0, baseImage.width, baseImage.height);
+  ctx.globalAlpha = alpha;
+  const watermarkImageSizeValue: number = Number(Number(baseImage.width) / 6);
+
+  position.forEach((pos: any) => {
+    const [x, y] = getCoordinates(
+      pos,
+      Number(watermarkImageSizeValue.toFixed()),
+      Number(watermarkImageSizeValue.toFixed()),
+      baseImage.width,
+      baseImage.height
+    );
+    ctx.drawImage(
+      watermarkImage,
+      x,
+      y,
+      Number(watermarkImageSizeValue.toFixed()),
+      Number(watermarkImageSizeValue.toFixed())
+    );
+  });
+
+  const randomString = generateRandomString(12);
+  const time = Date.now();
+  const fileName = `${randomString}${time}`;
+
+  await canvas.toBlob(async (blob: any) => {
+    let file = new File([blob], `${fileName}.png`, { type: "image/png" });
+
+    const response = await fetch(`/api/files/upload?filename=${file.name}`, {
+      method: "POST",
+      body: file,
+    });
+
+    const newBlob = (await response.json()) as PutBlobResult;
+
+    return newBlob;
+  }, "image/png");
+};
+
 export const uploadFile = async (
   file: ChangeEvent,
   requiredWidth?: number,
@@ -12,7 +66,7 @@ export const uploadFile = async (
 ) => {
   const { files } = file.target as HTMLInputElement;
 
-  if (files && files.length !== 0) {
+  if (files && files.length > 0) {
     if (requiredWidth && requiredHeight) {
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
@@ -68,14 +122,24 @@ export const uploadFile = async (
 };
 
 export const uploadFileOfFiles = async (file: File) => {
-  const response = await fetch(`/api/files/upload?filename=${file.name}`, {
-    method: "POST",
-    body: file,
-  });
+  let canvas: any = null;
 
-  const newBlob = (await response.json()) as PutBlobResult;
+  if (typeof window !== "undefined") {
+    canvas = document.createElement("canvas");
+  }
 
-  return newBlob;
+  const imageWatermark = async (img: any) =>
+    await addWatermark(canvas, img, img, ["bottom-left", "bottom-right"], 0.6);
+
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = async () => {
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    img.onload = async () => {
+      return await imageWatermark(img);
+    };
+  };
 };
 
 export const removeFile = async (url: string) => {

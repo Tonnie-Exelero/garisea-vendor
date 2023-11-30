@@ -41,14 +41,15 @@ const DropzoneWrapper = styled(Box)<BoxProps>(({ theme }) => ({
           }
         },
         '& img': {
-          width: 38,
-          height: 38,
+          width: 40,
+          height: 40,
           padding: theme.spacing(0.75),
+		  objectFit: 'cover',
           borderRadius: theme.shape.borderRadius,
           border: `1px solid ${theme.palette.mode === 'light' ? 'rgba(93, 89, 98, 0.14)' : 'rgba(247, 244, 254, 0.14)'}`
         },
         '& .file-name': {
-          fontWeight: 600
+          fontWeight: 400
         },
         '& + .MuiListItem-root': {
           marginTop: theme.spacing(3.5)
