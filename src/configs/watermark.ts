@@ -1,5 +1,53 @@
+import { generateRandomString } from "@core/utils/random-string";
+import { generateImage } from "./textToImage";
+
 const getAspectRatio = (width: number, height: number) => {
   return width / height;
+};
+
+const textWatermark = async (name: string) => {
+  //   let canvas: any = null;
+
+  //   if (typeof window !== "undefined") {
+  //     canvas = document.createElement("canvas");
+  //   }
+
+  //   const context = canvas.getContext("2d");
+
+  //   var img = new Image();
+  //   const result = await new Promise(
+  //     (resolve) =>
+  //       (img.onload = async () => {
+  //         context.drawImage(img, 10, 10);
+  //         context.fillStyle = "blue";
+  //         context.font = "bold 16px Arial";
+  //         context.textAlign = "center";
+  //         context.textBaseline = "middle";
+  //         context.textShadow =
+  //           "3px 3px 0 #000, -3px 3px 0 #000, -3px -3px 0 #000, 3px -3px 0 #000;";
+  //         context.fillText(name, canvas.width / 2, canvas.height / 2);
+
+  //         resolve(context);
+  //       })
+  //   );
+
+  //   return result;
+  const imageCanvas = await generateImage(name);
+  const randomString = generateRandomString(20);
+
+  const blob: File = await new Promise((resolve) =>
+    imageCanvas.toBlob((blob: any) =>
+      resolve(new File([blob], `${randomString}.png`, { type: "image/png" }))
+    )
+  );
+
+  const img = new Image();
+  img.src = URL.createObjectURL(blob);
+  const result = await new Promise(
+    (resolve) => (img.onload = () => resolve(img))
+  );
+
+  return result;
 };
 
 export const getCoordinates = (
@@ -34,8 +82,9 @@ export const getCoordinates = (
 export const addWatermark = async (
   canvas: any,
   baseImage: any,
-  watermarkImage: any,
-  position: any,
+  type: string,
+  watermarkItems: any[],
+  position: any[],
   alpha: any
 ) => {
   const ctx = canvas.getContext("2d");
@@ -49,19 +98,22 @@ export const addWatermark = async (
     Number(baseImage.width) / 3.5
   );
 
-  const vendorLogo: any = await fetch(watermarkImage[0])
-    .then((response) => response.blob())
-    .then(async (blob) => {
-      const img = new Image();
-      img.src = URL.createObjectURL(blob);
-      const result = await new Promise(
-        (resolve) => (img.onload = () => resolve(img))
-      );
+  const vendorLogo: any =
+    type === "image"
+      ? await fetch(watermarkItems[0])
+          .then((response) => response.blob())
+          .then(async (blob) => {
+            const img = new Image();
+            img.src = URL.createObjectURL(blob);
+            const result = await new Promise(
+              (resolve) => (img.onload = () => resolve(img))
+            );
 
-      return result;
-    });
+            return result;
+          })
+      : await textWatermark(watermarkItems[0]);
 
-  const gariseaLogo: any = await fetch(watermarkImage[1])
+  const gariseaLogo: any = await fetch(watermarkItems[1])
     .then((response) => response.blob())
     .then(async (blob) => {
       const img = new Image();
@@ -105,11 +157,7 @@ export const addWatermark = async (
       baseImage.height
     );
     ctx.drawImage(
-      pos === "bottom-left"
-        ? watermarkImage[0] !== ""
-          ? vendorLogo
-          : ""
-        : gariseaLogo,
+      pos === "bottom-left" ? vendorLogo : gariseaLogo,
       x,
       y,
       Number(

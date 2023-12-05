@@ -104,10 +104,16 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
 
   const handleUploadFiles = async () => {
     setUploading("ongoing");
-    const logo = authedVendor.organization.logo || "";
+    const type = authedVendor.organization.logo ? "image" : "name";
+    const name = authedVendor.organization.nicename
+      ? authedVendor.organization.nicename
+      : authedVendor.organization.name;
+    const vendorIdentity: any = authedVendor.organization.logo
+      ? authedVendor.organization.logo
+      : name;
 
     for (const file of files) {
-      const newBlob = await uploadFileOfFiles(file, logo);
+      const newBlob = await uploadFileOfFiles(file, type, vendorIdentity);
 
       imagesArray.push(newBlob);
     }
