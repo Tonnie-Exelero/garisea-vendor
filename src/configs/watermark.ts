@@ -45,6 +45,9 @@ export const addWatermark = async (
   ctx.drawImage(baseImage, 0, 0, baseImage.width, baseImage.height);
   ctx.globalAlpha = alpha;
   const watermarkImageWidthValue: number = Number(Number(baseImage.width) / 6);
+  const gariseawatermarkImageWidthValue: number = Number(
+    Number(baseImage.width) / 4
+  );
 
   const vendorLogo: any = await fetch(watermarkImage[0])
     .then((response) => response.blob())
@@ -82,13 +85,17 @@ export const addWatermark = async (
     Number(watermarkImageWidthValue) / vendorAspectRatio
   );
   const gariseaLogoHeight: number = Number(
-    Number(watermarkImageWidthValue) / gariseaAspectRatio
+    Number(gariseawatermarkImageWidthValue) / gariseaAspectRatio
   );
 
   position.forEach((pos: any) => {
     const [x, y] = getCoordinates(
       pos,
-      Number(watermarkImageWidthValue.toFixed()),
+      Number(
+        pos === "bottom-left"
+          ? watermarkImageWidthValue.toFixed()
+          : gariseawatermarkImageWidthValue.toFixed()
+      ),
       Number(
         pos === "bottom-left"
           ? vendorLogoHeight.toFixed()
@@ -105,7 +112,11 @@ export const addWatermark = async (
         : gariseaLogo,
       x,
       y,
-      Number(watermarkImageWidthValue.toFixed()),
+      Number(
+        pos === "bottom-left"
+          ? watermarkImageWidthValue.toFixed()
+          : gariseawatermarkImageWidthValue.toFixed()
+      ),
       Number(
         pos === "bottom-left"
           ? vendorLogoHeight.toFixed()

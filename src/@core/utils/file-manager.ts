@@ -79,7 +79,7 @@ export const uploadFileOfFiles = async (file: File, vendorLogo: string) => {
     canvas = document.createElement("canvas");
   }
 
-  const gariseaLogoUrl = `${baseUrl}/images/logos/garisea/logo-green-light.png`;
+  const gariseaLogoUrl = `${baseUrl}/images/watermark/watermark7.png`;
 
   const imageWatermark = async (img: any) =>
     await addWatermark(
