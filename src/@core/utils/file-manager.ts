@@ -6,58 +6,9 @@ import toast from "react-hot-toast";
 import type { PutBlobResult } from "@vercel/blob";
 
 // ** Watermark
-import { getCoordinates } from "@src/configs/watermark";
+import { addWatermark } from "@src/configs/watermark";
 import { generateRandomString } from "./random-string";
-
-const addWatermark = async (
-  canvas: any,
-  baseImage: any,
-  watermarkImage: any,
-  position: any,
-  alpha: any
-) => {
-  const ctx = canvas.getContext("2d");
-  canvas.width = baseImage.width;
-  canvas.height = baseImage.height;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(baseImage, 0, 0, baseImage.width, baseImage.height);
-  ctx.globalAlpha = alpha;
-  const watermarkImageSizeValue: number = Number(Number(baseImage.width) / 6);
-
-  position.forEach((pos: any) => {
-    const [x, y] = getCoordinates(
-      pos,
-      Number(watermarkImageSizeValue.toFixed()),
-      Number(watermarkImageSizeValue.toFixed()),
-      baseImage.width,
-      baseImage.height
-    );
-    ctx.drawImage(
-      watermarkImage,
-      x,
-      y,
-      Number(watermarkImageSizeValue.toFixed()),
-      Number(watermarkImageSizeValue.toFixed())
-    );
-  });
-
-  const randomString = generateRandomString(12);
-  const time = Date.now();
-  const fileName = `${randomString}${time}`;
-
-  await canvas.toBlob(async (blob: any) => {
-    let file = new File([blob], `${fileName}.png`, { type: "image/png" });
-
-    const response = await fetch(`/api/files/upload?filename=${file.name}`, {
-      method: "POST",
-      body: file,
-    });
-
-    const newBlob = (await response.json()) as PutBlobResult;
-
-    return newBlob;
-  }, "image/png");
-};
+import { baseUrl } from "@src/configs/baseUrl";
 
 export const uploadFile = async (
   file: ChangeEvent,
@@ -121,25 +72,64 @@ export const uploadFile = async (
   }
 };
 
-export const uploadFileOfFiles = async (file: File) => {
+export const uploadFileOfFiles = async (file: File, vendorLogo: string) => {
   let canvas: any = null;
 
   if (typeof window !== "undefined") {
     canvas = document.createElement("canvas");
   }
 
+  const gariseaLogoUrl = `${baseUrl}/images/logos/garisea/logo-green-light.png`;
+
   const imageWatermark = async (img: any) =>
-    await addWatermark(canvas, img, img, ["bottom-left", "bottom-right"], 0.6);
+    await addWatermark(
+      canvas,
+      img,
+      [vendorLogo, gariseaLogoUrl],
+      ["bottom-left", "bottom-right"],
+      0.6
+    );
 
   const reader = new FileReader();
   reader.readAsDataURL(file);
-  reader.onload = async () => {
-    const img = new Image();
-    img.src = URL.createObjectURL(file);
-    img.onload = async () => {
-      return await imageWatermark(img);
-    };
-  };
+  const newImage: File = await new Promise(
+    (resolve) =>
+      (reader.onload = async () => {
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        const result: File = await new Promise(
+          (resolve) =>
+            (img.onload = async () => {
+              const newCanvas = await imageWatermark(img);
+
+              const randomString = generateRandomString(12);
+              const time = Date.now();
+              const fileName = `${randomString}${time}`;
+
+              const blob: File = await new Promise((resolve) =>
+                newCanvas.toBlob((blob: any) =>
+                  resolve(
+                    new File([blob], `${fileName}.png`, { type: "image/png" })
+                  )
+                )
+              );
+
+              resolve(blob);
+            })
+        );
+
+        resolve(result);
+      })
+  );
+
+  const response = await fetch(`/api/files/upload?filename=${newImage.name}`, {
+    method: "POST",
+    body: newImage,
+  });
+
+  const newBlob = (await response.json()) as PutBlobResult;
+
+  return newBlob;
 };
 
 export const removeFile = async (url: string) => {

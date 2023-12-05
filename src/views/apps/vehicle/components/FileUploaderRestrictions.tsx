@@ -18,6 +18,8 @@ import toast from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
 import { CircularProgress } from "@mui/material";
 import { uploadFileOfFiles } from "@core/utils/file-manager";
+import { useSelector } from "react-redux";
+import { RootState } from "@src/store";
 
 interface FileProp {
   name: string;
@@ -81,6 +83,9 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
       });
     },
   });
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
 
   const renderFilePreview = (file: FileProp) => {
     if (file.type.startsWith("image")) {
@@ -99,8 +104,10 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
 
   const handleUploadFiles = async () => {
     setUploading("ongoing");
+    const logo = authedVendor.organization.logo || "";
+
     for (const file of files) {
-      const newBlob = await uploadFileOfFiles(file);
+      const newBlob = await uploadFileOfFiles(file, logo);
 
       imagesArray.push(newBlob);
     }

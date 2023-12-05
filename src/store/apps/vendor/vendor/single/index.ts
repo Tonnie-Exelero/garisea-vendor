@@ -57,6 +57,7 @@ const vendorInitialState = {
     address2: "",
     city: "",
     country: "",
+    coverImage: "",
     logo: "",
     certificate: "",
   },
