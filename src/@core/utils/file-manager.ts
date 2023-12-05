@@ -72,7 +72,11 @@ export const uploadFile = async (
   }
 };
 
-export const uploadFileOfFiles = async (file: File, vendorLogo: string) => {
+export const uploadFileOfFiles = async (
+  file: File,
+  type: string,
+  vendorInfo: string
+) => {
   let canvas: any = null;
 
   if (typeof window !== "undefined") {
@@ -85,7 +89,8 @@ export const uploadFileOfFiles = async (file: File, vendorLogo: string) => {
     await addWatermark(
       canvas,
       img,
-      [vendorLogo, gariseaLogoUrl],
+      type,
+      [vendorInfo, gariseaLogoUrl],
       ["bottom-left", "center"],
       0.4
     );
