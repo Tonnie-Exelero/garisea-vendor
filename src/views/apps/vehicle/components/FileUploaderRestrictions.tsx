@@ -18,6 +18,8 @@ import toast from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
 import { CircularProgress } from "@mui/material";
 import { uploadFileOfFiles } from "@core/utils/file-manager";
+import { useSelector } from "react-redux";
+import { RootState } from "@src/store";
 
 interface FileProp {
   name: string;
@@ -81,13 +83,16 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
       });
     },
   });
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
 
   const renderFilePreview = (file: FileProp) => {
     if (file.type.startsWith("image")) {
       return (
         <img
-          width={38}
-          height={38}
+          width={40}
+          height={40}
           alt={file.name}
           src={URL.createObjectURL(file as any)}
         />
@@ -99,18 +104,21 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
 
   const handleUploadFiles = async () => {
     setUploading("ongoing");
+    const logo = authedVendor.organization.logo || "";
+
     for (const file of files) {
-      const newBlob = await uploadFileOfFiles(file);
+      const newBlob = await uploadFileOfFiles(file, logo);
 
       imagesArray.push(newBlob);
     }
 
     // Create image url array.
-    let imageUrls: string[] = imagesArray.map(({ url }) => url);
+    let imageUrls: string[] =
+      imagesArray.length > 0 ? imagesArray.map((img) => img && img.url) : [];
 
     // Set images without duplication.
     // Push images to image handler as string.
-    handleImages([...new Set(imageUrls)].toString());
+    imageUrls.length > 0 && handleImages([...new Set(imageUrls)].toString());
 
     setUploading("complete");
   };

@@ -5,6 +5,11 @@ import toast from "react-hot-toast";
 // ** Vercel Imports
 import type { PutBlobResult } from "@vercel/blob";
 
+// ** Watermark
+import { addWatermark } from "@src/configs/watermark";
+import { generateRandomString } from "./random-string";
+import { baseUrl } from "@src/configs/baseUrl";
+
 export const uploadFile = async (
   file: ChangeEvent,
   requiredWidth?: number,
@@ -12,7 +17,7 @@ export const uploadFile = async (
 ) => {
   const { files } = file.target as HTMLInputElement;
 
-  if (files && files.length !== 0) {
+  if (files && files.length > 0) {
     if (requiredWidth && requiredHeight) {
       const reader = new FileReader();
       reader.readAsDataURL(files[0]);
@@ -67,10 +72,59 @@ export const uploadFile = async (
   }
 };
 
-export const uploadFileOfFiles = async (file: File) => {
-  const response = await fetch(`/api/files/upload?filename=${file.name}`, {
+export const uploadFileOfFiles = async (file: File, vendorLogo: string) => {
+  let canvas: any = null;
+
+  if (typeof window !== "undefined") {
+    canvas = document.createElement("canvas");
+  }
+
+  const gariseaLogoUrl = `${baseUrl}/images/watermark/watermark7.png`;
+
+  const imageWatermark = async (img: any) =>
+    await addWatermark(
+      canvas,
+      img,
+      [vendorLogo, gariseaLogoUrl],
+      ["bottom-left", "center"],
+      0.4
+    );
+
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  const newImage: File = await new Promise(
+    (resolve) =>
+      (reader.onload = async () => {
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        const result: File = await new Promise(
+          (resolve) =>
+            (img.onload = async () => {
+              const newCanvas = await imageWatermark(img);
+
+              const randomString = generateRandomString(12);
+              const time = Date.now();
+              const fileName = `${randomString}${time}`;
+
+              const blob: File = await new Promise((resolve) =>
+                newCanvas.toBlob((blob: any) =>
+                  resolve(
+                    new File([blob], `${fileName}.png`, { type: "image/png" })
+                  )
+                )
+              );
+
+              resolve(blob);
+            })
+        );
+
+        resolve(result);
+      })
+  );
+
+  const response = await fetch(`/api/files/upload?filename=${newImage.name}`, {
     method: "POST",
-    body: file,
+    body: newImage,
   });
 
   const newBlob = (await response.json()) as PutBlobResult;
