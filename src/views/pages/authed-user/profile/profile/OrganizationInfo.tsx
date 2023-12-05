@@ -642,7 +642,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                             <div>
                               <Box sx={{ display: "flex" }}>
                                 <Tooltip
-                                  title="Allowed PNG/JPEG/SVG. Image dimensions should be 200 x 200. Max size of 2MB. Ensure the focal point (concentration area) of the image is centered, so that it's not cropped out when displayed on different devices."
+                                  title="Allowed PNG/SVG/WebP. Should have a transparent background so that the watermark doesn't obscure the vehicle images. Image dimensions should be 200 x 200. Max size of 3MB. Ensure the focal point (concentration area) of the image is centered, so that it's not cropped out when displayed on different devices."
                                   placement="top"
                                 >
                                   <ButtonStyled
@@ -656,7 +656,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                                       hidden
                                       type="file"
                                       value={inputValue}
-                                      accept="image/png, image/jpeg, image/svg"
+                                      accept="image/png, image/svg, image/webp"
                                       onChange={handleInputLogoChange}
                                       id="upload-logo"
                                     />
