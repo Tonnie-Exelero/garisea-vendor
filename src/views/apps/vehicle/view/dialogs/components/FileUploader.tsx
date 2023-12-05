@@ -19,8 +19,8 @@ import { useDropzone } from "react-dropzone";
 import { CircularProgress } from "@mui/material";
 
 // ** API/Redux
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@src/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@src/store";
 import { editVehicleImages } from "@src/store/apps/vendor/vehicle/single";
 
 // ** Types
@@ -96,6 +96,9 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
       });
     },
   });
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
 
   const renderFilePreview = (file: FileProp) => {
     if (file.type.startsWith("image")) {
@@ -114,9 +117,10 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
 
   const handleUploadFiles = async () => {
     setUploading("ongoing");
+    const logo = authedVendor.organization.logo || "";
 
     for (const file of files) {
-      const newBlob = await uploadFileOfFiles(file);
+      const newBlob = await uploadFileOfFiles(file, logo);
 
       imagesArray.push(newBlob);
     }
