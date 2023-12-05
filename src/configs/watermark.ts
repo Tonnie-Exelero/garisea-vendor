@@ -46,7 +46,7 @@ export const addWatermark = async (
   ctx.globalAlpha = alpha;
   const watermarkImageWidthValue: number = Number(Number(baseImage.width) / 6);
   const gariseawatermarkImageWidthValue: number = Number(
-    Number(baseImage.width) / 4
+    Number(baseImage.width) / 3.5
   );
 
   const vendorLogo: any = await fetch(watermarkImage[0])

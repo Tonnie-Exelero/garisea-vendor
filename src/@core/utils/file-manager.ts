@@ -86,8 +86,8 @@ export const uploadFileOfFiles = async (file: File, vendorLogo: string) => {
       canvas,
       img,
       [vendorLogo, gariseaLogoUrl],
-      ["bottom-left", "bottom-right"],
-      0.6
+      ["bottom-left", "center"],
+      0.4
     );
 
   const reader = new FileReader();
