@@ -43,7 +43,7 @@ import { createToken, decodeToken } from "@src/configs/jwt";
 import { sendEmail } from "@src/configs/email";
 import { baseUrl } from "@src/configs/baseUrl";
 import { idleTimer } from "@src/configs/idleOrReload";
-import { encryptData } from "@core/utils/encryption";
+import { decryptData, encryptData } from "@core/utils/encryption";
 
 // ** Styled Components
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -62,11 +62,8 @@ const VerifyEmail = (props: Props) => {
   // ** Watch for idle time or reload
   idleTimer();
 
-  const {
-    data: { id, email, firstName },
-    isTokenExpired,
-    isEmailValid,
-  } = props;
+  const { data, isTokenExpired, isEmailValid } = props;
+  const { id, email, firstName } = decryptData(data);
 
   // ** States
   const [currentVendorVerified, setCurrentVendorVerified] = useState<string>();
@@ -95,7 +92,9 @@ const VerifyEmail = (props: Props) => {
       expirationTime: "7d",
     };
 
-    const resetPasswordTokenObj = await createToken(resetPasswordTokenPayload);
+    const resetPasswordTokenObj = await createToken({
+      pl: encryptData(resetPasswordTokenPayload),
+    });
 
     const vendorData = {
       id,
@@ -116,7 +115,9 @@ const VerifyEmail = (props: Props) => {
       // Finish sending email
 
       // Proceed to set password
-      Router.replace(`/reset-password?token=${resetPasswordTokenObj.token}`);
+      Router.replace(
+        `/reset-password?token=${encryptData(resetPasswordTokenObj)}`
+      );
 
       console.log(`Email verification updated successfully!`);
     } else {
@@ -134,9 +135,12 @@ const VerifyEmail = (props: Props) => {
       secret: encryptData(secret.toString()),
       expirationTime: "1d",
     };
-    const tokenObject = await createToken(tokenPayload);
+    const tokenObject = await createToken({
+      pl: encryptData(tokenPayload),
+    });
+
     // Verification link.
-    const url = `${baseUrl}/verify-email?token=${tokenObject.token}`;
+    const url = `${baseUrl}/verify-email?token=${encryptData(tokenObject)}`;
     const payload = {
       name: firstName,
       to: email,
@@ -315,7 +319,8 @@ const VerifyEmail = (props: Props) => {
 
 export const getServerSideProps: any = async ({ query }: any) => {
   const { token } = query;
-  const payload: any = await decodeToken(token);
+  const decryptedToken = decryptData(token.replace(/\s/g, "+"));
+  const payload: any = await decodeToken(decryptedToken.token);
 
   const { email } = payload;
   const secret = APP_SECRET + email;
@@ -338,7 +343,7 @@ export const getServerSideProps: any = async ({ query }: any) => {
 
   return {
     props: {
-      data,
+      data: encryptData(data),
       isTokenExpired,
       isEmailValid,
     },
