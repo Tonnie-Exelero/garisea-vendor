@@ -6,7 +6,8 @@ export default async function createToken(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { data, secret, expirationTime } = JSON.parse(req.body);
+  const { pl } = JSON.parse(req.body);
+  const { data, secret, expirationTime } = decryptData(pl);
 
   const decryptedSecret = decryptData(secret);
 

@@ -88,9 +88,10 @@ const ForgotPassword = () => {
         secret: encryptData(secret.toString()),
         expirationTime: "1d",
       };
-      const tokenObject = await createToken(tokenPayload);
+      const tokenObject = await createToken({ pl: encryptData(tokenPayload) });
+
       // Verification link.
-      const url = `${baseUrl}/reset-password?token=${tokenObject.token}`;
+      const url = `${baseUrl}/reset-password?token=${encryptData(tokenObject)}`;
       const payload = {
         name: firstName,
         to: email,

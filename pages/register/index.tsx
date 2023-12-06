@@ -165,11 +165,12 @@ const Register = () => {
           secret: encryptData(newSecret.toString()),
           expirationTime: "1d",
         };
-
-        const tokenObject = await createToken(tokenPayload);
+        const tokenObject = await createToken({
+          pl: encryptData(tokenPayload),
+        });
 
         // Verification link.
-        const url = `${baseUrl}/verify-email?token=${tokenObject.token}`;
+        const url = `${baseUrl}/verify-email?token=${encryptData(tokenObject)}`;
 
         const payload = {
           name: createVendor.firstName,

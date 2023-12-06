@@ -45,6 +45,7 @@ import { AppDispatch } from "@src/store";
 import { editPassword } from "@src/store/apps/vendor/vendor/single";
 import { decodeToken } from "@src/configs/jwt";
 import { idleTimer } from "@src/configs/idleOrReload";
+import { decryptData, encryptData } from "@core/utils/encryption";
 
 interface State {
   showNewPassword: boolean;
@@ -77,14 +78,15 @@ const schema = yup.object().shape({
 });
 
 interface Props {
-  uid: string;
+  uu: string;
 }
 
 const ResetPassword = (props: Props) => {
   // ** Watch for idle time or reload
   idleTimer();
 
-  const { uid } = props;
+  const { uu } = props;
+  const uid = decryptData(uu);
 
   // ** States
   const [values, setValues] = useState<State>({
@@ -340,13 +342,14 @@ const ResetPassword = (props: Props) => {
 
 export const getServerSideProps: any = async ({ query }: any) => {
   const { token } = query;
-  const payload: any = await decodeToken(token);
+  const decryptedToken = decryptData(token as string);
+  const payload: any = await decodeToken(decryptedToken.token);
 
   const { id } = payload;
 
   return {
     props: {
-      uid: id,
+      uu: encryptData(id),
     },
   };
 };
