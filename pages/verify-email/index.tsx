@@ -1,5 +1,5 @@
 // ** React Imports
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 
 // ** Next Import
 import Link from "next/link";
@@ -29,12 +29,11 @@ import EmailVerify from "@emails/EmailVerify";
 import VendorWelcome from "@emails/VendorWelcome";
 
 // ** API
-import { AppDispatch, RootState } from "src/store";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchVendorById,
-  editEmailVerified,
-} from "@src/store/apps/vendor/vendor/single";
+import apolloClient from "@src/lib/apollo";
+import { AppDispatch } from "src/store";
+import { useDispatch } from "react-redux";
+import { GET_VENDOR_BY_ID } from "@src/api/vendor/vendor";
+import { editEmailVerified } from "@src/store/apps/vendor/vendor/single";
 
 // ** Others
 import jwt from "jsonwebtoken";
@@ -43,7 +42,7 @@ import { createToken, decodeToken } from "@src/configs/jwt";
 import { sendEmail } from "@src/configs/email";
 import { baseUrl } from "@src/configs/baseUrl";
 import { idleTimer } from "@src/configs/idleOrReload";
-import { encryptData } from "@core/utils/encryption";
+import { decryptData, encryptData } from "@core/utils/encryption";
 
 // ** Styled Components
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -62,11 +61,9 @@ const VerifyEmail = (props: Props) => {
   // ** Watch for idle time or reload
   idleTimer();
 
-  const {
-    data: { id, email, firstName },
-    isTokenExpired,
-    isEmailValid,
-  } = props;
+  const { data, isTokenExpired, isEmailValid } = props;
+  const { id, email, firstName } = decryptData(data);
+  console.log(props);
 
   // ** States
   const [currentVendorVerified, setCurrentVendorVerified] = useState<string>();
@@ -75,17 +72,29 @@ const VerifyEmail = (props: Props) => {
   // ** Hooks
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
-  const { vendor } = useSelector((state: RootState) => state.singleVendor);
 
   // ** Local Storage
   const fromLocalStore = window.localStorage.getItem("settings");
   const appSettings = fromLocalStore && JSON.parse(fromLocalStore);
 
   useEffect(() => {
-    dispatch(fetchVendorById({ id }));
+    id && getVendor();
+  }, [id]);
 
-    setCurrentVendorVerified(vendor.emailVerified);
-  }, [dispatch, currentVendorVerified]);
+  const getVendor = useCallback(async () => {
+    const encryptedData = encryptData({ id });
+
+    const { data } = await apolloClient.query({
+      query: GET_VENDOR_BY_ID,
+      variables: { pl: encryptedData },
+    });
+
+    const {
+      vendorById: { emailVerified },
+    }: any = data;
+
+    setCurrentVendorVerified(emailVerified);
+  }, [id]);
 
   // Update Email Verification status
   const updateEmailVerified = async () => {
@@ -95,7 +104,9 @@ const VerifyEmail = (props: Props) => {
       expirationTime: "7d",
     };
 
-    const resetPasswordTokenObj = await createToken(resetPasswordTokenPayload);
+    const resetPasswordTokenObj = await createToken({
+      pl: encryptData(resetPasswordTokenPayload),
+    });
 
     const vendorData = {
       id,
@@ -116,7 +127,9 @@ const VerifyEmail = (props: Props) => {
       // Finish sending email
 
       // Proceed to set password
-      Router.replace(`/reset-password?token=${resetPasswordTokenObj.token}`);
+      Router.replace(
+        `/reset-password?token=${encryptData(resetPasswordTokenObj)}`
+      );
 
       console.log(`Email verification updated successfully!`);
     } else {
@@ -134,9 +147,12 @@ const VerifyEmail = (props: Props) => {
       secret: encryptData(secret.toString()),
       expirationTime: "1d",
     };
-    const tokenObject = await createToken(tokenPayload);
+    const tokenObject = await createToken({
+      pl: encryptData(tokenPayload),
+    });
+
     // Verification link.
-    const url = `${baseUrl}/verify-email?token=${tokenObject.token}`;
+    const url = `${baseUrl}/verify-email?token=${encryptData(tokenObject)}`;
     const payload = {
       name: firstName,
       to: email,
@@ -220,8 +236,7 @@ const VerifyEmail = (props: Props) => {
                 </Box>
               </>
             )}
-            {vendor &&
-              vendor.emailVerified === "No" &&
+            {currentVendorVerified === "No" &&
               isEmailValid &&
               !isTokenExpired && (
                 <>
@@ -238,8 +253,7 @@ const VerifyEmail = (props: Props) => {
                   </Box>
                 </>
               )}
-            {vendor &&
-              vendor.emailVerified === "No" &&
+            {currentVendorVerified === "No" &&
               isTokenExpired &&
               !isEmailValid && (
                 <>
@@ -315,7 +329,8 @@ const VerifyEmail = (props: Props) => {
 
 export const getServerSideProps: any = async ({ query }: any) => {
   const { token } = query;
-  const payload: any = await decodeToken(token);
+  const decryptedToken = decryptData(token as string);
+  const payload: any = await decodeToken(decryptedToken.token);
 
   const { email } = payload;
   const secret = APP_SECRET + email;
@@ -324,21 +339,25 @@ export const getServerSideProps: any = async ({ query }: any) => {
   let isTokenExpired: boolean = false;
   let isEmailValid: boolean = false;
 
-  jwt.verify(token, secret as string, async (err: any) => {
-    // ** If token is expired, add decoded data to props for new token generation
-    if (err) {
-      data = { ...payload };
-      isTokenExpired = true;
+  jwt.verify(
+    decryptedToken.token as string,
+    secret as string,
+    async (err: any) => {
+      // ** If token is expired, add decoded data to props for new token generation
+      if (err) {
+        data = { ...payload };
+        isTokenExpired = true;
+      }
+      if (!err) {
+        data = { ...payload };
+        isEmailValid = true;
+      }
     }
-    if (!err) {
-      data = { ...payload };
-      isEmailValid = true;
-    }
-  });
+  );
 
   return {
     props: {
-      data,
+      data: encryptData(data),
       isTokenExpired,
       isEmailValid,
     },

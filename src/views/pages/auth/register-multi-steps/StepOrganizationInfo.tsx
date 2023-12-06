@@ -251,11 +251,7 @@ const StepOrganizationInfo = (props: Props) => {
             label={
               <>
                 <span>I agree to </span>
-                <LinkStyled
-                  href="https://garisea.com/terms"
-                  target="_blank"
-                  onClick={(e) => e.preventDefault()}
-                >
+                <LinkStyled href="https://garisea.com/terms" target="_blank">
                   privacy policy & terms
                 </LinkStyled>
               </>

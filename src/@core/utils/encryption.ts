@@ -2,18 +2,20 @@ import CryptoJS from "crypto-js";
 import config from "@src/configs/auth";
 
 export const encryptData = (data: any) => {
-  const encrypted = CryptoJS.AES.encrypt(
+  let encrypted = CryptoJS.AES.encrypt(
     JSON.stringify(data),
     config.cryptoSecret
   ).toString();
 
-  return encrypted;
+  return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(encrypted));
 };
 
 export const decryptData = (data: string) => {
-  const decrypted = CryptoJS.AES.decrypt(data, config.cryptoSecret).toString(
-    CryptoJS.enc.Utf8
-  );
+  let decrypted = CryptoJS.enc.Base64.parse(data).toString(CryptoJS.enc.Utf8);
 
-  return JSON.parse(decrypted);
+  return JSON.parse(
+    CryptoJS.AES.decrypt(decrypted, config.cryptoSecret).toString(
+      CryptoJS.enc.Utf8
+    )
+  );
 };
