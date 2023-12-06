@@ -1,5 +1,5 @@
 // ** React Imports
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 
 // ** Next Import
 import Link from "next/link";
@@ -29,12 +29,11 @@ import EmailVerify from "@emails/EmailVerify";
 import VendorWelcome from "@emails/VendorWelcome";
 
 // ** API
-import { AppDispatch, RootState } from "src/store";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchVendorById,
-  editEmailVerified,
-} from "@src/store/apps/vendor/vendor/single";
+import apolloClient from "@src/lib/apollo";
+import { AppDispatch } from "src/store";
+import { useDispatch } from "react-redux";
+import { GET_VENDOR_BY_ID } from "@src/api/vendor/vendor";
+import { editEmailVerified } from "@src/store/apps/vendor/vendor/single";
 
 // ** Others
 import jwt from "jsonwebtoken";
@@ -64,6 +63,7 @@ const VerifyEmail = (props: Props) => {
 
   const { data, isTokenExpired, isEmailValid } = props;
   const { id, email, firstName } = decryptData(data);
+  console.log(props);
 
   // ** States
   const [currentVendorVerified, setCurrentVendorVerified] = useState<string>();
@@ -72,17 +72,29 @@ const VerifyEmail = (props: Props) => {
   // ** Hooks
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
-  const { vendor } = useSelector((state: RootState) => state.singleVendor);
 
   // ** Local Storage
   const fromLocalStore = window.localStorage.getItem("settings");
   const appSettings = fromLocalStore && JSON.parse(fromLocalStore);
 
   useEffect(() => {
-    dispatch(fetchVendorById({ id }));
+    id && getVendor();
+  }, [id]);
 
-    setCurrentVendorVerified(vendor.emailVerified);
-  }, [dispatch, currentVendorVerified]);
+  const getVendor = useCallback(async () => {
+    const encryptedData = encryptData({ id });
+
+    const { data } = await apolloClient.query({
+      query: GET_VENDOR_BY_ID,
+      variables: { pl: encryptedData },
+    });
+
+    const {
+      vendorById: { emailVerified },
+    }: any = data;
+
+    setCurrentVendorVerified(emailVerified);
+  }, [id]);
 
   // Update Email Verification status
   const updateEmailVerified = async () => {
@@ -224,8 +236,7 @@ const VerifyEmail = (props: Props) => {
                 </Box>
               </>
             )}
-            {vendor &&
-              vendor.emailVerified === "No" &&
+            {currentVendorVerified === "No" &&
               isEmailValid &&
               !isTokenExpired && (
                 <>
@@ -242,8 +253,7 @@ const VerifyEmail = (props: Props) => {
                   </Box>
                 </>
               )}
-            {vendor &&
-              vendor.emailVerified === "No" &&
+            {currentVendorVerified === "No" &&
               isTokenExpired &&
               !isEmailValid && (
                 <>
@@ -319,7 +329,7 @@ const VerifyEmail = (props: Props) => {
 
 export const getServerSideProps: any = async ({ query }: any) => {
   const { token } = query;
-  const decryptedToken = decryptData(token.replace(/\s/g, "+"));
+  const decryptedToken = decryptData(token as string);
   const payload: any = await decodeToken(decryptedToken.token);
 
   const { email } = payload;
@@ -329,17 +339,21 @@ export const getServerSideProps: any = async ({ query }: any) => {
   let isTokenExpired: boolean = false;
   let isEmailValid: boolean = false;
 
-  jwt.verify(token, secret as string, async (err: any) => {
-    // ** If token is expired, add decoded data to props for new token generation
-    if (err) {
-      data = { ...payload };
-      isTokenExpired = true;
+  jwt.verify(
+    decryptedToken.token as string,
+    secret as string,
+    async (err: any) => {
+      // ** If token is expired, add decoded data to props for new token generation
+      if (err) {
+        data = { ...payload };
+        isTokenExpired = true;
+      }
+      if (!err) {
+        data = { ...payload };
+        isEmailValid = true;
+      }
     }
-    if (!err) {
-      data = { ...payload };
-      isEmailValid = true;
-    }
-  });
+  );
 
   return {
     props: {

@@ -1,10 +1,8 @@
+import { decryptData } from "@core/utils/encryption";
 import nodemailer from "nodemailer";
 
 type EmailPayload = {
-  name: string;
-  to: string;
-  subject: string;
-  html: string;
+  pl: string;
 };
 
 const SMTP_PORT: any =
@@ -29,8 +27,10 @@ export const sendEmail = async (data: EmailPayload) => {
     ...smtpOptions,
   });
 
+  const { pl } = data;
+
   return await transporter.sendMail({
     from: process.env.SMTP_FROM_EMAIL,
-    ...data,
+    ...decryptData(pl),
   });
 };

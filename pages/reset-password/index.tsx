@@ -342,7 +342,7 @@ const ResetPassword = (props: Props) => {
 
 export const getServerSideProps: any = async ({ query }: any) => {
   const { token } = query;
-  const decryptedToken = decryptData(token.replace(/\s/g, "+"));
+  const decryptedToken = decryptData(token as string);
   const payload: any = await decodeToken(decryptedToken.token);
 
   const { id } = payload;
