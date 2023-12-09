@@ -22,88 +22,32 @@ const randomString = generateRandomString(12);
 const time = Date.now();
 const fileName = `${randomString}${time}`;
 
-const compressImage = async (imageFile: File) =>
+const compressFile = async (imageFile: File) =>
   await imageCompression(imageFile, compressionOptions);
 
-export const uploadFile = async (
-  file: ChangeEvent,
-  requiredWidth?: number,
-  requiredHeight?: number
-) => {
+export const uploadFile = async (file: ChangeEvent, fileType?: string) => {
   const { files } = file.target as HTMLInputElement;
 
   if (files && files.length > 0) {
-    if (requiredWidth && requiredHeight) {
-      const reader = new FileReader();
-      reader.readAsDataURL(files[0]);
-      reader.onload = function (e) {
-        //Initiate the JavaScript Image object.
-        let image: any = new Image();
+    try {
+      const compressedFile = new File(
+        [await compressFile(files[0])],
+        `${fileName}.${fileType === "doc" ? "pdf" : "png"}`,
+        { type: fileType === "doc" ? "application/pdf" : "image/png" }
+      );
 
-        //Set the Base64 string return from FileReader as source.
-        image.src = e.target?.result;
+      const response =
+        compressedFile &&
+        (await fetch(`/api/files/upload?filename=${compressedFile.name}`, {
+          method: "POST",
+          body: compressedFile,
+        }));
 
-        //Validate the File Height and Width.
-        image.onload = async function () {
-          const width = this.width;
-          const height = this.height;
+      const newBlob = (await response.json()) as PutBlobResult;
 
-          if (width < requiredWidth || height < requiredHeight) {
-            toast.error(
-              `Required image dimensions are ${requiredWidth} x ${requiredHeight}. Please upload image with required dimensions.`,
-              {
-                duration: 7000,
-              }
-            );
-            return false;
-          } else {
-            try {
-              const compressedImage = new File(
-                [await compressImage(files[0])],
-                `${fileName}.png`,
-                { type: "image/png" }
-              );
-
-              const response =
-                compressedImage &&
-                (await fetch(
-                  `/api/files/upload?filename=${compressedImage.name}`,
-                  {
-                    method: "POST",
-                    body: compressedImage,
-                  }
-                ));
-
-              const newBlob = (await response.json()) as PutBlobResult;
-
-              return newBlob;
-            } catch (error) {
-              console.log(error);
-            }
-          }
-        };
-      };
-    } else {
-      try {
-        const compressedImage = new File(
-          [await compressImage(files[0])],
-          `${fileName}.png`,
-          { type: "image/png" }
-        );
-
-        const response =
-          compressedImage &&
-          (await fetch(`/api/files/upload?filename=${compressedImage.name}`, {
-            method: "POST",
-            body: compressedImage,
-          }));
-
-        const newBlob = (await response.json()) as PutBlobResult;
-
-        return newBlob;
-      } catch (error) {
-        console.log(error);
-      }
+      return newBlob;
+    } catch (error) {
+      console.log(error);
     }
   }
 };
@@ -161,7 +105,7 @@ export const uploadFileOfFiles = async (
 
   try {
     const compressedImage = new File(
-      [await compressImage(newImage)],
+      [await compressFile(newImage)],
       `${fileName}.png`,
       { type: "image/png" }
     );
