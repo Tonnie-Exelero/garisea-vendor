@@ -83,15 +83,23 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
   const dispatch = useDispatch<AppDispatch>();
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 10,
-    maxSize: 5000000,
     accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".svg"],
+      "image/*": [
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".gif",
+        ".webp",
+        ".avif",
+        ".svg",
+        ".heic",
+      ],
     },
     onDrop: (acceptedFiles: File[]) => {
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
     },
     onDropRejected: () => {
-      toast.error("You can upload upto 10 files & maximum size of 5 MB/file.", {
+      toast.error("You can upload upto 10 files.", {
         duration: 5000,
       });
     },
@@ -230,11 +238,11 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
               (Select all images at once. You can update them later.)
             </Typography>
             <Typography color="textSecondary" sx={{ mb: 2 }}>
-              Allowed types: *.jpeg, *.jpg, *.png, *.gif, *.webp, *.avif.
+              Allowed types: *.jpeg, *.jpg, *.png, *.gif, *.webp, *.avif,
+              *.heic.
             </Typography>
             <Typography color="textSecondary" sx={{ mb: 2 }}>
-              Upto <strong>10 files</strong> and max size of{" "}
-              <strong>5 MB/file</strong>.
+              Upto <strong>10 files</strong> allowed.
             </Typography>
             <Typography color="textSecondary">
               The <strong>first</strong> image is the <b>main</b> image.

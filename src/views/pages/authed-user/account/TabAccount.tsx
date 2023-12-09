@@ -95,7 +95,6 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
   const [userInput, setUserInput] = useState<string>("yes");
   const [secondDialogOpen, setSecondDialogOpen] = useState<boolean>(false);
   const [uploadingImage, setUploadingImage] = useState<boolean>(false);
-  const [deactivateChecked, setDeactivateChecked] = useState<boolean>(false);
   const [noListingsChecked, setNoListingsChecked] = useState<boolean>(false);
 
   // ** Hooks
@@ -281,7 +280,7 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
                       hidden
                       type="file"
                       value={inputValue}
-                      accept="image/png, image/jpeg"
+                      accept="image/*"
                       onChange={handleInputImageChange}
                       id="account-settings-upload-image"
                     />
