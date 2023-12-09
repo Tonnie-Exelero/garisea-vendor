@@ -197,7 +197,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
   const handleInputCertificateChange = async (file: ChangeEvent) => {
     setUploadingFile(true);
 
-    const newFile = await uploadFile(file);
+    const newFile = await uploadFile(file, "doc");
 
     newFile && handleUpdateCertificate(newFile.url);
     newFile && setOCertificate(newFile.url);
@@ -228,7 +228,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
   const handleInputKRAPinChange = async (file: ChangeEvent) => {
     setUploadingPinFile(true);
 
-    const newFile = await uploadFile(file);
+    const newFile = await uploadFile(file, "doc");
 
     newFile && handleUpdateKRAPin(newFile.url);
     newFile && setOKraPin(newFile.url);
@@ -569,7 +569,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                             <div>
                               <Box sx={{ display: "flex" }}>
                                 <Tooltip
-                                  title="Allowed PNG/JPEG/SVG. Image dimensions should be 1200 x 210. Max size of 2MB. Ensure the focal point (concentration area) of the image is centered, so that it's not cropped out when displayed on different devices."
+                                  title="Allowed PNG/JPEG/SVG. Image dimensions should be 1200 x 210. Max size of 3MB. Ensure the focal point (concentration area) of the image is centered, so that it's not cropped out when displayed on different devices."
                                   placement="top"
                                 >
                                   <ButtonStyled
@@ -716,7 +716,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                               <div>
                                 <Box sx={{ display: "flex" }}>
                                   <Tooltip
-                                    title="Your Business/Company Registration Certificate. Max size of 2MB."
+                                    title="Your Business/Company Registration Certificate. Max size of 3MB."
                                     placement="top"
                                   >
                                     <ButtonStyled
@@ -790,7 +790,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
                               <div>
                                 <Box sx={{ display: "flex" }}>
                                   <Tooltip
-                                    title="Your Business/Company KRA Pin. Max size of 2MB."
+                                    title="Your Business/Company KRA Pin. Max size of 3MB."
                                     placement="top"
                                   >
                                     <ButtonStyled

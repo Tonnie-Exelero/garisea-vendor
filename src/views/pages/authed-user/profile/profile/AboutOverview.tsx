@@ -88,7 +88,7 @@ const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
   const handleInputDocChange = async (file: ChangeEvent) => {
     setUploadingFile(true);
 
-    const newFile = await uploadFile(file);
+    const newFile = await uploadFile(file, "doc");
 
     newFile && handleUpdateIdentification(newFile.url);
     newFile && setVIdentification(newFile.url);
