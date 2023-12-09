@@ -10,6 +10,21 @@ import { addWatermark } from "@src/configs/watermark";
 import { generateRandomString } from "./random-string";
 import { baseUrl } from "@src/configs/baseUrl";
 
+// ** Image Compression
+import imageCompression from "browser-image-compression";
+
+const compressionOptions = {
+  maxSizeMB: 4,
+  useWebWorker: true,
+};
+
+const randomString = generateRandomString(12);
+const time = Date.now();
+const fileName = `${randomString}${time}`;
+
+const compressImage = async (imageFile: File) =>
+  await imageCompression(imageFile, compressionOptions);
+
 export const uploadFile = async (
   file: ChangeEvent,
   requiredWidth?: number,
@@ -42,32 +57,53 @@ export const uploadFile = async (
             );
             return false;
           } else {
-            const response = await fetch(
-              `/api/files/upload?filename=${files[0].name}`,
-              {
-                method: "POST",
-                body: files[0],
-              }
-            );
+            try {
+              const compressedImage = new File(
+                [await compressImage(files[0])],
+                `${fileName}.png`,
+                { type: "image/png" }
+              );
 
-            const newBlob = (await response.json()) as PutBlobResult;
+              const response =
+                compressedImage &&
+                (await fetch(
+                  `/api/files/upload?filename=${compressedImage.name}`,
+                  {
+                    method: "POST",
+                    body: compressedImage,
+                  }
+                ));
 
-            return newBlob;
+              const newBlob = (await response.json()) as PutBlobResult;
+
+              return newBlob;
+            } catch (error) {
+              console.log(error);
+            }
           }
         };
       };
     } else {
-      const response = await fetch(
-        `/api/files/upload?filename=${files[0].name}`,
-        {
-          method: "POST",
-          body: files[0],
-        }
-      );
+      try {
+        const compressedImage = new File(
+          [await compressImage(files[0])],
+          `${fileName}.png`,
+          { type: "image/png" }
+        );
 
-      const newBlob = (await response.json()) as PutBlobResult;
+        const response =
+          compressedImage &&
+          (await fetch(`/api/files/upload?filename=${compressedImage.name}`, {
+            method: "POST",
+            body: compressedImage,
+          }));
 
-      return newBlob;
+        const newBlob = (await response.json()) as PutBlobResult;
+
+        return newBlob;
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 };
@@ -107,10 +143,6 @@ export const uploadFileOfFiles = async (
             (img.onload = async () => {
               const newCanvas = await imageWatermark(img);
 
-              const randomString = generateRandomString(12);
-              const time = Date.now();
-              const fileName = `${randomString}${time}`;
-
               const blob: File = await new Promise((resolve) =>
                 newCanvas.toBlob((blob: any) =>
                   resolve(
@@ -127,14 +159,26 @@ export const uploadFileOfFiles = async (
       })
   );
 
-  const response = await fetch(`/api/files/upload?filename=${newImage.name}`, {
-    method: "POST",
-    body: newImage,
-  });
+  try {
+    const compressedImage = new File(
+      [await compressImage(newImage)],
+      `${fileName}.png`,
+      { type: "image/png" }
+    );
 
-  const newBlob = (await response.json()) as PutBlobResult;
+    const response =
+      compressedImage &&
+      (await fetch(`/api/files/upload?filename=${compressedImage.name}`, {
+        method: "POST",
+        body: compressedImage,
+      }));
 
-  return newBlob;
+    const newBlob = (await response.json()) as PutBlobResult;
+
+    return newBlob;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const removeFile = async (url: string) => {
