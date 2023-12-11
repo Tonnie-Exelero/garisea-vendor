@@ -109,6 +109,8 @@ export const uploadFileOfFiles = async (
       { type: "image/png" }
     );
 
+    console.log(`${compressedImage.size / 1024 / 1024} MB`);
+
     const response =
       compressedImage &&
       (await fetch(`/api/files/upload?filename=${compressedImage.name}`, {
