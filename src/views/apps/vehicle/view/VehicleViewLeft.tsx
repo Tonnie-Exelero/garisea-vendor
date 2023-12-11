@@ -361,7 +361,7 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                       />
                     </Box>
                   )}
-                  {registrationNo && (
+                  {registered === "Yes" && registrationNo && (
                     <Box sx={{ display: "flex", mb: 4 }}>
                       <Typography
                         sx={{ mr: 2, fontWeight: 700, color: "text.secondary" }}
@@ -590,7 +590,7 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
           }}
           aria-describedby="vehicle-images-view-edit-description"
         >
-          <DialogContent sx={{ pb: 16, px: 18 }}>
+          <DialogContent sx={{ pb: 4, px: 6 }}>
             <ImagesControls
               vehicle={vehicle}
               handleImagesDialogToggle={handleImagesDialogToggle}
