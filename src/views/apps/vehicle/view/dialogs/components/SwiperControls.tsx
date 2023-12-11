@@ -1,6 +1,9 @@
 // ** React Imports
 import { useState } from "react";
 
+// ** Next Imports
+import Image from "next/image";
+
 // ** MUI Imports
 import {
   Badge,
@@ -174,7 +177,7 @@ const SwiperControls: React.FC<any> = ({
                   <Tooltip title="Close">
                     <IconButton
                       onClick={handleImagesDialogToggle}
-                      color="inherit"
+                      color="error"
                       sx={{
                         position: "absolute",
                         top: 0,
@@ -185,20 +188,21 @@ const SwiperControls: React.FC<any> = ({
                     </IconButton>
                   </Tooltip>
 
-                  <img
+                  <Image
                     src={image}
                     alt={`Image ${index + 1}`}
+                    width={800}
+                    height={600}
                     style={{
                       objectFit: "contain",
-                      width: "100%",
-                      height: "70vh",
+                      objectPosition: "center",
                     }}
                   />
 
                   <Tooltip title="Set image as thumbnail" placement="top">
                     <IconButton
                       onClick={() => handleUpdateThumbnail(image)}
-                      color="inherit"
+                      color="info"
                       sx={{
                         position: "absolute",
                         bottom: 100,
@@ -218,7 +222,7 @@ const SwiperControls: React.FC<any> = ({
                   <Tooltip title="Add more images" placement="top">
                     <IconButton
                       onClick={handleAddImagesSection}
-                      color="inherit"
+                      color="success"
                       sx={{
                         position: "absolute",
                         bottom: 50,
@@ -231,7 +235,7 @@ const SwiperControls: React.FC<any> = ({
                   <Tooltip title="Delete image">
                     <IconButton
                       onClick={() => handleDeleteImage(image)}
-                      color="inherit"
+                      color="error"
                       sx={{
                         position: "absolute",
                         bottom: 4,

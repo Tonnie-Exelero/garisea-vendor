@@ -14,7 +14,7 @@ import { baseUrl } from "@src/configs/baseUrl";
 import imageCompression from "browser-image-compression";
 
 const compressionOptions = {
-  maxSizeMB: 4,
+  maxSizeMB: 1,
   useWebWorker: true,
 };
 
