@@ -31,8 +31,8 @@ export const uploadFile = async (file: ChangeEvent, fileType?: string) => {
     try {
       const compressedFile = new File(
         [await compressFile(files[0])],
-        `${fileName}.${fileType === "doc" ? "pdf" : "png"}`,
-        { type: fileType === "doc" ? "application/pdf" : "image/png" }
+        `${fileName}.png`,
+        { type: "image/png" }
       );
 
       const response =
@@ -42,7 +42,18 @@ export const uploadFile = async (file: ChangeEvent, fileType?: string) => {
           body: compressedFile,
         }));
 
-      const newBlob = (await response.json()) as PutBlobResult;
+      const docResponse = await fetch(
+        `/api/files/upload?filename=${files[0].name}`,
+        {
+          method: "POST",
+          body: files[0],
+        }
+      );
+
+      const newBlob =
+        fileType === "doc"
+          ? ((await docResponse.json()) as PutBlobResult)
+          : ((await response.json()) as PutBlobResult);
 
       return newBlob;
     } catch (error) {
