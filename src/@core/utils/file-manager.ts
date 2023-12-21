@@ -24,7 +24,29 @@ const fileName = `${randomString}${time}`;
 const compressFile = async (imageFile: File) =>
   await imageCompression(imageFile, compressionOptions);
 
-export const uploadFile = async (file: ChangeEvent, fileType?: string) => {
+export const uploadDocumentFile = async (file: ChangeEvent) => {
+  const { files } = file.target as HTMLInputElement;
+
+  if (files && files.length > 0) {
+    try {
+      const response = await fetch(
+        `/api/files/upload?filename=${files[0].name}`,
+        {
+          method: "POST",
+          body: files[0],
+        }
+      );
+
+      const newBlob = (await response.json()) as PutBlobResult;
+
+      return newBlob;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+};
+
+export const uploadFile = async (file: ChangeEvent) => {
   const { files } = file.target as HTMLInputElement;
 
   if (files && files.length > 0) {
@@ -42,18 +64,7 @@ export const uploadFile = async (file: ChangeEvent, fileType?: string) => {
           body: compressedFile,
         }));
 
-      const docResponse = await fetch(
-        `/api/files/upload?filename=${files[0].name}`,
-        {
-          method: "POST",
-          body: files[0],
-        }
-      );
-
-      const newBlob =
-        fileType === "doc"
-          ? ((await docResponse.json()) as PutBlobResult)
-          : ((await response.json()) as PutBlobResult);
+      const newBlob = (await response.json()) as PutBlobResult;
 
       return newBlob;
     } catch (error) {
