@@ -63,7 +63,6 @@ const VerifyEmail = (props: Props) => {
 
   const { data, isTokenExpired, isEmailValid } = props;
   const { id, email, firstName } = decryptData(data);
-  console.log(props);
 
   // ** States
   const [currentVendorVerified, setCurrentVendorVerified] = useState<string>();
