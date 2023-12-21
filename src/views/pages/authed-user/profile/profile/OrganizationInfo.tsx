@@ -52,7 +52,11 @@ import { AbilityContext } from "src/layouts/components/acl/Can";
 import OrganizationEditDialog from "./dialogs/OrganizationEditDialog";
 import toast from "react-hot-toast";
 import PDFViewer from "@src/views/components/pdf-viewer";
-import { uploadFile, removeFile } from "@core/utils/file-manager";
+import {
+  uploadFile,
+  removeFile,
+  uploadDocumentFile,
+} from "@core/utils/file-manager";
 
 const ButtonStyled = styled(Button)<
   ButtonProps & { component?: ElementType; htmlFor?: string }
@@ -197,7 +201,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
   const handleInputCertificateChange = async (file: ChangeEvent) => {
     setUploadingFile(true);
 
-    const newFile = await uploadFile(file, "doc");
+    const newFile = await uploadDocumentFile(file);
 
     newFile && handleUpdateCertificate(newFile.url);
     newFile && setOCertificate(newFile.url);
@@ -228,7 +232,7 @@ const OrganizationInfo = ({ vendor }: Props) => {
   const handleInputKRAPinChange = async (file: ChangeEvent) => {
     setUploadingPinFile(true);
 
-    const newFile = await uploadFile(file, "doc");
+    const newFile = await uploadDocumentFile(file);
 
     newFile && handleUpdateKRAPin(newFile.url);
     newFile && setOKraPin(newFile.url);

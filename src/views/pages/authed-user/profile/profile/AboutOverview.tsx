@@ -34,7 +34,7 @@ import { editIdentification } from "@src/store/apps/vendor/vendor/single";
 import CustomChip from "src/@core/components/mui/chip";
 import { ThemeColor } from "@core/layouts/types";
 import PDFViewer from "@src/views/components/pdf-viewer";
-import { uploadFile, removeFile } from "@core/utils/file-manager";
+import { removeFile, uploadDocumentFile } from "@core/utils/file-manager";
 import toast from "react-hot-toast";
 
 interface ColorsType {
@@ -88,7 +88,7 @@ const AboutOverview: React.FC<AboutOverviewProps> = ({ user }) => {
   const handleInputDocChange = async (file: ChangeEvent) => {
     setUploadingFile(true);
 
-    const newFile = await uploadFile(file, "doc");
+    const newFile = await uploadDocumentFile(file);
 
     newFile && handleUpdateIdentification(newFile.url);
     newFile && setVIdentification(newFile.url);
