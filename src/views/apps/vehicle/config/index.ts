@@ -61,6 +61,7 @@ export const vehicleBodyTypes = [
   "Hardtop",
   "Campervan",
   "Panel Van",
+  "Open Body",
   "Truck",
   "Minibus",
   "Bus",
