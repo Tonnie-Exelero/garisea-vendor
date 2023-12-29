@@ -53,8 +53,8 @@ export const uploadFile = async (file: ChangeEvent) => {
     try {
       const compressedFile = new File(
         [await compressFile(files[0])],
-        `${fileName}.png`,
-        { type: "image/png" }
+        `${fileName}.webp`,
+        { type: "image/webp" }
       );
 
       const response =
@@ -111,7 +111,7 @@ export const uploadFileOfFiles = async (
               const blob: File = await new Promise((resolve) =>
                 newCanvas.toBlob((blob: any) =>
                   resolve(
-                    new File([blob], `${fileName}.png`, { type: "image/png" })
+                    new File([blob], `${fileName}.webp`, { type: "image/webp" })
                   )
                 )
               );
@@ -127,8 +127,8 @@ export const uploadFileOfFiles = async (
   try {
     const compressedImage = new File(
       [await compressFile(newImage)],
-      `${fileName}.png`,
-      { type: "image/png" }
+      `${fileName}.webp`,
+      { type: "image/webp" }
     );
 
     const response =
