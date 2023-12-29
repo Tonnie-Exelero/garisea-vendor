@@ -13,10 +13,12 @@ import Typography, { TypographyProps } from "@mui/material/Typography";
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
 
+// ** Custom Components
+import LinearProgressWithLabel from "@components/progress/LinearProgressWithLabel";
+
 // ** Third Party Components
 import toast from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
-import { CircularProgress } from "@mui/material";
 
 // ** API/Redux
 import { useDispatch, useSelector } from "react-redux";
@@ -71,6 +73,7 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
 
   // ** State
   const [uploading, setUploading] = useState<string>("");
+  const [progress, setProgress] = useState<number>(0);
   const [files, setFiles] = useState<File[]>([]);
   const [vImages, setVImages] = useState<string[]>(
     hasImages ? images.split(",") : []
@@ -116,11 +119,22 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
           height={38}
           alt={file.name}
           src={URL.createObjectURL(file as any)}
+          style={{ objectFit: "cover" }}
         />
       );
     } else {
       return <Icon icon="bx:file" />;
     }
+  };
+
+  const updateUploadProgress = () => {
+    const noOfFiles = files.length;
+    const noOfUploadedImages = imagesArray.length;
+
+    const preProgress = Number(noOfUploadedImages) / Number(noOfFiles);
+    const uploadProgress = preProgress * 100;
+
+    setProgress(Number(uploadProgress));
   };
 
   const handleUploadFiles = async () => {
@@ -137,6 +151,8 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
       const newBlob = await uploadFileOfFiles(file, type, vendorIdentity);
 
       imagesArray.push(newBlob);
+
+      updateUploadProgress();
     }
 
     // Create image url array.
@@ -265,15 +281,10 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
               <Box
                 sx={{
                   mb: 4,
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
+                  width: "100%",
                 }}
               >
-                <CircularProgress size="1.5rem" sx={{ mr: 2 }} />
-                <Typography variant="h6" sx={{ color: "text.secondary" }}>
-                  Uploading...
-                </Typography>
+                <LinearProgressWithLabel value={progress} />
               </Box>
             )}
             {uploading === "complete" && (
