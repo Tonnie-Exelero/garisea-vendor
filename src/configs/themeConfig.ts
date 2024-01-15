@@ -72,8 +72,10 @@ const themeConfig: ThemeConfig = {
     greenDark: "/images/logos/garisea/logo-green-dark.svg",
     greenLight: "/images/logos/garisea/logo-green-light.svg",
   },
-  templateName: "Garisea" /* App Name */,
-  templateDescription: "Sell any vehicle easily" /* App Name */,
+  templateName:
+    "Sell Smartly on Garisea | Free Forever Listings, Vendor Benefits" /* App Name */,
+  templateDescription:
+    "Join hundreds of dealers and start selling smartly on Garisea. Enjoy free-forever car listings, and explore the advantages of becoming a Garisea vendor. Your journey to successful car sales begins here." /* App Description */,
   layout: "vertical" /* vertical | horizontal */,
   mode: "light" as Mode /* light | dark | semi-dark /*! Note: semi-dark value will only work for Vertical Layout */,
   direction: "ltr" /* ltr | rtl */,
