@@ -35,6 +35,7 @@ type ThemeConfig = {
     greenDark: string;
     greenLight: string;
   };
+  appName: string;
   templateName: string;
   templateDescription: string;
   navCollapsed: boolean;
@@ -72,6 +73,7 @@ const themeConfig: ThemeConfig = {
     greenDark: "/images/logos/garisea/logo-green-dark.svg",
     greenLight: "/images/logos/garisea/logo-green-light.svg",
   },
+  appName: "Garisea",
   templateName:
     "Sell Smartly on Garisea | Free Forever Listings, Vendor Benefits" /* App Name */,
   templateDescription:
