@@ -130,10 +130,10 @@ const App = (props: ExtendedAppProps) => {
       <CacheProvider value={emotionCache}>
         <ApolloProvider client={client}>
           <Head>
-            <title>{`${themeConfig.templateName} | ${themeConfig.templateDescription}`}</title>
+            <title>{`${themeConfig.templateName}`}</title>
             <meta
               name="description"
-              content={`${themeConfig.templateName} | ${themeConfig.templateDescription}`}
+              content={`${themeConfig.templateDescription}`}
             />
             <meta
               name="keywords"
