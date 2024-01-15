@@ -157,7 +157,7 @@ const Login = () => {
               </Box>
             </Box>
             <Typography variant="h6" sx={{ mb: 1.5 }}>
-              Welcome to {themeConfig.templateName} <strong>Vendor</strong>! 👋🏻
+              Welcome to {themeConfig.appName} <strong>Vendor</strong>! 👋🏻
             </Typography>
             <Typography sx={{ mb: 6, color: "text.secondary" }}>
               Please sign-in to your account to manage and explore.
@@ -279,7 +279,7 @@ const Login = () => {
                 }}
               >
                 <Typography variant="body2" sx={{ mr: 2 }}>
-                  New to {themeConfig.templateName}?
+                  New to {themeConfig.appName}?
                 </Typography>
                 <Typography>
                   <LinkStyled href="/register">Create an account</LinkStyled>
