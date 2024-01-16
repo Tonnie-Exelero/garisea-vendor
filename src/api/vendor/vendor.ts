@@ -226,6 +226,14 @@ export const GET_VENDOR_BY_ID = gql`
   }
 `;
 
+export const GET_VENDOR_IF_NEW = gql`
+  query GetVendorById($pl: String!) {
+    vendorById(pl: $pl) {
+      password
+    }
+  }
+`;
+
 export const GET_VENDOR_BY_EMAIL = gql`
   query GetVendorByEmail($pl: String!) {
     vendorByEmail(pl: $pl) {

@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, ReactNode } from "react";
+import { useState, ReactNode, useEffect, useCallback } from "react";
 
 // ** Next Import
 import Router from "next/router";
@@ -46,6 +46,8 @@ import { editPassword } from "@src/store/apps/vendor/vendor/single";
 import { decodeToken } from "@src/configs/jwt";
 import { idleTimer } from "@src/configs/idleOrReload";
 import { decryptData, encryptData } from "@core/utils/encryption";
+import apolloClient from "@src/lib/apollo";
+import { GET_VENDOR_IF_NEW } from "@src/api/vendor/vendor";
 
 interface State {
   showNewPassword: boolean;
@@ -94,6 +96,7 @@ const ResetPassword = (props: Props) => {
     showConfirmNewPassword: false,
   });
   const [isSaving, setIsSaving] = useState<string>("");
+  const [hasPassword, setHasPassword] = useState<boolean>(false);
 
   // ** Hook
   const theme = useTheme();
@@ -108,6 +111,25 @@ const ResetPassword = (props: Props) => {
   // ** Local Storage
   const fromLocalStore = window.localStorage.getItem("settings");
   const appSettings = fromLocalStore && JSON.parse(fromLocalStore);
+
+  useEffect(() => {
+    uid && getVendor();
+  }, [uid]);
+
+  const getVendor = useCallback(async () => {
+    const encryptedData = encryptData({ id: uid });
+
+    const { data } = await apolloClient.query({
+      query: GET_VENDOR_IF_NEW,
+      variables: { pl: encryptedData },
+    });
+
+    const {
+      vendorById: { password },
+    }: any = data;
+
+    setHasPassword(password ? true : false);
+  }, [uid]);
 
   const handleClickShowNewPassword = () => {
     setValues({ ...values, showNewPassword: !values.showNewPassword });
@@ -134,7 +156,7 @@ const ResetPassword = (props: Props) => {
       setIsSaving("complete");
       toast.success(`Password updated successfully!`);
 
-      Router.replace("/login");
+      Router.replace(hasPassword ? "/login" : "/thankyou");
     } else {
       toast.error(`Error updating password: ${resultAction.error}`);
     }
