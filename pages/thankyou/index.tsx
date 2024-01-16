@@ -1,5 +1,5 @@
 // ** React Imports
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 
 // ** Next Import
 import Link from "next/link";
@@ -8,27 +8,9 @@ import Link from "next/link";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import InputLabel from "@mui/material/InputLabel";
 import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
 import CardContent from "@mui/material/CardContent";
-import FormControl from "@mui/material/FormControl";
-import OutlinedInput from "@mui/material/OutlinedInput";
 import { styled, useTheme } from "@mui/material/styles";
-import InputAdornment from "@mui/material/InputAdornment";
-import FormHelperText from "@mui/material/FormHelperText";
-
-// ** Icon Imports
-import Icon from "src/@core/components/icon";
-
-// ** Third Party Imports
-import * as yup from "yup";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-
-// ** Hooks
-import { useAuth } from "src/hooks/useAuth";
 
 // ** Configs
 import themeConfig from "src/configs/themeConfig";
@@ -50,60 +32,16 @@ const LinkStyled = styled(Link)(({ theme }) => ({
   color: theme.palette.primary.main,
 }));
 
-const schema = yup.object().shape({
-  email: yup.string().email().required(),
-  password: yup.string().min(5).required(),
-});
-
-interface FormData {
-  email: string;
-  password: string;
-}
-
 const ThankYou = () => {
   // ** Watch for idle time or reload
   idleTimer();
 
-  // ** States
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-
   // ** Hooks
-  const auth = useAuth();
   const theme = useTheme();
 
   // ** Local Storage
   const fromLocalStore = window.localStorage.getItem("settings");
   const appSettings = fromLocalStore && JSON.parse(fromLocalStore);
-
-  useEffect(() => {
-    // Clear local storage to allow direct return login
-    window.localStorage.removeItem("aT");
-    window.localStorage.removeItem("uD");
-  }, []);
-
-  // ** Var
-  const loginErrorMessage = localStorage.getItem("lE");
-  const idleTimeOrReloadMessage = localStorage.getItem("iT");
-
-  const {
-    control,
-    setError,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    mode: "onBlur",
-    resolver: yupResolver(schema),
-  });
-
-  const onSubmit = (data: FormData) => {
-    const { email, password } = data;
-    auth.login({ email, password }, () => {
-      setError("email", {
-        type: "manual",
-        message: "Email or Password is invalid",
-      });
-    });
-  };
 
   return (
     <Box className="content-center">
