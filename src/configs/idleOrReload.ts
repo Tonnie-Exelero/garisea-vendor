@@ -13,6 +13,7 @@ const whitelist = [
   "/verify-email",
   "/forgot-password",
   "/reset-password",
+  "/thankyou",
 ];
 
 const events = [
