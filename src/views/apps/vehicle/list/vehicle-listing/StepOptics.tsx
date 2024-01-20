@@ -86,6 +86,7 @@ const StepOptics: React.FC<StepOpticsProps> = (props) => {
             onBlur={(e) => saveDraft("exteriorColor", e.target.value)}
             placeholder="e.g. White"
             sx={{ mb: 4 }}
+            required
           />
         </Grid>
         <Grid item xs={12} md={6}>
@@ -100,10 +101,11 @@ const StepOptics: React.FC<StepOpticsProps> = (props) => {
             onBlur={(e) => saveDraft("interiorColor", e.target.value)}
             placeholder="e.g. Beige"
             sx={{ mb: 4 }}
+            required
           />
         </Grid>
         <Grid item xs={12} md={6}>
-          <FormControl fullWidth sx={{ mb: 4 }}>
+          <FormControl fullWidth sx={{ mb: 4 }} required>
             <InputLabel htmlFor="upholstery-select">Upholstery</InputLabel>
             <Select
               fullWidth
@@ -227,7 +229,12 @@ const StepOptics: React.FC<StepOpticsProps> = (props) => {
             Confirm data entered is correct by clicking below
           </Typography>
           <Box>
-            <Button color="info" variant="outlined" onClick={confirmData}>
+            <Button
+              color="info"
+              variant="outlined"
+              disabled={!exteriorColor || !interiorColor || !upholstery}
+              onClick={confirmData}
+            >
               Confirm Data
             </Button>
           </Box>
