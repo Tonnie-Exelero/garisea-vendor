@@ -84,7 +84,7 @@ export const uploadFileOfFiles = async (
     canvas = document.createElement("canvas");
   }
 
-  const gariseaLogoUrl = `${baseUrl}/images/watermark/watermark7.png`;
+  const gariseaLogoUrl = `${baseUrl}/images/watermark/watermark7.webp`;
 
   const imageWatermark = async (img: any) =>
     await addWatermark(

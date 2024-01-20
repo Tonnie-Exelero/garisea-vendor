@@ -8,7 +8,6 @@ import Image from "next/image";
 import {
   Box,
   Button,
-  CircularProgress,
   Grid,
   IconButton,
   Tooltip,
@@ -38,9 +37,8 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
   const [thumbnail, setThumbnail] = useState<string>(
     window.localStorage.getItem("thumbnail") || ""
   );
-  const [selectedImage, setSelectedImage] = useState<number>(0);
-  const [uploaded, setUploaded] = useState<boolean>(false);
   const [deleting, setDeleting] = useState<string>("");
+  const [deletingIndex, setDeletingIndex] = useState<any>();
 
   const images: string[] = (imageUrls && [...imageUrls.split(",")]) || [
     imageUrls,
@@ -54,19 +52,17 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
   const handleImages = (images: string) => {
     setImageUrls(images);
     setThumbnail(images.split(",")[0]);
-    setUploaded(true);
     saveDraft("imageUrls", images);
   };
 
-  const handleImageClick = (url: string, ind: number) => () => {
-    setSelectedImage(ind);
+  const handleImageClick = (url: string) => () => {
     setThumbnail(url);
-    setUploaded(true);
     saveDraft("thumbnail", url);
   };
 
-  const handleDeleteImage = async (url: string) => {
+  const handleDeleteImage = async (url: string, index: any) => {
     setDeleting("ongoing");
+    setDeletingIndex(index);
 
     const newResp = await removeFile(url);
 
@@ -96,102 +92,74 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
             Select Thumbnail
           </Typography>
 
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              mb: "2rem",
-              overflow: "hidden",
-            }}
-          >
-            <Box
-              sx={{
-                position: "relative",
-                display: "flex",
-                justifyContent: "space-between",
-                gap: "2rem",
-                overflow: "hidden",
-              }}
-            >
-              <Image
-                src={images[selectedImage]}
-                alt={"Garisea vehicle image"}
-                width={600}
-                height={400}
-                style={{ objectFit: "cover", objectPosition: "center" }}
-              />
-
-              <Tooltip title="Delete image">
-                <IconButton
-                  onClick={() => handleDeleteImage(images[selectedImage])}
-                  color="error"
-                  sx={{
-                    position: "absolute",
-                    bottom: 4,
-                    right: 0,
-                  }}
-                >
-                  {deleting === "ongoing" && (
-                    <Box
-                      sx={{
-                        mr: 4,
-                        display: "flex",
-                        justifyContent: "flex-start",
-                        alignItems: "center",
-                      }}
-                    >
-                      <CircularProgress
-                        size="1.5rem"
-                        sx={{ mr: 2, color: "lightgrey" }}
-                      />
-                      <Typography variant="h6" sx={{ color: "lightgrey" }}>
-                        Deleting image...
-                      </Typography>
-                    </Box>
-                  )}
-                  <Icon fontSize={30} icon="bx:trash" />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              mb: "2rem",
-              overflow: "auto",
-            }}
-          >
-            {images.map((url, ind) => (
-              <Box
-                key={ind}
-                sx={{
-                  width: "70px",
-                  height: "70px",
-                  background: "white",
-                  cursor: "pointer",
-                  borderRadius: "5px",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  ml: ind === 0 ? "auto" : "",
-                  mr: ind === images.length - 1 ? "auto" : "10px",
-                }}
-                onClick={handleImageClick(url, ind)}
-              >
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: "1rem", mt: 6 }}>
+            {images.map((image, index) => (
+              <Box sx={{ position: "relative" }} key={index}>
                 <Image
-                  src={url}
-                  alt={"Vehicle image"}
-                  width={70}
-                  height={70}
+                  src={image}
+                  alt={image}
+                  width={150}
+                  height={150}
                   style={{
                     objectFit: "cover",
                     objectPosition: "center",
-                    padding: "5px",
-                    border: selectedImage === ind ? "1px solid green" : "none",
-                    borderRadius: "5px",
+                    borderRadius: ".4rem",
                   }}
                 />
+
+                <Tooltip placement="top" title="Remove Image">
+                  <IconButton
+                    onClick={() => handleDeleteImage(image, index)}
+                    color="error"
+                    sx={{
+                      position: "absolute",
+                      background: "#FFF",
+                      top: 5,
+                      right: 5,
+                      padding: "5px",
+                    }}
+                  >
+                    <Icon fontSize={20} icon="bx:trash" />
+                  </IconButton>
+                </Tooltip>
+
+                <Tooltip placement="top" title="Set as Thumbnail">
+                  <IconButton
+                    onClick={handleImageClick(image)}
+                    color="secondary"
+                    sx={{
+                      position: "absolute",
+                      background: "#FFF",
+                      bottom: 11,
+                      right: 5,
+                      padding: 0,
+                      borderRadius: "50%",
+                    }}
+                  >
+                    <Icon
+                      fontSize={30}
+                      icon={
+                        image === thumbnail
+                          ? "bx:checkbox-checked"
+                          : "bx:checkbox"
+                      }
+                    />
+                  </IconButton>
+                </Tooltip>
+
+                {deleting === "ongoing" && deletingIndex === index && (
+                  <IconButton
+                    color="success"
+                    sx={{
+                      position: "absolute",
+                      top: "30%",
+                      right: "30%",
+                      opacity: 1,
+                    }}
+                  >
+                    <Icon fontSize={50} icon="line-md:loading-twotone-loop" />
+                  </IconButton>
+                )}
               </Box>
             ))}
           </Box>
@@ -236,7 +204,7 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
             <Button
               color="info"
               variant="outlined"
-              disabled={!uploaded}
+              disabled={!imageUrls || !thumbnail}
               onClick={confirmData}
             >
               Confirm Data

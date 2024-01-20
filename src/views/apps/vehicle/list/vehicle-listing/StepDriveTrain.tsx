@@ -94,10 +94,11 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
               endAdornment: <InputAdornment position="end">cc</InputAdornment>,
             }}
             sx={{ mb: 4 }}
+            required
           />
         </Grid>
         <Grid item xs={12} md={6}>
-          <FormControl fullWidth sx={{ mb: 4 }}>
+          <FormControl fullWidth sx={{ mb: 4 }} required>
             <InputLabel htmlFor="fuel-type-select">Fuel Type</InputLabel>
             <Select
               fullWidth
@@ -120,7 +121,7 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
           </FormControl>
         </Grid>
         <Grid item xs={12} md={6}>
-          <FormControl fullWidth sx={{ mb: 4 }}>
+          <FormControl fullWidth sx={{ mb: 4 }} required>
             <InputLabel htmlFor="transmission-type-select">
               Transmission Type
             </InputLabel>
@@ -144,7 +145,7 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
           </FormControl>
         </Grid>
         <Grid item xs={12} md={6}>
-          <FormControl fullWidth sx={{ mb: 4 }}>
+          <FormControl fullWidth sx={{ mb: 4 }} required>
             <InputLabel htmlFor="drive-type-select">Drive Type</InputLabel>
             <Select
               fullWidth
@@ -196,7 +197,14 @@ const StepDriveTrain: React.FC<StepDriveTrainProps> = (props) => {
             Confirm data entered is correct by clicking below
           </Typography>
           <Box>
-            <Button color="info" variant="outlined" onClick={confirmData}>
+            <Button
+              color="info"
+              variant="outlined"
+              disabled={
+                !engineCapacity || !fuelType || !transmissionType || !driveType
+              }
+              onClick={confirmData}
+            >
               Confirm Data
             </Button>
           </Box>

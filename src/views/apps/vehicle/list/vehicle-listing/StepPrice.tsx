@@ -141,7 +141,7 @@ const StepPrice: React.FC<StepPriceProps> = (props) => {
               ),
             }}
             sx={{ mb: 4 }}
-            disabled={listingPrice === null}
+            disabled={!listingPrice}
           />
           {(Number(listingPrice) < Number(discountedPrice) ||
             Number(listingPrice) === Number(discountedPrice)) && (

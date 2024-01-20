@@ -362,11 +362,13 @@ const VehicleListingWizard: React.FC<any> = () => {
               return (
                 <Step
                   key={index}
-                  onClick={() => setActiveStep(index)}
                   sx={{ "&.Mui-completed + svg": { color: "primary.main" } }}
                 >
-                  <StepLabel>
-                    <div className="step-label">
+                  <StepLabel sx={{ cursor: "default !important" }}>
+                    <div
+                      className="step-label"
+                      style={{ cursor: "default !important" }}
+                    >
                       <CustomAvatar
                         variant="rounded"
                         skin={activeStep === index ? "filled" : "light"}

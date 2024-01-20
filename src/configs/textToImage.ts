@@ -115,7 +115,7 @@ const textToBitmap = async (text: string, font: string) => {
   trimCanvas(canvas);
 
   return convertToBlob({
-    type: "image/png",
+    type: "image/webp",
   });
 };
 

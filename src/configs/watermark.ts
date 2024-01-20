@@ -37,7 +37,7 @@ const textWatermark = async (name: string) => {
 
   const blob: File = await new Promise((resolve) =>
     imageCanvas.toBlob((blob: any) =>
-      resolve(new File([blob], `${randomString}.png`, { type: "image/png" }))
+      resolve(new File([blob], `${randomString}.webp`, { type: "image/webp" }))
     )
   );
 

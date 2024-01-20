@@ -65,7 +65,6 @@ const data: CustomRadioIconsData[] = [
   {
     title: "Brand New",
     value: "brand-new",
-    isSelected: true,
     content: (
       <Typography variant="body2" sx={{ textAlign: "center" }}>
         This vehicle is brand new, it hasn't been used before.
@@ -75,6 +74,7 @@ const data: CustomRadioIconsData[] = [
   {
     title: "Foreign Used",
     value: "foreign-used",
+    isSelected: true,
     content: (
       <Typography variant="body2" sx={{ textAlign: "center" }}>
         This vehicle has been used previously in a foreign country.
@@ -376,7 +376,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
           />
         ))}
         <Grid item xs={12} md={6}>
-          <FormControl fullWidth sx={{ mb: 0 }}>
+          <FormControl fullWidth sx={{ mb: 0 }} required>
             <InputLabel htmlFor="brand-select">Brand</InputLabel>
             <Select
               fullWidth
@@ -438,7 +438,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
           </FormControl>
         </Grid>
         <Grid item xs={12} md={6}>
-          <FormControl fullWidth sx={{ mb: 0 }}>
+          <FormControl fullWidth sx={{ mb: 0 }} required>
             <InputLabel htmlFor="model-select">Model</InputLabel>
             <Select
               fullWidth
@@ -529,6 +529,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
             onBlur={(e) => saveDraft("yearOfManufacture", e.target.value)}
             placeholder="e.g. 08/2023"
             sx={{ mb: 4 }}
+            required
           />
         </Grid>
         <Grid item xs={12} md={6}>
@@ -595,6 +596,7 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
             onBlur={(e) => saveDraft("viewingLocation", e.target.value)}
             placeholder="e.g. Galleria Mall, Langata Rd, Nairobi"
             sx={{ mb: 4 }}
+            required
           />
         </Grid>
         <Grid item xs={12} md={6}>
@@ -678,7 +680,18 @@ const StepBasic: React.FC<StepBasicProps> = (props) => {
             Confirm data entered is correct by clicking below
           </Typography>
           <Box>
-            <Button color="info" variant="outlined" onClick={confirmData}>
+            <Button
+              color="info"
+              variant="outlined"
+              disabled={
+                !condition ||
+                !brandId ||
+                !modelId ||
+                !yearOfManufacture ||
+                !viewingLocation
+              }
+              onClick={confirmData}
+            >
               Confirm Data
             </Button>
           </Box>
