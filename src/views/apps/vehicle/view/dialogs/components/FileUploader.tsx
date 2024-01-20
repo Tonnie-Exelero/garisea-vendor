@@ -1,20 +1,17 @@
 // ** React Imports
 import { Fragment, useState } from "react";
 
+// ** Next Imports
+import Image from "next/image";
+
 // ** MUI Imports
 import Box from "@mui/material/Box";
-import List from "@mui/material/List";
-import Button from "@mui/material/Button";
-import ListItem from "@mui/material/ListItem";
 import IconButton from "@mui/material/IconButton";
 import { styled, useTheme } from "@mui/material/styles";
 import Typography, { TypographyProps } from "@mui/material/Typography";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
-
-// ** Custom Components
-import LinearProgressWithLabel from "@components/progress/LinearProgressWithLabel";
 
 // ** Third Party Components
 import toast from "react-hot-toast";
@@ -29,11 +26,8 @@ import { editVehicleImages } from "@src/store/apps/vendor/vehicle/single";
 import { VehicleNode } from "src/types/apps/vehicleTypes";
 import { uploadFileOfFiles } from "@core/utils/file-manager";
 
-interface FileProp {
-  name: string;
-  type: string;
-  size: number;
-}
+// ** Others
+import { InView } from "react-intersection-observer";
 
 // Styled component for the upload image inside the dropzone area
 const Img = styled("img")(({ theme }) => ({
@@ -72,12 +66,11 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
   const hasImages = images !== "" && images !== null;
 
   // ** State
-  const [uploading, setUploading] = useState<string>("");
-  const [progress, setProgress] = useState<number>(0);
   const [files, setFiles] = useState<File[]>([]);
   const [vImages, setVImages] = useState<string[]>(
     hasImages ? images.split(",") : []
   );
+  const [uploadFuncCalled, setUploadFuncCalled] = useState<boolean>(false);
 
   let imagesArray: any[] = [];
 
@@ -111,34 +104,9 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
     (state: RootState) => state.authedVendor
   );
 
-  const renderFilePreview = (file: FileProp) => {
-    if (file.type.startsWith("image")) {
-      return (
-        <img
-          width={38}
-          height={38}
-          alt={file.name}
-          src={URL.createObjectURL(file as any)}
-          style={{ objectFit: "cover" }}
-        />
-      );
-    } else {
-      return <Icon icon="bx:file" />;
-    }
-  };
-
-  const updateUploadProgress = () => {
-    const noOfFiles = files.length;
-    const noOfUploadedImages = imagesArray.length;
-
-    const preProgress = Number(noOfUploadedImages) / Number(noOfFiles);
-    const uploadProgress = preProgress * 100;
-
-    setProgress(Number(uploadProgress));
-  };
-
   const handleUploadFiles = async () => {
-    setUploading("ongoing");
+    setUploadFuncCalled(true);
+
     const type = authedVendor.organization.logo ? "image" : "name";
     const name = authedVendor.organization.nicename
       ? authedVendor.organization.nicename
@@ -151,8 +119,6 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
       const newBlob = await uploadFileOfFiles(file, type, vendorIdentity);
 
       imagesArray.push(newBlob);
-
-      updateUploadProgress();
     }
 
     // Create image url array.
@@ -167,8 +133,6 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
 
     // Push images to image handler as string.
     handleUpdateVehicleImages([...new Set(newArray)]);
-
-    setUploading("complete");
   };
 
   const handleUpdateVehicleImages = async (images: string[]) => {
@@ -189,144 +153,105 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
     }
   };
 
-  const handleRemoveFile = (file: FileProp) => {
-    const uploadedFiles = files;
-    const filtered = uploadedFiles.filter(
-      (i: FileProp) => i.name !== file.name
+  const ImagesToUpload = () => {
+    return (
+      <InView>
+        {({ inView, ref }) => {
+          inView && !uploadFuncCalled && handleUploadFiles();
+
+          return (
+            <Box
+              ref={ref}
+              sx={{ display: "flex", flexWrap: "wrap", gap: "1rem", mt: 6 }}
+            >
+              {fileList}
+            </Box>
+          );
+        }}
+      </InView>
     );
-    setFiles([...filtered]);
   };
 
-  const fileList = files.map((file: FileProp) => (
-    <ListItem key={file.name}>
-      <div className="file-details">
-        <div className="file-preview">{renderFilePreview(file)}</div>
-        <div>
-          <Typography className="file-name">{file.name}</Typography>
-          <Typography className="file-size" variant="body2">
-            {Math.round(file.size / 100) / 10 > 1000
-              ? `${(Math.round(file.size / 100) / 10000).toFixed(1)} mb`
-              : `${(Math.round(file.size / 100) / 10).toFixed(1)} kb`}
-          </Typography>
-        </div>
-      </div>
-      <IconButton onClick={() => handleRemoveFile(file)}>
-        <Icon icon="bx:x" fontSize={20} />
-      </IconButton>
-    </ListItem>
-  ));
+  const fileList = files.map((file: File, index) => {
+    return (
+      <Box sx={{ position: "relative" }} key={index}>
+        <Image
+          src={URL.createObjectURL(file as any)}
+          alt={file.name}
+          width={150}
+          height={150}
+          style={{
+            objectFit: "cover",
+            objectPosition: "center",
+            borderRadius: ".4rem",
+            opacity: 0.6,
+          }}
+        />
 
-  const handleRemoveAllFiles = () => {
-    setFiles([]);
-    setUploading("");
-  };
+        <IconButton
+          color="success"
+          sx={{
+            position: "absolute",
+            top: "30%",
+            right: "30%",
+            opacity: 1,
+          }}
+        >
+          <Icon fontSize={50} icon="line-md:loading-twotone-loop" />
+        </IconButton>
+      </Box>
+    );
+  });
 
   return (
     <Fragment>
-      <div {...getRootProps({ className: "dropzone" })}>
-        <input {...getInputProps()} />
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: ["column", "column", "row"],
-            alignItems: "center",
-          }}
-        >
-          <Img
-            alt="Upload img"
-            src={`/images/misc/upload-${theme.palette.mode}.png`}
-          />
+      {files.length === 0 && (
+        <div {...getRootProps({ className: "dropzone" })}>
+          <input {...getInputProps()} />
           <Box
             sx={{
               display: "flex",
-              flexDirection: "column",
-              textAlign: ["center", "center", "inherit"],
+              flexDirection: ["column", "column", "row"],
+              alignItems: "center",
             }}
           >
-            <HeadingTypography variant="h5">
-              Drop files here or click to upload.
-            </HeadingTypography>
-            <Typography
-              variant="body1"
-              color="textPrimary"
-              sx={{ mb: 2, fontStyle: "italic", fontWeight: 600 }}
+            <Img
+              alt="Upload img"
+              src={`/images/misc/upload-${theme.palette.mode}.png`}
+            />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                textAlign: ["center", "center", "inherit"],
+              }}
             >
-              (Select all images at once. You can update them later.)
-            </Typography>
-            <Typography color="textSecondary" sx={{ mb: 2 }}>
-              Allowed types: *.jpeg, *.jpg, *.png, *.gif, *.webp, *.avif,
-              *.heic.
-            </Typography>
-            <Typography color="textSecondary" sx={{ mb: 2 }}>
-              Upto <strong>10 files</strong> allowed.
-            </Typography>
-            <Typography color="textSecondary">
-              The <strong>first</strong> image is the <b>main</b> image.
-            </Typography>
+              <HeadingTypography variant="h5">
+                Drop images here or click to upload.
+              </HeadingTypography>
+
+              <Typography color="textSecondary" sx={{ mb: 2 }}>
+                Allowed types: *.jpeg, *.jpg, *.png, *.gif, *.webp, *.avif,
+                *.heic.
+              </Typography>
+              <Typography color="textSecondary" sx={{ mb: 2 }}>
+                Upload upto <strong>10 images</strong>.
+              </Typography>
+              <Typography variant="body1" color="textPrimary">
+                Images may not exceed <strong>5MB</strong>.
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-      </div>
+        </div>
+      )}
 
       {files.length ? (
         <Fragment>
-          <List
-            sx={{
-              mb: 4,
-            }}
-          >
-            {fileList}
-          </List>
-          <div>
-            {uploading === "ongoing" && (
-              <Box
-                sx={{
-                  mb: 4,
-                  width: "100%",
-                }}
-              >
-                <LinearProgressWithLabel value={progress} />
-              </Box>
-            )}
-            {uploading === "complete" && (
-              <Box
-                sx={{
-                  mb: 4,
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                }}
-              >
-                <Typography variant="h6" sx={{ color: "green" }}>
-                  Uploading completed successfully!
-                </Typography>
-              </Box>
-            )}
-          </div>
-          <Box
-            className="buttons"
-            sx={{
-              mb: 4,
-              display: "flex",
-              justifyContent: "flex-end",
-              alignItems: "center",
-              gap: 4,
-            }}
-          >
-            <Button
-              color="error"
-              variant="outlined"
-              onClick={handleRemoveAllFiles}
-            >
-              Remove All
-            </Button>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={handleUploadFiles}
-            >
-              Upload Files
-            </Button>
-          </Box>
+          {files.length > 0 && (
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+              <ImagesToUpload />
+            </Box>
+          )}
         </Fragment>
       ) : null}
     </Fragment>
