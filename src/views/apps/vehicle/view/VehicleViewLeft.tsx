@@ -16,8 +16,12 @@ import {
   Divider,
   FormGroup,
   Grid,
+  IconButton,
   Typography,
 } from "@mui/material";
+
+// ** Icon Imports
+import Icon from "src/@core/components/icon";
 
 // ** Custom Components
 import CustomChip from "@components/mui/chip";
@@ -110,6 +114,7 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [openImages, setOpenImages] = useState<boolean>(false);
   const [openMarkDialog, setOpenMarkDialog] = useState<boolean>(false);
+  const [showEditIcon, setShowEditIcon] = useState<boolean>(false);
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
@@ -181,21 +186,40 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                 }}
               >
                 {thumbnail ? (
-                  <CustomAvatar
-                    src={thumbnail}
-                    variant="rounded"
-                    alt={brand.name + " " + model.name}
-                    onClick={handleImagesDialogToggle}
-                    sx={{
-                      width: 300,
-                      height: 210,
-                      mb: 6,
-                      cursor: "pointer",
-                      "&:hover": {
-                        opacity: 0.6,
-                      },
-                    }}
-                  />
+                  <Box sx={{ position: "relative" }}>
+                    <CustomAvatar
+                      src={thumbnail}
+                      variant="rounded"
+                      alt={brand.name + " " + model.name}
+                      onClick={handleImagesDialogToggle}
+                      onMouseEnter={() => setShowEditIcon(true)}
+                      onMouseLeave={() => setShowEditIcon(false)}
+                      sx={{
+                        width: 300,
+                        height: 210,
+                        mb: 6,
+                        cursor: "pointer",
+                        "&:hover": {
+                          opacity: 0.6,
+                        },
+                      }}
+                    />
+
+                    {showEditIcon && (
+                      <IconButton
+                        color="success"
+                        onClick={handleImagesDialogToggle}
+                        sx={{
+                          position: "absolute",
+                          top: "30%",
+                          right: "35%",
+                          opacity: 1,
+                        }}
+                      >
+                        <Icon fontSize={70} icon="bxs:edit" />
+                      </IconButton>
+                    )}
+                  </Box>
                 ) : (
                   <CustomAvatar
                     skin="light"

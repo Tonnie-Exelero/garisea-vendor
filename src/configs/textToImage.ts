@@ -1,3 +1,5 @@
+import { generateRandomString } from "@core/utils/random-string";
+
 let dpr: any = null;
 
 if (typeof window !== "undefined") {
@@ -57,7 +59,13 @@ const textToBitmap = async (text: string, font: string) => {
 
             resolve(blob);
           } else {
-            canvas.toBlob(resolve);
+            const randomString = generateRandomString(20);
+
+            canvas.toBlob((blob: any) =>
+              resolve(
+                new File([blob], `${randomString}.webp`, { type: "image/webp" })
+              )
+            );
           }
         });
     }
@@ -114,9 +122,7 @@ const textToBitmap = async (text: string, font: string) => {
   ctx.fillText(text, canvasWidth / 4, canvasHeight / 4);
   trimCanvas(canvas);
 
-  return convertToBlob({
-    type: "image/webp",
-  });
+  return convertToBlob();
 };
 
 /*

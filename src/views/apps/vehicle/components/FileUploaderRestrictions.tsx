@@ -63,7 +63,7 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
   // ** Hooks
   const theme = useTheme();
   const { getRootProps, getInputProps } = useDropzone({
-    maxFiles: 15,
+    maxFiles: 12,
     accept: {
       "image/*": [
         ".png",
@@ -80,7 +80,7 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
     },
     onDropRejected: () => {
-      toast.error("You can upload upto 15 files.", {
+      toast.error("You can upload upto 12 files.", {
         duration: 5000,
       });
     },
@@ -197,7 +197,7 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
                 *.heic.
               </Typography>
               <Typography color="textSecondary" sx={{ mb: 2 }}>
-                Upload upto <strong>15 images</strong>.
+                Upload upto <strong>12 images</strong>.
               </Typography>
               <Typography variant="body1" color="textPrimary">
                 Images may not exceed <strong>5MB</strong>.
