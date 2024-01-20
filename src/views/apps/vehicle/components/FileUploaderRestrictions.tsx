@@ -1,11 +1,11 @@
 // ** React Imports
 import { Fragment, useState } from "react";
 
+// ** Next Imports
+import Image from "next/image";
+
 // ** MUI Imports
 import Box from "@mui/material/Box";
-import List from "@mui/material/List";
-import Button from "@mui/material/Button";
-import ListItem from "@mui/material/ListItem";
 import IconButton from "@mui/material/IconButton";
 import { styled, useTheme } from "@mui/material/styles";
 import Typography, { TypographyProps } from "@mui/material/Typography";
@@ -13,21 +13,13 @@ import Typography, { TypographyProps } from "@mui/material/Typography";
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
 
-// ** Custom Components
-import LinearProgressWithLabel from "@components/progress/LinearProgressWithLabel";
-
 // ** Third Party Components
 import toast from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
 import { uploadFileOfFiles } from "@core/utils/file-manager";
 import { useSelector } from "react-redux";
 import { RootState } from "@src/store";
-
-interface FileProp {
-  name: string;
-  type: string;
-  size: number;
-}
+import { InView } from "react-intersection-observer";
 
 // Styled component for the upload image inside the dropzone area
 const Img = styled("img")(({ theme }) => ({
@@ -63,16 +55,15 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
   const { handleImages } = props;
 
   // ** State
-  const [uploading, setUploading] = useState<string>("");
-  const [progress, setProgress] = useState<number>(0);
   const [files, setFiles] = useState<File[]>([]);
+  const [uploadFuncCalled, setUploadFuncCalled] = useState<boolean>(false);
 
   let imagesArray: any[] = [];
 
   // ** Hooks
   const theme = useTheme();
   const { getRootProps, getInputProps } = useDropzone({
-    maxFiles: 10,
+    maxFiles: 15,
     accept: {
       "image/*": [
         ".png",
@@ -89,7 +80,7 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
     },
     onDropRejected: () => {
-      toast.error("You can upload upto 10 files.", {
+      toast.error("You can upload upto 15 files.", {
         duration: 5000,
       });
     },
@@ -98,34 +89,9 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
     (state: RootState) => state.authedVendor
   );
 
-  const renderFilePreview = (file: FileProp) => {
-    if (file.type.startsWith("image")) {
-      return (
-        <img
-          width={40}
-          height={40}
-          alt={file.name}
-          src={URL.createObjectURL(file as any)}
-          style={{ objectFit: "cover" }}
-        />
-      );
-    } else {
-      return <Icon icon="bx:file" />;
-    }
-  };
-
-  const updateUploadProgress = () => {
-    const noOfFiles = files.length;
-    const noOfUploadedImages = imagesArray.length;
-
-    const preProgress = Number(noOfUploadedImages) / Number(noOfFiles);
-    const uploadProgress = preProgress * 100;
-
-    setProgress(Number(uploadProgress));
-  };
-
   const handleUploadFiles = async () => {
-    setUploading("ongoing");
+    setUploadFuncCalled(true);
+
     const type = authedVendor.organization.logo ? "image" : "name";
     const name = authedVendor.organization.nicename
       ? authedVendor.organization.nicename
@@ -138,8 +104,6 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
       const newBlob = await uploadFileOfFiles(file, type, vendorIdentity);
 
       imagesArray.push(newBlob);
-
-      updateUploadProgress();
     }
 
     // Create image url array.
@@ -149,156 +113,107 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
     // Set images without duplication.
     // Push images to image handler as string.
     imageUrls.length > 0 && handleImages([...new Set(imageUrls)].toString());
-
-    setUploading("complete");
   };
 
-  const handleRemoveFile = (file: FileProp) => {
-    const uploadedFiles = files;
-    const filtered = uploadedFiles.filter(
-      (i: FileProp) => i.name !== file.name
+  const ImagesToUpload = () => {
+    return (
+      <InView>
+        {({ inView, ref }) => {
+          inView && !uploadFuncCalled && handleUploadFiles();
+
+          return (
+            <Box
+              ref={ref}
+              sx={{ display: "flex", flexWrap: "wrap", gap: "1rem", mt: 6 }}
+            >
+              {fileList}
+            </Box>
+          );
+        }}
+      </InView>
     );
-    setFiles([...filtered]);
   };
 
-  const fileList = files.map((file: FileProp) => (
-    <ListItem key={file.name}>
-      <div className="file-details">
-        <div className="file-preview">{renderFilePreview(file)}</div>
-        <div>
-          <Typography className="file-name">{file.name}</Typography>
-          <Typography className="file-size" variant="body2">
-            {Math.round(file.size / 100) / 10 > 1000
-              ? `${(Math.round(file.size / 100) / 10000).toFixed(1)} mb`
-              : `${(Math.round(file.size / 100) / 10).toFixed(1)} kb`}
-          </Typography>
-        </div>
-      </div>
-      <IconButton onClick={() => handleRemoveFile(file)}>
-        <Icon icon="bx:x" fontSize={20} />
-      </IconButton>
-    </ListItem>
-  ));
+  const fileList = files.map((file: File, index) => {
+    return (
+      <Box sx={{ position: "relative" }} key={index}>
+        <Image
+          src={URL.createObjectURL(file as any)}
+          alt={file.name}
+          width={150}
+          height={150}
+          style={{
+            objectFit: "cover",
+            objectPosition: "center",
+            borderRadius: ".4rem",
+            opacity: 0.6,
+          }}
+        />
 
-  const handleRemoveAllFiles = () => {
-    setFiles([]);
-    setUploading("");
-  };
+        <IconButton
+          color="success"
+          sx={{
+            position: "absolute",
+            top: "30%",
+            right: "30%",
+            opacity: 1,
+          }}
+        >
+          <Icon fontSize={50} icon="line-md:loading-twotone-loop" />
+        </IconButton>
+      </Box>
+    );
+  });
 
   return (
     <Fragment>
-      <div {...getRootProps({ className: "dropzone" })}>
-        <input {...getInputProps()} />
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: ["column", "column", "row"],
-            alignItems: "center",
-          }}
-        >
-          <Img
-            alt="Upload img"
-            src={`/images/misc/upload-${theme.palette.mode}.png`}
-          />
+      {files.length === 0 && (
+        <div {...getRootProps({ className: "dropzone" })}>
+          <input {...getInputProps()} />
           <Box
             sx={{
               display: "flex",
-              flexDirection: "column",
-              textAlign: ["center", "center", "inherit"],
+              flexDirection: ["column", "column", "row"],
+              alignItems: "center",
             }}
           >
-            <HeadingTypography variant="h5">
-              Drop files here or click to upload.
-            </HeadingTypography>
-            <Typography
-              variant="body1"
-              color="textPrimary"
-              sx={{ mb: 2, fontStyle: "italic", fontWeight: 600 }}
+            <Img
+              alt="Upload img"
+              src={`/images/misc/upload-${theme.palette.mode}.png`}
+            />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                textAlign: ["center", "center", "inherit"],
+              }}
             >
-              (Select all images at once. You can update them later.)
-            </Typography>
-            <Typography color="textSecondary" sx={{ mb: 2 }}>
-              Allowed types: *.jpeg, *.jpg, *.png, *.gif, *.webp, *.avif,
-              *.heic.
-            </Typography>
-            <Typography color="textSecondary" sx={{ mb: 2 }}>
-              Upto <strong>10 files</strong> allowed.
-            </Typography>
-            <Typography color="textSecondary" sx={{ mb: 3 }}>
-              The <strong>first</strong> image is the <b>thumbnail</b> image.
-              You can update this later.
-            </Typography>
-            <Typography variant="body1" color="textPrimary">
-              <strong>PRO TIP:</strong>{" "}
-              <i>
-                Use aspect-ratio of <strong>16:9</strong>, and center the image
-                focal point, for maximum visibility on all devices.
-              </i>
-            </Typography>
+              <HeadingTypography variant="h5">
+                Drop images here or click to upload.
+              </HeadingTypography>
+
+              <Typography color="textSecondary" sx={{ mb: 2 }}>
+                Allowed types: *.jpeg, *.jpg, *.png, *.gif, *.webp, *.avif,
+                *.heic.
+              </Typography>
+              <Typography color="textSecondary" sx={{ mb: 2 }}>
+                Upload upto <strong>15 images</strong>.
+              </Typography>
+              <Typography variant="body1" color="textPrimary">
+                Images may not exceed <strong>5MB</strong>.
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-      </div>
+        </div>
+      )}
 
       {files.length ? (
         <Fragment>
-          <List
-            sx={{
-              mb: 4,
-            }}
-          >
-            {fileList}
-          </List>
-          <div>
-            {uploading === "ongoing" && (
-              <Box
-                sx={{
-                  mb: 4,
-                  width: "100%",
-                }}
-              >
-                <LinearProgressWithLabel value={progress} />
-              </Box>
-            )}
-            {uploading === "complete" && (
-              <Box
-                sx={{
-                  mb: 4,
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  alignItems: "center",
-                }}
-              >
-                <Typography variant="h6" sx={{ color: "green" }}>
-                  Uploading completed successfully!
-                </Typography>
-              </Box>
-            )}
-          </div>
-          <Box
-            className="buttons"
-            sx={{
-              mb: 4,
-              display: "flex",
-              justifyContent: "flex-end",
-              alignItems: "center",
-              gap: 4,
-            }}
-          >
-            <Button
-              color="error"
-              variant="outlined"
-              onClick={handleRemoveAllFiles}
-            >
-              Remove All
-            </Button>
-            <Button
-              variant="contained"
-              color="success"
-              onClick={handleUploadFiles}
-            >
-              Upload Files
-            </Button>
-          </Box>
+          {files.length > 0 && (
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+              <ImagesToUpload />
+            </Box>
+          )}
         </Fragment>
       ) : null}
     </Fragment>
