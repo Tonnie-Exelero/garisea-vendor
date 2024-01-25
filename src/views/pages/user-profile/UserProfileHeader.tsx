@@ -22,6 +22,7 @@ import { ProfileHeaderType } from "src/@fake-db/types";
 import CustomAvatar from "@components/mui/avatar";
 import { getInitials } from "@utils/get-initials";
 import { ThemeColor } from "@core/layouts/types";
+import { isFromVercel } from "@src/configs/vercelFiles";
 
 const ProfilePicture = styled("img")(({ theme }) => ({
   width: 120,
@@ -83,7 +84,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({ user }) => {
           <CustomAvatar
             skin="light"
             variant="rounded"
-            src={image || data.profileImg}
+            src={isFromVercel(image) ? image : `https://ucarecdn.com/${image}/`}
             alt={firstName + " " + lastName}
             sx={{
               width: 120,

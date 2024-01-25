@@ -37,6 +37,7 @@ import { AppDispatch, RootState } from "@src/store";
 import { fetchMoreAdminVendorMessages } from "@src/store/apps/shared/adminVendorMessage";
 import { editAdminVendorMessageSeen } from "@src/store/apps/shared/adminVendorMessage/single";
 import { formatMessageTime } from "@src/configs/formatTime";
+import { isFromVercel } from "@src/configs/vercelFiles";
 
 const PerfectScrollbar = styled(PerfectScrollbarComponent)<
   ScrollBarProps & { ref: Ref<unknown> }
@@ -279,13 +280,17 @@ const ChatLog = (props: ChatLogType) => {
                 }}
                 {...(admin.image && !isSender
                   ? {
-                      src: admin.image,
+                      src: isFromVercel(admin.image)
+                        ? admin.image
+                        : `https://ucarecdn.com/${admin.image}/`,
                       alt: admin.firstName + " " + admin.lastName,
                     }
                   : {})}
                 {...(isSender
                   ? {
-                      src: authedVendor.image,
+                      src: isFromVercel(authedVendor.image)
+                        ? authedVendor.image
+                        : `https://ucarecdn.com/${authedVendor.image}/`,
                       alt: authedVendor.firstName + " " + authedVendor.lastName,
                     }
                   : {})}

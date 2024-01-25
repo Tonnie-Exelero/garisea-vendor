@@ -61,6 +61,7 @@ import ImagesControls from "./dialogs/ImagesDialog";
 import { currency } from "../config";
 import { AbilityContext } from "src/layouts/components/acl/Can";
 import { mainSiteUrl } from "@src/configs/baseUrl";
+import { isFromVercel } from "@src/configs/vercelFiles";
 
 interface ColorsType {
   [key: string]: ThemeColor;
@@ -188,7 +189,11 @@ const VehicleViewLeft: React.FC<VehicleViewLeftProps> = ({ vehicle }) => {
                 {thumbnail ? (
                   <Box sx={{ position: "relative" }}>
                     <CustomAvatar
-                      src={thumbnail}
+                      src={
+                        isFromVercel(thumbnail)
+                          ? thumbnail
+                          : `https://ucarecdn.com/${thumbnail}/`
+                      }
                       variant="rounded"
                       alt={brand.name + " " + model.name}
                       onClick={handleImagesDialogToggle}
