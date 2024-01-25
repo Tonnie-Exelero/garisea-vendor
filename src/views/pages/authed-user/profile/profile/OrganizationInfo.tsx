@@ -47,16 +47,30 @@ import {
   editCoverImage,
 } from "@src/store/apps/vendor/organization/single";
 
+// ** Uploadcare Imports
+import {
+  deleteFile,
+  UploadcareSimpleAuthSchema,
+} from "@uploadcare/rest-client";
+
 // ** Others
 import { AbilityContext } from "src/layouts/components/acl/Can";
 import OrganizationEditDialog from "./dialogs/OrganizationEditDialog";
 import toast from "react-hot-toast";
 import PDFViewer from "@src/views/components/pdf-viewer";
+import { uploadFile } from "@core/utils/uploadcare-file-manager";
+import { removeFile, uploadDocumentFile } from "@core/utils/file-manager";
 import {
-  uploadFile,
-  removeFile,
-  uploadDocumentFile,
-} from "@core/utils/file-manager";
+  UPLOADCARE_PUBLIC_KEY,
+  UPLOADCARE_SECRET_KEY,
+} from "@src/configs/constants";
+import { isFromVercel } from "@src/configs/vercelFiles";
+import { fileInputToBlob } from "@core/utils/file-input-to-blob";
+
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: UPLOADCARE_PUBLIC_KEY || "",
+  secretKey: UPLOADCARE_SECRET_KEY || "",
+});
 
 const ButtonStyled = styled(Button)<
   ButtonProps & { component?: ElementType; htmlFor?: string }
@@ -141,13 +155,22 @@ const OrganizationInfo = ({ vendor }: Props) => {
   const handleInputCoverImageChange = async (file: ChangeEvent) => {
     setUploadingCoverImage(true);
 
-    const newFile = await uploadFile(file);
+    const fileBlob = fileInputToBlob(file);
 
-    newFile && handleUpdateCoverImage(newFile.url);
-    newFile && setOCoverImage(newFile.url);
+    const newFile = fileBlob && (await uploadFile(fileBlob));
+
+    newFile && handleUpdateCoverImage(newFile);
+    newFile && setOCoverImage(newFile);
 
     // Then remove the previous image from server.
-    coverImage && removeFile(coverImage);
+    coverImage && isFromVercel(coverImage)
+      ? await removeFile(coverImage)
+      : await deleteFile(
+          {
+            uuid: coverImage,
+          },
+          { authSchema: uploadcareSimpleAuthSchema }
+        );
 
     setUploadingCoverImage(false);
   };
@@ -172,13 +195,22 @@ const OrganizationInfo = ({ vendor }: Props) => {
   const handleInputLogoChange = async (file: ChangeEvent) => {
     setUploadingLogo(true);
 
-    const newFile = await uploadFile(file);
+    const fileBlob = fileInputToBlob(file);
 
-    newFile && handleUpdateLogo(newFile.url);
-    newFile && setOLogo(newFile.url);
+    const newFile = fileBlob && (await uploadFile(fileBlob));
+
+    newFile && handleUpdateLogo(newFile);
+    newFile && setOLogo(newFile);
 
     // Then remove the previous image from server.
-    logo && removeFile(logo);
+    logo && isFromVercel(logo)
+      ? await removeFile(logo)
+      : await deleteFile(
+          {
+            uuid: logo,
+          },
+          { authSchema: uploadcareSimpleAuthSchema }
+        );
 
     setUploadingLogo(false);
   };
@@ -559,7 +591,11 @@ const OrganizationInfo = ({ vendor }: Props) => {
                         >
                           {oCoverImage && (
                             <CustomAvatar
-                              src={oCoverImage}
+                              src={
+                                isFromVercel(oCoverImage)
+                                  ? oCoverImage
+                                  : `https://ucarecdn.com/${oCoverImage}/`
+                              }
                               variant="rounded"
                               alt={"Cover Image"}
                               sx={{
@@ -632,7 +668,11 @@ const OrganizationInfo = ({ vendor }: Props) => {
                         >
                           {oLogo && (
                             <CustomAvatar
-                              src={oLogo}
+                              src={
+                                isFromVercel(oLogo)
+                                  ? oLogo
+                                  : `https://ucarecdn.com/${oLogo}/`
+                              }
                               variant="rounded"
                               alt={"Logo"}
                               sx={{

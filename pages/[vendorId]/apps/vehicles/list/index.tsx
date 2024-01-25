@@ -55,7 +55,6 @@ import { getInitials } from "src/@core/utils/get-initials";
 
 // ** Actions Imports
 import apolloClient from "@lib/apollo";
-import { fetchVendors } from "@src/store/apps/vendor/vendor";
 import { fetchFilteredVehicles } from "@src/store/apps/vendor/vehicle";
 import { removeVehicle } from "@src/store/apps/vendor/vehicle/single";
 import {
@@ -63,8 +62,11 @@ import {
   GET_VEHICLES_STATS_BY_VENDOR_ID,
 } from "@src/api/vendor/vehicle";
 
-// ** Third Party Components
-import axios from "axios";
+// ** Uploadcare Imports
+import {
+  deleteFile,
+  UploadcareSimpleAuthSchema,
+} from "@uploadcare/rest-client";
 
 // ** Types Imports
 import { RootState, AppDispatch } from "src/store";
@@ -83,9 +85,18 @@ import { idleTimer } from "@src/configs/idleOrReload";
 import { AbilityContext } from "src/layouts/components/acl/Can";
 import { removeFile } from "@core/utils/file-manager";
 import { encryptData } from "@core/utils/encryption";
-import { GET_VENDORS } from "@src/api/vendor/vendor";
+import { isFromVercel } from "@src/configs/vercelFiles";
+import {
+  UPLOADCARE_PUBLIC_KEY,
+  UPLOADCARE_SECRET_KEY,
+} from "@src/configs/constants";
 
 const PAGE_SIZE = 20;
+
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: UPLOADCARE_PUBLIC_KEY || "",
+  secretKey: UPLOADCARE_SECRET_KEY || "",
+});
 
 interface VehicleStatusType {
   [key: string]: ThemeColor;
@@ -593,7 +604,16 @@ const VehiclesList = (props: Partial<Props>) => {
     e.preventDefault();
 
     // Remove images from server
-    images.split(",").forEach(async (image) => await removeFile(image));
+    images.split(",").forEach(async (image) =>
+      isFromVercel(image)
+        ? await removeFile(image)
+        : await deleteFile(
+            {
+              uuid: image,
+            },
+            { authSchema: uploadcareSimpleAuthSchema }
+          )
+    );
 
     const resultAction = await dispatch(removeVehicle({ id }));
 
