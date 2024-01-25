@@ -167,7 +167,11 @@ const UserDropdown = (props: Props) => {
               {authedVendor.image ? (
                 <Avatar
                   alt={authedVendor.firstName}
-                  src={authedVendor.image}
+                  src={
+                    isFromVercel(authedVendor.image)
+                      ? authedVendor.image
+                      : `https://ucarecdn.com/${authedVendor.image}/`
+                  }
                   onClick={handleDropdownOpen}
                   sx={{ width: 40, height: 40 }}
                 />
