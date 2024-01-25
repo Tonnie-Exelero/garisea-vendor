@@ -14,7 +14,10 @@ module.exports = {
   trailingSlash: true,
   reactStrictMode: false,
   images: {
-    domains: ["b4kebskkfsllp01c.public.blob.vercel-storage.com"],
+    domains: [
+      "b4kebskkfsllp01c.public.blob.vercel-storage.com",
+      "ucarecdn.com",
+    ],
   },
   webpack: (config) => {
     config.resolve.alias = {

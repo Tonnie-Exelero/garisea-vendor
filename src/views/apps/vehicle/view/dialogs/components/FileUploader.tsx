@@ -17,17 +17,20 @@ import Icon from "src/@core/components/icon";
 import toast from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
 
+// ** Uploadcare Imports
+import { Queue, uploadFile } from "@uploadcare/upload-client";
+
 // ** API/Redux
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@src/store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@src/store";
 import { editVehicleImages } from "@src/store/apps/vendor/vehicle/single";
 
 // ** Types
 import { VehicleNode } from "src/types/apps/vehicleTypes";
-import { uploadFileOfFiles } from "@core/utils/file-manager";
 
 // ** Others
 import { InView } from "react-intersection-observer";
+import { UPLOADCARE_PUBLIC_KEY } from "@src/configs/constants";
 
 // Styled component for the upload image inside the dropzone area
 const Img = styled("img")(({ theme }) => ({
@@ -51,6 +54,9 @@ const HeadingTypography = styled(Typography)<TypographyProps>(({ theme }) => ({
     marginBottom: theme.spacing(4),
   },
 }));
+
+// Create a queue with a limit of 10 concurrent requests.
+const queue = new Queue(10);
 
 interface FileUploaderProps {
   vehicle: VehicleNode;
@@ -78,7 +84,6 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const { getRootProps, getInputProps } = useDropzone({
-    maxFiles: 10,
     accept: {
       "image/*": [
         ".png",
@@ -95,38 +100,36 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
     },
     onDropRejected: () => {
-      toast.error("You can upload upto 10 files.", {
+      toast.error("There was an error uploading. Try again!", {
         duration: 5000,
       });
     },
   });
-  const { authedVendor } = useSelector(
-    (state: RootState) => state.authedVendor
-  );
 
   const handleUploadFiles = async () => {
     setUploadFuncCalled(true);
 
-    const type = authedVendor.organization.logo ? "image" : "name";
-    const name = authedVendor.organization.nicename
-      ? authedVendor.organization.nicename
-      : authedVendor.organization.name;
-    const vendorIdentity: any = authedVendor.organization.logo
-      ? authedVendor.organization.logo
-      : name;
+    const promises = files.map((file, i) => {
+      return queue
+        .add(() =>
+          uploadFile(file, {
+            publicKey: UPLOADCARE_PUBLIC_KEY || "",
+            contentType: "image/*",
+          })
+        )
+        .then((fileInfo) => {
+          imagesArray.push(fileInfo);
+        });
+    });
 
-    for (const file of files) {
-      const newBlob = await uploadFileOfFiles(file, type, vendorIdentity);
-
-      imagesArray.push(newBlob);
-    }
+    await Promise.all(promises);
 
     // Create image url array.
-    let imageUrls: string[] = imagesArray.map(({ url }) => url);
+    let imageUuids: string[] = imagesArray.map(({ uuid }) => uuid);
 
     // If vImages arrays isn't empty, add new image urls without duplication.
     const newArray =
-      vImages.length === 0 ? imageUrls : [...vImages, ...imageUrls];
+      vImages.length === 0 ? imageUuids : [...vImages, ...imageUuids];
 
     // Set images without duplication.
     setVImages([...new Set(newArray)]);
@@ -231,11 +234,8 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
               </HeadingTypography>
 
               <Typography color="textSecondary" sx={{ mb: 2 }}>
-                Allowed types: *.jpeg, *.jpg, *.png, *.gif, *.webp, *.avif,
-                *.heic.
-              </Typography>
-              <Typography color="textSecondary" sx={{ mb: 2 }}>
-                Upload upto <strong>10 images</strong>.
+                Allowed types: *.jpeg, *.jpg, *.png, *.gif, *.webp, *.svg,
+                *.avif, *.heic.
               </Typography>
               <Typography variant="body1" color="textPrimary">
                 Images may not exceed <strong>5MB</strong>.

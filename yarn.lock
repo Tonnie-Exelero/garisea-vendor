@@ -2114,6 +2114,27 @@
   dependencies:
     "@ucast/core" "^1.4.1"
 
+"@uploadcare/nextjs-loader@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@uploadcare/nextjs-loader/-/nextjs-loader-1.0.0.tgz#e30224480d76f602c03e4d0893a78025ae9f0457"
+  integrity sha512-zLTMW21VgRKenOfQ5uAWVMMjimnsaawXncqOwwedd/ysp3t9tmjVrAg6Mo5K8bk0rtoBTTrh0LKxLIaQj1xBUQ==
+
+"@uploadcare/rest-client@^6.12.1":
+  version "6.12.1"
+  resolved "https://registry.yarnpkg.com/@uploadcare/rest-client/-/rest-client-6.12.1.tgz#62fd65b625962a71f604f6bc23fc0e9d0d7363d2"
+  integrity sha512-XcahG6ZYrwto5SdONu93xBZIgGAKAcxQep65yR1akHx6MsHT6ve6dzNTjH9J6lLHvNHzojm1Od2C+qwUZpeGOg==
+  dependencies:
+    blueimp-md5 "^2.19.0"
+    node-fetch "^2.6.9"
+
+"@uploadcare/upload-client@^6.12.1":
+  version "6.12.1"
+  resolved "https://registry.yarnpkg.com/@uploadcare/upload-client/-/upload-client-6.12.1.tgz#776d086e3101f84d28b16a4ff491e7ce7342acb8"
+  integrity sha512-y1z5ZWEyMEGXBmzJBjEmJtjCCA/By+6iO3lT4KrdqSitnq0k8fX8HXbtOjOWSLf3qvANemXGza4PaaQquk69UQ==
+  dependencies:
+    form-data "^4.0.0"
+    ws "^8.2.3"
+
 "@vercel/blob@^0.10.0":
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/@vercel/blob/-/blob-0.10.0.tgz#468771cc9629b93c1436ca55fb0483159d3d3ce5"
@@ -2556,6 +2577,11 @@ bluebird@~3.4.1:
   version "3.4.7"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.4.7.tgz#f72d760be09b7f76d08ed8fae98b289a8d05fab3"
   integrity sha512-iD3898SR7sWVRHbiQv+sHUtHnMvC1o3nW5rAcqnq3uOn07DSAppZYUkIGslDz6gXC7HfunPe7YVBgoEJASPcHA==
+
+blueimp-md5@^2.19.0:
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/blueimp-md5/-/blueimp-md5-2.19.0.tgz#b53feea5498dcb53dc6ec4b823adb84b729c4af0"
+  integrity sha512-DRQrD6gJyy8FbiE4s+bDoXS9hiW3Vbx5uCdwvcCf3zLHL+Iv7LtGHLpr+GZV8rHG8tK766FGYBwRbu8pELTt+w==
 
 body-parser@1.20.1:
   version "1.20.1"
@@ -5568,7 +5594,7 @@ node-fetch@^2.6.11, node-fetch@^2.6.12:
   dependencies:
     whatwg-url "^5.0.0"
 
-node-fetch@^2.6.7:
+node-fetch@^2.6.7, node-fetch@^2.6.9:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.7.0.tgz#d0f0fa6e3e2dc1d27efcd8ad99d550bda94d187d"
   integrity sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==
@@ -7787,6 +7813,11 @@ ws@^8.11.0:
   version "8.13.0"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.13.0.tgz#9a9fb92f93cf41512a0735c8f4dd09b8a1211cd0"
   integrity sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==
+
+ws@^8.2.3:
+  version "8.16.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.16.0.tgz#d1cd774f36fbc07165066a60e40323eab6446fd4"
+  integrity sha512-HS0c//TP7Ina87TfiPUz1rQzMhHrl/SG2guqRcTOIUYD2q8uhUdNHZYJUaQ8aTGPzCh+c6oawMKW35nFl1dxyQ==
 
 xml-name-validator@^4.0.0:
   version "4.0.0"

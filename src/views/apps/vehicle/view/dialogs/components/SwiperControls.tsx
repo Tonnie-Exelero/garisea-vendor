@@ -28,12 +28,19 @@ import clsx from "clsx";
 import { useKeenSlider } from "keen-slider/react";
 
 // ** API/Redux
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@src/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@src/store";
 import {
   editVehicleImages,
   editVehicleThumbnail,
 } from "@src/store/apps/vendor/vehicle/single";
+
+// ** Uploadcare Imports
+import {
+  deleteFile,
+  UploadcareSimpleAuthSchema,
+} from "@uploadcare/rest-client";
+import { uploadcareLoader } from "@uploadcare/nextjs-loader";
 
 // ** Types
 import { VehicleNode } from "src/types/apps/vehicleTypes";
@@ -42,6 +49,16 @@ import { VehicleNode } from "src/types/apps/vehicleTypes";
 import toast from "react-hot-toast";
 import FileUploader from "./FileUploader";
 import { removeFile } from "@core/utils/file-manager";
+import {
+  UPLOADCARE_PUBLIC_KEY,
+  UPLOADCARE_SECRET_KEY,
+} from "@src/configs/constants";
+import { isFromVercel } from "@src/configs/vercelFiles";
+
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: UPLOADCARE_PUBLIC_KEY || "",
+  secretKey: UPLOADCARE_SECRET_KEY || "",
+});
 
 const SwiperControls: React.FC<any> = ({
   direction,
@@ -75,6 +92,9 @@ const SwiperControls: React.FC<any> = ({
       setLoaded(true);
     },
   });
+  const { authedVendor } = useSelector(
+    (state: RootState) => state.authedVendor
+  );
 
   const ImagesDropZone = () => {
     return (
@@ -106,13 +126,37 @@ const SwiperControls: React.FC<any> = ({
 
   const handleAddImagesSection = () => setOpenAddSection(!openAddSection);
 
-  const handleDeleteImage = async (url: string) => {
+  // Authed Vendor logo
+  const vercelVendorLogo =
+    authedVendor.organization.logo &&
+    isFromVercel(authedVendor.organization.logo);
+  const uploadcareVendorLogo =
+    authedVendor.organization.logo && !vercelVendorLogo
+      ? `-/overlay/${authedVendor.organization.logo}/20px20p/1p,99p/20p/`
+      : "";
+
+  const handleDeleteImage = async (imageUrl: string) => {
     setDeleting("ongoing");
 
-    const newResp = await removeFile(url);
+    const newResp = isFromVercel(imageUrl)
+      ? await removeFile(imageUrl)
+      : await deleteFile(
+          {
+            uuid: imageUrl,
+          },
+          { authSchema: uploadcareSimpleAuthSchema }
+        );
 
-    if (vImages.some((image) => image === newResp.url)) {
-      const updatedList = vImages.filter((image) => image !== newResp.url);
+    if (
+      vImages.some(
+        (image) =>
+          image === (isFromVercel(imageUrl) ? newResp.url : newResp?.uuid)
+      )
+    ) {
+      const updatedList = vImages.filter(
+        (image) =>
+          image !== (isFromVercel(imageUrl) ? newResp.url : newResp?.uuid)
+      );
 
       setVImages(updatedList);
       handleUpdateVehicleImageDelete(updatedList);
@@ -189,7 +233,11 @@ const SwiperControls: React.FC<any> = ({
                   </Tooltip>
 
                   <Image
-                    src={image}
+                    src={
+                      isFromVercel(image)
+                        ? image
+                        : `https://ucarecdn.com/${image}/-/overlay/f9aac757-7cc6-49b9-ac94-09aeb0cfa345/40px40p/center/30p/${uploadcareVendorLogo}`
+                    }
                     alt={`Image ${index + 1}`}
                     width={800}
                     height={600}
@@ -197,6 +245,7 @@ const SwiperControls: React.FC<any> = ({
                       objectFit: "contain",
                       objectPosition: "center",
                     }}
+                    loader={isFromVercel(image) ? undefined : uploadcareLoader}
                   />
 
                   <Tooltip title="Set image as thumbnail" placement="top">

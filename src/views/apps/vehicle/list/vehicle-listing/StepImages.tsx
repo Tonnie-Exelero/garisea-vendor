@@ -17,10 +17,26 @@ import {
 // ** Icon Imports
 import Icon from "@components/icon";
 
+// ** Uploadcare Imports
+import {
+  deleteFile,
+  UploadcareSimpleAuthSchema,
+} from "@uploadcare/rest-client";
+
 // ** Custom Components Imports
 import DropzoneWrapper from "src/@core/styles/libs/react-dropzone";
 import FileUploaderRestrictions from "../../components/FileUploaderRestrictions";
-import { removeFile } from "@core/utils/file-manager";
+
+// ** Others
+import {
+  UPLOADCARE_PUBLIC_KEY,
+  UPLOADCARE_SECRET_KEY,
+} from "@src/configs/constants";
+
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: UPLOADCARE_PUBLIC_KEY || "",
+  secretKey: UPLOADCARE_SECRET_KEY || "",
+});
 
 interface StepImagesProps {
   handleImagesData: (data: any) => void;
@@ -53,6 +69,7 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
     setImageUrls(images);
     setThumbnail(images.split(",")[0]);
     saveDraft("imageUrls", images);
+    saveDraft("thumbnail", images.split(",")[0]);
   };
 
   const handleImageClick = (url: string) => () => {
@@ -60,14 +77,19 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
     saveDraft("thumbnail", url);
   };
 
-  const handleDeleteImage = async (url: string, index: any) => {
+  const handleDeleteImage = async (uuid: string, index: any) => {
     setDeleting("ongoing");
     setDeletingIndex(index);
 
-    const newResp = await removeFile(url);
+    const result = await deleteFile(
+      {
+        uuid,
+      },
+      { authSchema: uploadcareSimpleAuthSchema }
+    );
 
-    if (images.some((image) => image === newResp.url)) {
-      const updatedList = images.filter((image) => image !== newResp.url);
+    if (images.some((image) => image === result?.uuid)) {
+      const updatedList = images.filter((image) => image !== result?.uuid);
 
       setImageUrls(updatedList.toString());
       window.localStorage.setItem("imageUrls", updatedList.toString());
@@ -96,7 +118,7 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
             {images.map((image, index) => (
               <Box sx={{ position: "relative" }} key={index}>
                 <Image
-                  src={image}
+                  src={`https://ucarecdn.com/${image}/`}
                   alt={image}
                   width={150}
                   height={150}
@@ -137,7 +159,7 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
                     }}
                   >
                     <Icon
-                      fontSize={30}
+                      fontSize={35}
                       icon={
                         image === thumbnail
                           ? "bx:checkbox-checked"

@@ -40,6 +40,12 @@ import Icon from "src/@core/components/icon";
 // ** Custom Components
 import CustomAvatar from "@components/mui/avatar";
 
+// ** Uploadcare Imports
+import {
+  deleteFile,
+  UploadcareSimpleAuthSchema,
+} from "@uploadcare/rest-client";
+
 // ** Others
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -48,8 +54,20 @@ import { editVendor, editImage, removeVendor } from "@src/store/apps/auth";
 import { fetchVehiclesByVendor } from "@src/store/apps/vendor/vehicle";
 import { ThemeColor } from "@core/layouts/types";
 import { getInitials } from "@utils/get-initials";
-import { removeFile, uploadFile } from "@core/utils/file-manager";
+import { removeFile } from "@core/utils/file-manager";
+import { uploadFile } from "@core/utils/uploadcare-file-manager";
 import authConfig from "@src/configs/auth";
+import {
+  UPLOADCARE_PUBLIC_KEY,
+  UPLOADCARE_SECRET_KEY,
+} from "@src/configs/constants";
+import { isFromVercel } from "@src/configs/vercelFiles";
+import { fileInputToBlob } from "@core/utils/file-input-to-blob";
+
+const uploadcareSimpleAuthSchema = new UploadcareSimpleAuthSchema({
+  publicKey: UPLOADCARE_PUBLIC_KEY || "",
+  secretKey: UPLOADCARE_SECRET_KEY || "",
+});
 
 const ButtonStyled = styled(Button)<
   ButtonProps & { component?: ElementType; htmlFor?: string }
@@ -149,12 +167,21 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
   const handleInputImageChange = async (file: ChangeEvent) => {
     setUploadingImage(true);
 
-    const newFile = await uploadFile(file);
+    const fileBlob = fileInputToBlob(file);
 
-    newFile && handleUpdateUserImage(newFile.url);
+    const newFile = fileBlob && (await uploadFile(fileBlob));
+
+    newFile && handleUpdateUserImage(newFile);
 
     // Then remove the previous image from server.
-    image && removeFile(image);
+    image && isFromVercel(image)
+      ? await removeFile(image)
+      : await deleteFile(
+          {
+            uuid: image,
+          },
+          { authSchema: uploadcareSimpleAuthSchema }
+        );
 
     setUploadingImage(false);
   };
@@ -222,8 +249,15 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
 
     if (removeVendor.fulfilled.match(resultAction)) {
       // Remove files from server
-      filesToDelete.forEach((file) => {
-        file && removeFile(file);
+      filesToDelete.forEach(async (file) => {
+        file && isFromVercel(file)
+          ? await removeFile(file)
+          : await deleteFile(
+              {
+                uuid: file,
+              },
+              { authSchema: uploadcareSimpleAuthSchema }
+            );
       });
 
       toast.success(`Account deleted successfully!`);
@@ -242,7 +276,11 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
             <Box sx={{ display: "flex", alignItems: "center" }}>
               {image ? (
                 <CustomAvatar
-                  src={image}
+                  src={
+                    isFromVercel(image)
+                      ? image
+                      : `https://ucarecdn.com/${image}/`
+                  }
                   variant="rounded"
                   alt={firstName + " " + lastName}
                   sx={{
@@ -306,7 +344,7 @@ const TabAccount: React.FC<TabAccountProps> = ({ user }) => {
                   )}
                 </Box>
                 <Typography sx={{ mt: 6, color: "text.disabled" }}>
-                  Allowed PNG or JPEG. Max size of 2MB.
+                  Max size of 2MB.
                 </Typography>
               </div>
             </Box>
