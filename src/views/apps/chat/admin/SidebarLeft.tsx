@@ -454,7 +454,11 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
             }
           >
             <MuiAvatar
-              src={authedVendor.image}
+              src={
+                isFromVercel(authedVendor.image)
+                  ? authedVendor.image
+                  : `https://ucarecdn.com/${authedVendor.image}/`
+              }
               alt={authedVendor.firstName + " " + authedVendor.lastName}
               sx={{
                 width: "2.375rem",
