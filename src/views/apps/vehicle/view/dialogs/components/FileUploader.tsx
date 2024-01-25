@@ -19,6 +19,7 @@ import { useDropzone } from "react-dropzone";
 
 // ** Uploadcare Imports
 import { Queue, uploadFile } from "@uploadcare/upload-client";
+import { uploadcareLoader } from "@uploadcare/nextjs-loader";
 
 // ** API/Redux
 import { useDispatch } from "react-redux";
@@ -189,6 +190,7 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
             borderRadius: ".4rem",
             opacity: 0.6,
           }}
+          loader={uploadcareLoader}
         />
 
         <IconButton

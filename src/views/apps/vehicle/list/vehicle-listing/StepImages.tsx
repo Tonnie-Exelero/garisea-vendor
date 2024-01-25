@@ -22,6 +22,7 @@ import {
   deleteFile,
   UploadcareSimpleAuthSchema,
 } from "@uploadcare/rest-client";
+import { uploadcareLoader } from "@uploadcare/nextjs-loader";
 
 // ** Custom Components Imports
 import DropzoneWrapper from "src/@core/styles/libs/react-dropzone";
@@ -127,6 +128,7 @@ const StepImages: React.FC<StepImagesProps> = (props) => {
                     objectPosition: "center",
                     borderRadius: ".4rem",
                   }}
+                  loader={uploadcareLoader}
                 />
 
                 <Tooltip placement="top" title="Remove Image">

@@ -15,6 +15,7 @@ import Icon from "src/@core/components/icon";
 
 // ** Uploadcare Imports
 import { Queue, uploadFile } from "@uploadcare/upload-client";
+import { uploadcareLoader } from "@uploadcare/nextjs-loader";
 
 // ** Third Party Components
 import toast from "react-hot-toast";
@@ -151,6 +152,7 @@ const FileUploaderRestrictions: React.FC<FileUploaderRestrictionsProps> = (
             borderRadius: ".4rem",
             opacity: 0.6,
           }}
+          loader={uploadcareLoader}
         />
 
         <IconButton
