@@ -29,6 +29,7 @@ import { RootState } from "@src/store";
 import apolloClient from "@src/lib/apollo";
 import { GET_MESSAGES } from "@src/api/shared/adminVendorMessage";
 import { encryptData } from "@core/utils/encryption";
+import { isFromVercel } from "@src/configs/vercelFiles";
 
 // ** Styled Components
 const ChatWrapperStartChat = styled(Box)<BoxProps>(({ theme }) => ({
@@ -177,7 +178,11 @@ const ChatContent = (props: ChatContentType) => {
                 >
                   {currAdmin.image ? (
                     <MuiAvatar
-                      src={currAdmin.image}
+                      src={
+                        isFromVercel(currAdmin.image)
+                          ? currAdmin.image
+                          : `https://ucarecdn.com/${currAdmin.image}/`
+                      }
                       alt={currAdmin.firstName + " " + currAdmin.lastName}
                       sx={{ width: "2.375rem", height: "2.375rem" }}
                     />

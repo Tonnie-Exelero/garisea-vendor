@@ -25,6 +25,9 @@ import { UserProfileRightType } from "src/types/apps/chatTypes";
 import Sidebar from "src/@core/components/sidebar";
 import CustomAvatar from "src/@core/components/mui/avatar";
 
+// ** Others
+import { isFromVercel } from "@src/configs/vercelFiles";
+
 const UserProfileRight = (props: UserProfileRightType) => {
   const {
     currCustomer,
@@ -122,7 +125,11 @@ const UserProfileRight = (props: UserProfileRightType) => {
                   {currCustomer.image ? (
                     <MuiAvatar
                       sx={{ width: "5rem", height: "5rem" }}
-                      src={currCustomer.image}
+                      src={
+                        isFromVercel(currCustomer.image)
+                          ? currCustomer.image
+                          : `https://ucarecdn.com/${currCustomer.image}/`
+                      }
                       alt={currCustomer.firstName + " " + currCustomer.lastName}
                     />
                   ) : (

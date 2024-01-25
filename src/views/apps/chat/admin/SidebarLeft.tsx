@@ -34,7 +34,10 @@ import apolloClient from "@src/lib/apollo";
 import { fetchAdminVendorMessages } from "@src/store/apps/shared/adminVendorMessage";
 import { GET_MESSAGES } from "@src/api/shared/adminVendorMessage";
 import { fetchActiveAdminById } from "@src/store/apps/shared/adminVendorContact/single/activeAdmin";
+
+// ** Others
 import { encryptData } from "@core/utils/encryption";
+import { isFromVercel } from "@src/configs/vercelFiles";
 
 const ScrollWrapper = ({
   children,
@@ -236,7 +239,11 @@ const SidebarLeft = (props: ChatSidebarLeftType) => {
                       >
                         {user.node.user.image ? (
                           <MuiAvatar
-                            src={user.node.user.image}
+                            src={
+                              isFromVercel(user.node.user.image)
+                                ? user.node.user.image
+                                : `https://ucarecdn.com/${user.node.user.image}/`
+                            }
                             alt={
                               user.node.user.firstName +
                               " " +

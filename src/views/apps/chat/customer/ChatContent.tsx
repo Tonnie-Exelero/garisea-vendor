@@ -29,6 +29,7 @@ import { RootState } from "@src/store";
 import apolloClient from "@src/lib/apollo";
 import { GET_MESSAGES } from "@src/api/shared/vendorCustomerMessage";
 import { encryptData } from "@core/utils/encryption";
+import { isFromVercel } from "@src/configs/vercelFiles";
 
 // ** Styled Components
 const ChatWrapperStartChat = styled(Box)<BoxProps>(({ theme }) => ({
@@ -180,7 +181,11 @@ const ChatContent = (props: ChatContentType) => {
                 >
                   {currCustomer.image ? (
                     <MuiAvatar
-                      src={currCustomer.image}
+                      src={
+                        isFromVercel(currCustomer.image)
+                          ? currCustomer.image
+                          : `https://ucarecdn.com/${currCustomer.image}/`
+                      }
                       alt={currCustomer.firstName + " " + currCustomer.lastName}
                       sx={{ width: "2.375rem", height: "2.375rem" }}
                     />

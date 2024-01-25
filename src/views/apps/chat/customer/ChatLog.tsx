@@ -36,6 +36,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@src/store";
 import { fetchMoreAdminVendorMessages } from "@src/store/apps/shared/adminVendorMessage";
 import { editVendorCustomerMessageSeen } from "@src/store/apps/shared/vendorCustomerMessage/single";
+import { isFromVercel } from "@src/configs/vercelFiles";
 
 const PerfectScrollbar = styled(PerfectScrollbarComponent)<
   ScrollBarProps & { ref: Ref<unknown> }
@@ -278,13 +279,17 @@ const ChatLog = (props: ChatLogType) => {
                 }}
                 {...(customer.image && !isSender
                   ? {
-                      src: customer.image,
+                      src: isFromVercel(customer.image)
+                        ? customer.image
+                        : `https://ucarecdn.com/${customer.image}/`,
                       alt: customer.firstName + " " + customer.lastName,
                     }
                   : {})}
                 {...(isSender
                   ? {
-                      src: authedVendor.image,
+                      src: isFromVercel(authedVendor.image)
+                        ? authedVendor.image
+                        : `https://ucarecdn.com/${authedVendor.image}/`,
                       alt: authedVendor.firstName + " " + authedVendor.lastName,
                     }
                   : {})}

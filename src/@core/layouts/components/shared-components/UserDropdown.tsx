@@ -30,6 +30,7 @@ import CustomAvatar from "@components/mui/avatar";
 import { useSelector } from "react-redux";
 import { RootState } from "@src/store";
 import { getInitials } from "@utils/get-initials";
+import { isFromVercel } from "@src/configs/vercelFiles";
 
 interface Props {
   settings: Settings;
@@ -111,7 +112,11 @@ const UserDropdown = (props: Props) => {
         {authedVendor.image ? (
           <Avatar
             alt={authedVendor.firstName}
-            src={authedVendor.image}
+            src={
+              isFromVercel(authedVendor.image)
+                ? authedVendor.image
+                : `https://ucarecdn.com/${authedVendor.image}/`
+            }
             onClick={handleDropdownOpen}
             sx={{ width: 40, height: 40 }}
           />

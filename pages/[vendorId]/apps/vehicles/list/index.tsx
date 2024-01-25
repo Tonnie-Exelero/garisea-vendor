@@ -162,7 +162,11 @@ const renderClient = (row: VehicleRowType) => {
   if (row.node.thumbnail) {
     return (
       <CustomAvatar
-        src={row.node.thumbnail}
+        src={
+          isFromVercel(row.node.thumbnail)
+            ? row.node.thumbnail
+            : `https://ucarecdn.com/${row.node.thumbnail}/`
+        }
         sx={{ mr: 3, width: 32, height: 32 }}
       />
     );
